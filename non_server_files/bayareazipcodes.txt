@@ -1,44 +1,3 @@
--- Still working on actual column instructions in table creation
-
-CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
-    user_name VARCHAR(50) NOT NULL,
-    password VARCHAR(30) NOT NULL,
-    zipcode VARCHAR(12) REFERENCES zipcodes(valid_zipcode),
-    last_active date,
-    email VARCHAR(50) NOT NULL,
-    hourly_rate INTEGER  //// OR numeric(8,2) ??????????
-    link_to_website VARCHAR(50)
-);
-
-CREATE TABLE posts (
-    post_id SERIAL PRIMARY KEY,
-    user_id VARCHAR(12) REFERENCES users(user_id) NOT NULL,
-    description VARCHAR(1250) NOT NULL
-    zipcode VARCHAR(12) REFERENCES zipcodes(valid_zipcode)
-);
-
-CREATE TABLE tags (
-    tag_id SERIAL PRIMARY KEY,
-    tag_name VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE posts_tags (
-    tag_id VARCHAR(12) REFERENCES tags(tag_id) NOT NULL,
-    post_id VARCHAR(12) REFERENCES posts(post_id) NOT NULL
-);
-
-CREATE TABLE users_tags (
-    tag_id VARCHAR(12) REFERENCES tags(tag_id) NOT NULL,
-    user_id VARCHAR(12) REFERENCES users(user_id) NOT NULL
-);
-
-CREATE TABLE zipcodes (
-    valid_zipcode INTEGER NOT NULL
-);
-
-
-INSERT INTO zipcodes(valid_zipcode) VALUES
 (94102),
 (94103),
 (94104),
@@ -517,4 +476,5 @@ INSERT INTO zipcodes(valid_zipcode) VALUES
 (95024),
 (95023),
 (93930),
-(95045);
+(95045),
+(

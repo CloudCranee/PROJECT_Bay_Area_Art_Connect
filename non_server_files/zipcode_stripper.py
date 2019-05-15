@@ -11,6 +11,8 @@ print(type(words))
 
 shorter_list = []
 
+final_list = []
+
 print(words)
 
 for word in words:
@@ -21,4 +23,16 @@ for word in words:
     if to_add:
         shorter_list.append(word[:5])
 
-print(shorter_list)
+for code in shorter_list:
+    if code.isdigit():
+        final_list.append(code)
+
+string_output = "("
+
+for zip_code in final_list:
+    string_output = string_output + zip_code + "),\n("
+
+
+bayzips=open("bayareazipcodes.txt",'w')
+bayzips.write(string_output)
+bayzips.close()
