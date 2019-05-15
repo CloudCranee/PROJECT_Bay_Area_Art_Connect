@@ -1,7 +1,10 @@
-# python zipcode stripper
+# python zipcode stripper.
 
+from flask_sqlalchemy import SQLAlchemy
 
-file = open("raw_zipcodes.txt")
+from model import Zipcode 
+
+file = open("non_server_files/raw_zipcodes.txt")
 text = file.read()
 file.close()
 
@@ -27,12 +30,21 @@ for code in shorter_list:
     if code.isdigit():
         final_list.append(code)
 
-string_output = "("
+# string_output = "("
+
+# This code will seed all zipcodes into the bayart database.
 
 for zip_code in final_list:
-    string_output = string_output + zip_code + "),\n("
+    new_zcode = Zipcode(valid_zipcode=zip_code)
+    db.session.add(new_zcode)
 
+    # instantiate Zipcode object
+    # add to db
+    # string_output = string_output + zip_code + "),\n("
 
-bayzips=open("bayareazipcodes.txt",'w')
-bayzips.write(string_output)
-bayzips.close()
+db.session.commit()
+# commit to db
+
+# bayzips=open("bayareazipcodes.txt",'w')
+# bayzips.write(string_output)
+# bayzips.close()
