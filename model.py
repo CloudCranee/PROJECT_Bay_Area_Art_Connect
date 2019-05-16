@@ -45,6 +45,7 @@ class Post(db.Model):
     post_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
     description = db.Column(db.String(1250))
+    post_date = db.Column(db.DateTime)
     zipcode = db.Column(db.Integer, db.ForeignKey("zipcodes.valid_zipcode"),
                         nullable = False)
 
@@ -114,15 +115,16 @@ def connect_to_db(app):
     db.init_app(app)
 
 
-def seed_user():
+def seed_users():
     for i in range(1, 51):
         fname = fake.name()
         fpassword = randint(1, 9)
         fpassword += i
         fhourly_rate = randint(16, 125)
         femail = (fname[:3] + fname[-2:] + '@gmail.com')
+        flast_active = fake.date_between(start_date="-1y", end_date="today")
         fuser = User(user_name=fname, password=fpassword,
-                hourly_rate=fhourly_rate, email=femail)
+                hourly_rate=fhourly_rate, email=femail, last_active=flast_active)
         db.session.add(fuser) 
     print("Commiting all new users.")
     db.session.commit()
@@ -132,11 +134,12 @@ def seed_user():
 def seed_posts():
     for i in range(1, 35):
         fuser_id = randint(1,50)
-        fdescription = fake.sentence() + fake.sentence() + fake.sentence()
+        fpost_date = fake.date_between(start_date="-3y", end_date="today")
+        fdescription = fake.sentence() + fake.sentence()
         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
         fzipcode = fzipcodes[i]
         fpost = Post(user_id=fuser_id, description=fdescription,
-            zipcode=fzipcode)
+            zipcode=fzipcode, post_date=fpost_date)
         db.session.add(fpost)
     print("Commiting all new posts.")
     db.session.commit()
