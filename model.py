@@ -44,8 +44,9 @@ class Post(db.Model):
 
     post_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
-    description = db.Column(db.String(30))
-    zipcode = db.Column(db.Integer, db.ForeignKey("zipcodes.valid_zipcode"))
+    description = db.Column(db.String(1250))
+    zipcode = db.Column(db.Integer, db.ForeignKey("zipcodes.valid_zipcode"),
+                        nullable = False)
 
     # tags = db.relationship("Tag", secondary="posts_tags", backref="posts")
 
@@ -131,11 +132,12 @@ def seed_user():
 def seed_posts():
     for i in range(1, 35):
         fuser_id = randint(1,50)
-        fdescription = fake.sentence()
-        all_zips = db.session.query().all()
-        fzipcode = all_zips[i]
+        fdescription = fake.sentence() + fake.sentence() + fake.sentence()
+        fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
+        fzipcode = fzipcodes[i]
         fpost = Post(user_id=fuser_id, description=fdescription,
-            zipcode=fzipcode) 
+            zipcode=fzipcode)
+        db.session.add(fpost)
     print("Commiting all new posts.")
     db.session.commit()
 
