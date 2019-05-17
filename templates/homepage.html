@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+
+This is the homepage,
+
+
+
+
+        {% if "user_id" in session %}
+         <!--  <li><a href="/users/{{ session['user_id'] }}">Profile</a></li>
+          <li><a href="/logout">Logout</a></li>
+         -->
+         <p>A user is in session</p>
+         {% else %}
+         <p>No user in session</p>
+         <!--  <li><a href="/register">Register</a></li>
+          <li><a href="/login">Login</a></li> -->
+        {% endif %}
+
+
+{% endblock %}

@@ -20,9 +20,9 @@ class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_name = db.Column(db.String(50))
+    user_name = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(30))
-    email = db.Column(db.String(50))
+    email = db.Column(db.String(50), unique=True)
     last_active = db.Column(db.DateTime, nullable = True)
     hourly_rate = db.Column(db.Integer, nullable = True)
     link_to_website = db.Column(db.String(50), nullable = True)
@@ -189,6 +189,14 @@ def seed_zipcodes():
         db.session.add(new_zcode)
 
     db.session.commit()
+
+def seed_all():
+    db.create_all()
+    seed_zipcodes()
+    seed_tags()
+    seed_users()
+    seed_posts()
+
 
 
 if __name__ == "__main__":
