@@ -1,10 +1,9 @@
--- Still working on actual column instructions in table creation
+-- BayArt - Bay Area Art Connection Project: Database Creation
 
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     user_name VARCHAR(50) NOT NULL,
     password VARCHAR(30) NOT NULL,
-    zipcode VARCHAR(12) REFERENCES zipcodes(valid_zipcode),
     last_active date,
     email VARCHAR(50) NOT NULL,
     hourly_rate INTEGER  //// OR numeric(8,2) ??????????

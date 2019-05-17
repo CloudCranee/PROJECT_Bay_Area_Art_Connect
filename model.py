@@ -1,6 +1,7 @@
 """BayArt - Bay Area Art Connection Project: db.Model classes"""
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin
 
 db = SQLAlchemy()
 
@@ -13,23 +14,24 @@ from faker import Faker
 fake = Faker()
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     """User class"""
 
     __tablename__ = "users"
 
-    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_name = db.Column(db.String(50))
     password = db.Column(db.String(30))
     email = db.Column(db.String(50))
     last_active = db.Column(db.DateTime, nullable = True)
     hourly_rate = db.Column(db.Integer, nullable = True)
     link_to_website = db.Column(db.String(50), nullable = True)
+    bio = db.Column(db.String(500), nullable = True)
 
     def __repr__(self):
         """Provides the representaion of a User instance when printed"""
 
-        return f"<User user_id={self.user_id} user_name={self.user_name}>"
+        return f"<User id={self.id} user_name={self.user_name}>"
 
     posts = db.relationship("Post",
                            backref=db.backref("users"))
@@ -43,7 +45,7 @@ class Post(db.Model):
     __tablename__ = "posts"
 
     post_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     description = db.Column(db.String(1250))
     post_date = db.Column(db.DateTime)
     zipcode = db.Column(db.Integer, db.ForeignKey("zipcodes.valid_zipcode"),
@@ -99,7 +101,7 @@ users_tags = db.Table(
     "users_tags",
     db.metadata,
     db.Column("tag_id", db.Integer, db.ForeignKey("tags.tag_id")),
-    db.Column("user_id", db.Integer, db.ForeignKey("users.user_id"))
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id"))
 )
 
 #####################################################################
@@ -116,6 +118,7 @@ def connect_to_db(app):
 
 
 def seed_users():
+    """Creates a series of fake posts. Must seed BEFORE posts."""
     for i in range(1, 51):
         fname = fake.name()
         fpassword = randint(1, 9)
@@ -132,10 +135,11 @@ def seed_users():
 
 
 def seed_posts():
+    """Creates a series of fake posts. Must seed AFTER zipcodes and users."""
     for i in range(1, 35):
         fuser_id = randint(1,50)
         fpost_date = fake.date_between(start_date="-3y", end_date="today")
-        fdescription = fake.sentence() + fake.sentence()
+        fdescription = fake.sentence() + " " + fake.sentence()
         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
         fzipcode = fzipcodes[i]
         fpost = Post(user_id=fuser_id, description=fdescription,
@@ -145,7 +149,21 @@ def seed_posts():
     db.session.commit()
 
 
+def seed_tags():
+    """Seeds tags as listed below:"""
+    tag_list = ['Photography', 'Cinematography', 'Video Editing', 'Music',
+                'Audio Recording', 'Dance', 'Acting', 'Graphic Design']
+
+    for category in tag_list:
+        tag_to_add = Tag(tag_name=category)
+        db.session.add(tag_to_add)
+
+    db.session.commit()
+
+
 def seed_zipcodes():
+    """Strips zipcodes from raw html txt file and adds to database.
+    Must seed BEFORE posts."""
     file = open("non_server_files/raw_zipcodes.txt")
     text = file.read()
     file.close()
