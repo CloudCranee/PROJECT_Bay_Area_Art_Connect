@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_name = db.Column(db.String(50), unique=True)
+    is_artist = db.Column(db.Boolean, unique=False, default=False)
     password = db.Column(db.String(30))
     email = db.Column(db.String(50), unique=True)
     last_active = db.Column(db.DateTime, nullable = True)
@@ -46,6 +47,7 @@ class Post(db.Model):
 
     post_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    post_title = db.Column(db.String(50))
     description = db.Column(db.String(1250))
     post_date = db.Column(db.DateTime)
     zipcode = db.Column(db.Integer, db.ForeignKey("zipcodes.valid_zipcode"),
@@ -56,7 +58,7 @@ class Post(db.Model):
     def __repr__(self):
         """Provides the representaion of a Post instance when printed"""
 
-        return f"<Post post_id={self.post_id} user_id={self.user_id}>"
+        return f"<Post post_id={self.post_id} post_title={self.post_title} user_id={self.user_id}>"
 
     tags = db.relationship("Tag", secondary="posts_tags", backref="posts")
 
@@ -124,9 +126,14 @@ def seed_users():
         fpassword = randint(1, 9)
         fpassword += i
         fhourly_rate = randint(16, 125)
-        femail = (fname[:3] + fname[-2:] + '@gmail.com')
+        fartistnum = randint(0, 1)
+        if fartistnum == 0:
+            fartist = False
+        else:
+            fartist = True
+        femail = (fname[:3] + fname[-2:] + str(i) + '@gmail.com')
         flast_active = fake.date_between(start_date="-1y", end_date="today")
-        fuser = User(user_name=fname, password=fpassword,
+        fuser = User(user_name=fname, is_artist=fartist, password=fpassword,
                 hourly_rate=fhourly_rate, email=femail, last_active=flast_active)
         db.session.add(fuser) 
     print("Commiting all new users.")
@@ -139,11 +146,13 @@ def seed_posts():
     for i in range(1, 35):
         fuser_id = randint(1,50)
         fpost_date = fake.date_between(start_date="-3y", end_date="today")
+        fpone = fake.name()
+        fpost_title = fpone[:4] + '. This is the title of this post!'
         fdescription = fake.sentence() + " " + fake.sentence()
         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
         fzipcode = fzipcodes[i]
         fpost = Post(user_id=fuser_id, description=fdescription,
-            zipcode=fzipcode, post_date=fpost_date)
+            zipcode=fzipcode, post_title=fpost_title, post_date=fpost_date)
         db.session.add(fpost)
     print("Commiting all new posts.")
     db.session.commit()

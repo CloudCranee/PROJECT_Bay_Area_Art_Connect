@@ -17,16 +17,34 @@ app.secret_key = "thefriendswemadealongtheway"
 
 app.jinja_env.undefined = StrictUndefined
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
     ###WHAT DO HERE ???
 
-@app.route('/homepage')
+@app.route('/')
 def index():
     """Homepage."""
 
     return render_template("homepage.html")
+
+
+@app.route('/artists')
+def show_artists():
+    """Renders a page with all artists info."""
+
+    # artists = User.   ################################### HERE
+    pass
+    # return render_template("artists.html")
+
+
+@app.route('/newpost')
+def new_post():
+    """Renders a page with all artists info."""
+
+    return render_template("new_post.html")
+    # return render_template("artists.html")
 
 
 @app.route('/logout')
@@ -38,7 +56,7 @@ def logout():
     logout_user()
     flash("You have successfully logged out.")
 
-    return redirect('/homepage')
+    return redirect('/')
 
 
 @app.route('/login_form')
@@ -47,6 +65,19 @@ def present_login_form():
     homepage"""
 
     return render_template("login_form.html")
+
+
+
+@app.route('/posts')
+@login_required
+def display_posts():
+    """Displays a list of all posts
+    (Pinterest style ((AJAX? REACT??)) infintie scroll.
+    Sort by most recent post at the top."""
+
+    posts = Post.query.all()
+
+    return render_template("posts.html", posts=posts)
 
 
 
@@ -103,42 +134,29 @@ def register_form():
     return render_template("register_form.html")
 
 
-# @app.route('/register', methods=['POST'])
-# def register_process():
-#     """Process registration."""
 
-#     # Get form variables
+@app.route('/register', methods=['POST'])
+def register_process():
+    """Process registration."""
 
-#     user_name = request.form["user_name"]
-#     password = request.form["password"]
-#     email = request.form["email"]
-    
-#     if (request.form["link_to_website"])
-#         link_to_website = (request.form["link_to_website"])
+    # Get form variables
 
-#     zipcode = request.form["zipcode"]
+    user_name = request.form["user_name"]
+    password = request.form["password"]
+    email = request.form["email"]
+    isartist = request.form["isartist"]    
+    link_to_website = request.form["link_to_website"]
+    hourly_rate = request.form["hourly_rate"]
 
-#     if (request.form["hourly_rate"])
-#         hourly_rate = (request.form["hourly_rate"])
+    new_user = User(user_name=user_name, password=password,
+                email=email, zipcode=zipcode)
 
-#     new_user = User(user_name=user_name, password=password,
-#                 email=email, zipcode=zipcode)
+    db.session.add(new_user)
+    db.session.commit()
 
-#     db.session.add(new_user)
-#     db.session.commit()
+    flash(f"User {email} added.")
+    return redirect(f"/users/{new_user.user_name}")
 
-#     flash(f"User {email} added.")
-#     return redirect(f"/users/{new_user.user_name}")
-
-
-
-# @app.route('/logout')
-# @login_required
-# def logout():
-#     """Logs a user out."""
-#     logout_user()
-#     flash("You are now logged out.")
-#     return redirect("homepage.html")
 
 
 if __name__ == "__main__":
