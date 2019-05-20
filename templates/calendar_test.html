@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+
+<link href="/static/styles/glDatePicker.default.css" rel="stylesheet" type="text/css">
+
+
+    <script src="/static/js/glDatePicker.js"></script>
+
+
+<form action="/savedate" method="POST">
+    <input type="text" id="mydate" name= "mydate" gldp-id="mydate" />
+        <div gldp-el="mydate"
+             style="width:400px; height:300px; position:absolute; top:70px; left:100px;">
+        </div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+          <div class="form-group">
+    <input type="submit" value="Submit" class="btn btn-danger">
+  </div>
+
+</form>
+
+
+
+<script type="text/javascript">
+
+    $(window).on('load', function()
+    {
+        $('#mydate').glDatePicker(
+        {
+            showAlways: true,
+        
+        }
+            );
+        
+ 
+
+    });
+
+
+
+</script>
+
+
+
+
+
+{% endblock %}

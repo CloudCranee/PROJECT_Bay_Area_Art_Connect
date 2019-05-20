@@ -206,6 +206,27 @@ def register_process():
     return redirect(f"/users/{new_user.user_name}")
 
 
+@app.route('/calendar')
+def show_calendar():
+    """This is a page to test my calendar plug in."""
+
+    return render_template("calendar_test.html")
+
+
+@app.route('/savedate', methods=['POST'])
+def save_date():
+    """This is a TEST route to test my calendar plug in."""
+
+    mydate = str(request.form["mydate"])
+
+    flash(f"Date {mydate} selected.")
+
+
+    posts = Post.query.all()
+    posts.reverse()
+
+    return render_template("posts.html", posts=posts)
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
