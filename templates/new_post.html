@@ -2,9 +2,43 @@
 {% block content %}
 
 
-MAKE A NEW POST HERE
+
+<form action="/creategig" method="POST">
+
+  <div class="form-group">
+    <label>
+        Title:
+        <input type="text" name="post_title" class="form-control">
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label>
+        Description:
+        <input type="textarea" name="description" class="form-control" class="largetextbox">
+    </label>
+  </div>
+
+  <!-- <div class="form-group">
+    <label>
+        Hourly Rate:
+        <input type="text" name="post_title" class="form-control">
+    </label>
+  </div> -->
+
+  <div class="form-group">
+    <label>
+        Zipcode:
+        (If the gig is over multiple locations, please just enter one.)
+        <input type="text" name="zipcode" class="form-control">
+    </label>
+  </div>
+
+  <div class="form-group">
+    <input type="submit" value="Submit" class="btn">
+  </div>
 
 
-
+</form>
 
 {% endblock %}

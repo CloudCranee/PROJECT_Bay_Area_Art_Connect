@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, flash, redirect, session, abo
 app=Flask(__name__)
 from flask_bootstrap import Bootstrap
 from jinja2 import StrictUndefined
-
+from datetime import datetime
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 from flask_sqlalchemy import SQLAlchemy
@@ -23,6 +23,17 @@ def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
     ###WHAT DO HERE ???
 
+
+
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    """If there is no user logged in,
+    this will redirect the client back to the homepage."""
+    flash("You will need to log in or create an account before viewing this page.")
+    return redirect('/')
+
+
+
 @app.route('/')
 def index():
     """Homepage."""
@@ -31,20 +42,54 @@ def index():
 
 
 @app.route('/artists')
-def show_artists():
+@login_required
+def display_artists():
     """Renders a page with all artists info."""
 
-    # artists = User.   ################################### HERE
-    pass
-    # return render_template("artists.html")
+    users = User.query.all()
+
+    artists = []
+
+    for user in users:
+        if user.is_artist == True:
+            artists.append(user)
+
+    return render_template("artists.html", artists=artists)
 
 
 @app.route('/newpost')
+@login_required
 def new_post():
-    """Renders a page with all artists info."""
+    """Renders a page with the option to post a new gig."""
 
     return render_template("new_post.html")
-    # return render_template("artists.html")
+
+
+@app.route('/creategig', methods=['POST'])
+def add_new_gig_to_database():
+    """Adds a new gig to the database."""
+
+    user_id = current_user.id
+    
+    post_title = request.form["post_title"]
+    description = request.form["description"]
+    zipcode = request.form["zipcode"]
+    post_date = datetime.now()
+
+
+    #CHECK IF THE ZIPCODE IS VALID USING AJAX/REACT/JS??
+    #ON THE ACTUAL NEW POST PAGE
+
+    new_post = Post(post_title=post_title, description=description,
+        zipcode=zipcode, post_date=post_date)
+
+    db.session.add(new_post)
+    db.session.commit()
+        
+    flash("Thank you. Your new post is now live.")
+
+    return redirect("posts")
+
 
 
 @app.route('/logout')
@@ -72,12 +117,15 @@ def present_login_form():
 @login_required
 def display_posts():
     """Displays a list of all posts
-    (Pinterest style ((AJAX? REACT??)) infintie scroll.
+    TODO: (Pinterest style ((AJAX? REACT??)) infinte scroll.
     Sort by most recent post at the top."""
 
     posts = Post.query.all()
 
+    posts.reverse()
+
     return render_template("posts.html", posts=posts)
+
 
 
 
@@ -108,7 +156,7 @@ def login():
         # if not is_safe_url(next):
         #     return abort(400)
 
-        return redirect('/homepage')
+        return redirect('/')
     return render_template('login.html', form=form)
 
 

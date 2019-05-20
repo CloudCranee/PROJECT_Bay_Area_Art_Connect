@@ -35,7 +35,8 @@
     {% if current_user.is_authenticated %}
      <ul class="navbar-nav nav justify-content-end">
       <li class="nav-item active">
-        <a class="nav-link" href="file:///home/engineer/src/bootstrap/bootstrap.html#"> {{ current_user.user_name }} <span class="sr-only mr-sm-2">(current)</span></a>
+        <a class="nav-link" href="/users/{{ current_user.id }}"><i class="fas fa-user-cog"></i> {{ current_user.user_name }}
+        <span class="sr-only mr-sm-2">(current)</span></a>
       </li>
     </ul>
     <form action="/logout">
@@ -62,12 +63,6 @@
   {% endfor %}
 {% block content %}
 {% endblock %}
-
-<br>
-
-{% if current_user.is_authenticated %}
-  Hi {{ current_user.user_name }}!
-{% endif %}
 
 
 <script

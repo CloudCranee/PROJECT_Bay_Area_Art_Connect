@@ -8,7 +8,7 @@ db = SQLAlchemy()
 from flask import Flask
 
 from random import randint
-import datetime
+from datetime import datetime
 
 from faker import Faker
 fake = Faker()
@@ -26,6 +26,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(50), unique=True)
     last_active = db.Column(db.DateTime, nullable = True)
     hourly_rate = db.Column(db.Integer, nullable = True)
+    show_unpaid = db.Column(db.Boolean, unique=False, default=False)
     link_to_website = db.Column(db.String(50), nullable = True)
     bio = db.Column(db.String(500), nullable = True)
 
@@ -50,6 +51,9 @@ class Post(db.Model):
     post_title = db.Column(db.String(50))
     description = db.Column(db.String(1250))
     post_date = db.Column(db.DateTime)
+    hourly_rate = db.Column(db.Integer, nullable = True)
+    #### What if they want a day rate??
+
     zipcode = db.Column(db.Integer, db.ForeignKey("zipcodes.valid_zipcode"),
                         nullable = False)
 
@@ -125,6 +129,7 @@ def seed_users():
         fname = fake.name()
         fpassword = randint(1, 9)
         fpassword += i
+        fbio = fake.sentence() + " " + fake.sentence()
         fhourly_rate = randint(16, 125)
         fartistnum = randint(0, 1)
         if fartistnum == 0:
@@ -133,7 +138,7 @@ def seed_users():
             fartist = True
         femail = (fname[:3] + fname[-2:] + str(i) + '@gmail.com')
         flast_active = fake.date_between(start_date="-1y", end_date="today")
-        fuser = User(user_name=fname, is_artist=fartist, password=fpassword,
+        fuser = User(user_name=fname, is_artist=fartist, password=fpassword, bio=fbio,
                 hourly_rate=fhourly_rate, email=femail, last_active=flast_active)
         db.session.add(fuser) 
     print("Commiting all new users.")
@@ -146,6 +151,7 @@ def seed_posts():
     for i in range(1, 35):
         fuser_id = randint(1,50)
         fpost_date = fake.date_between(start_date="-3y", end_date="today")
+
         fpone = fake.name()
         fpost_title = fpone[:4] + '. This is the title of this post!'
         fdescription = fake.sentence() + " " + fake.sentence()

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row justify-content-md-center">
+    {% for artist in artists %}
+        <div class="col col-4">
+            <h3>
+                {{ artist.user_name }}
+            </h3>
+                <p class="postdescription">
+                    {{ artist.bio }}
+                </p>
+                    <p>
+                        {% for tag in artist.tags %}
+                        <b>{{ tag.tag_name }}
+                        {% endfor %}
+                    </p>
+                </div>
+            {% endfor %}
+            
+
+
+
+
+{% endblock %}
