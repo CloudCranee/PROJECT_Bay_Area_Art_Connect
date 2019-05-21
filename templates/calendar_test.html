@@ -51,7 +51,20 @@
         $('#mydate').glDatePicker(
         {
             showAlways: true,
-        
+                   specialDates: [
+           {
+               date: new Date(0, 5, 5),
+               data: { message: 'Happy Birthday!' },
+               repeatYear: true,
+           },
+           {
+               date: new Date(2019, 0, 8),
+               data: { message: 'Meeting every day 8 of the month' },
+               repeatMonth: true
+           }
+       ]
+
+
         }
             );
         

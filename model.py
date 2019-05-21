@@ -51,8 +51,8 @@ class Post(db.Model):
     post_title = db.Column(db.String(50))
     description = db.Column(db.String(1250))
     post_date = db.Column(db.DateTime)
-    hourly_rate = db.Column(db.Integer, nullable = True)
-    #### What if they want a day rate??
+    gig_date = db.Column(db.String(100))
+    pay = db.Column(db.Integer, nullable = True)
 
     zipcode = db.Column(db.Integer, db.ForeignKey("zipcodes.valid_zipcode"),
                         nullable = False)
@@ -151,14 +151,19 @@ def seed_posts():
     for i in range(1, 35):
         fuser_id = randint(1,50)
         fpost_date = fake.date_between(start_date="-3y", end_date="today")
-
+        is_pay = randint(0,1)
+        if is_pay == 0:
+            fpay = None
+        else:
+            fpay = randint(30,2000)
         fpone = fake.name()
         fpost_title = fpone[:4] + '. This is the title of this post!'
         fdescription = fake.sentence() + " " + fake.sentence()
         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
         fzipcode = fzipcodes[i]
         fpost = Post(user_id=fuser_id, description=fdescription,
-            zipcode=fzipcode, post_title=fpost_title, post_date=fpost_date)
+            zipcode=fzipcode, post_title=fpost_title, post_date=fpost_date,
+            pay=fpay)
         db.session.add(fpost)
     print("Commiting all new posts.")
     db.session.commit()

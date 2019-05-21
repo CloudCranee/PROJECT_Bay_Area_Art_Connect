@@ -45,10 +45,10 @@
 
 		// Set to true if you want the calendar to be visible at all times.
 		// NOTE: If your target element is hidden, the calendar will be hidden as well.
-		showAlways: false,
+		showAlways: true,
 
 		// Hide the calendar when a date is selected (only if showAlways is set to false).
-		hideOnClick: true,
+		hideOnClick: false,
 
 		// Allow selection of months by clicking on the month in the title.
 		allowMonthSelect: true,
@@ -156,7 +156,7 @@
 		dowNames: null,
 
 		// The day of the week to start the calendar on.  0 is Sunday, 1 is Monday and so on.
-		dowOffset: 0,
+		dowOffset: 1,
 
 		// Callback that will trigger when the user clicks a selectable date.
 		// Parameters that are passed to the callback:
