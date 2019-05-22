@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link href="/static/styles/general.css" rel="stylesheet" type="text/css">
+
+    <h1> {{ current_user.user_name }} </h1>
+<p>
+   {{ current_user.email }}
+<br>
+   {{ current_user.bio }}
+</p>
+<p>
+    Update your unavailability:<br>
+</p>
+    I am unavailable these recurring days:<br>
+
+
+<div class="container-fluid">
+        <div class="row justify-content-md-center">
+
+{% for day in days %}
+
+    <div class="dropdown">
+      <button class="dropbtn">{{ day }}</button>
+      <div class="dropdown-content">
+        <a href="#">Available</a>
+        <a href="#">Unavailable</a>
+
+      </div>
+    </div>
+
+{% endfor %}
+    </div>
+</div>
+
+
+
+
+
+<br>
+{% endblock %}

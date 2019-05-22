@@ -44,7 +44,7 @@
     {% if current_user.is_authenticated %}
      <ul class="navbar-nav nav justify-content-end">
       <li class="nav-item active">
-        <a class="nav-link" href="/users/{{ current_user.id }}"><i class="fas fa-user-cog"></i> {{ current_user.user_name }}
+        <a class="nav-link" href="/profile"><i class="fas fa-user-cog"></i> {{ current_user.user_name }}
         <span class="sr-only mr-sm-2">(current)</span></a>
       </li>
     </ul>

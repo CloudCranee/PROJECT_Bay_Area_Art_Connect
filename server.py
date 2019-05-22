@@ -195,15 +195,29 @@ def register_process():
     isartist = request.form["isartist"]    
     link_to_website = request.form["link_to_website"]
     hourly_rate = request.form["hourly_rate"]
+    phone = request.form["phone"]
 
     new_user = User(user_name=user_name, password=password,
-                email=email, zipcode=zipcode)
+                email=email, zipcode=zipcode, phone=phone)
 
     db.session.add(new_user)
     db.session.commit()
 
     flash(f"User {email} added.")
     return redirect(f"/users/{new_user.user_name}")
+
+
+@app.route('/profile')
+@login_required
+def user_profile():
+    """Individual user profile, pertainable to logged in user."""
+
+    days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+    return render_template("profile.html", days=days)
+
+
+##################### Test Routes  vvvvvvvvvvvvvvv
 
 
 @app.route('/calendar')
@@ -227,6 +241,8 @@ def save_date():
 
     return render_template("posts.html", posts=posts)
 
+
+##################### Test Routes Finished ^^^^^^^^^
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
