@@ -30,13 +30,7 @@ class User(UserMixin, db.Model):
     show_unpaid = db.Column(db.Boolean, unique=False, default=False)
     link_to_website = db.Column(db.String(50), nullable = True)
     bio = db.Column(db.String(500), nullable = True)
-    unavail_mon = db.Column(db.Boolean, default=False)
-    unavail_tues = db.Column(db.Boolean, default=False)
-    unavail_wed = db.Column(db.Boolean, default=False)
-    unavail_thurs = db.Column(db.Boolean, default=False)
-    unavail_fri = db.Column(db.Boolean, default=False)
-    unavail_sat = db.Column(db.Boolean, default=False)
-    unavail_sun = db.Column(db.Boolean, default=False)
+    daysweek = db.Column(db.String(7), default="ttttttt")
 
     def __repr__(self):
         """Provides the representaion of a User instance when printed"""
@@ -112,7 +106,7 @@ class Unavailability(db.Model):
     def __repr__(self):
         """Provides the representaion of an Unavailability instance when printed"""
 
-        return f"<Unavailabilty tag_id={self.user_id} tag_name={self.date_ranges}>"
+        return f"<Unvailabilty tag_id={self.user_id} tag_name={self.date_ranges}>"
 
     users = db.relationship("User", backref=db.backref("unavailabilty"))
 

@@ -9,29 +9,16 @@
 <br>
    {{ current_user.bio }}
 </p>
+
+
 <p>
-    Update your unavailability:<br>
+  {% if current_user.is_artist %}
+
+    <a href="/availability"> Update your availability.</a>
+    <br>
 </p>
-    I am unavailable these recurring days:<br>
 
-
-<div class="container-fluid">
-        <div class="row justify-content-md-center">
-
-{% for day in days %}
-
-    <div class="dropdown">
-      <button class="dropbtn">{{ day }}</button>
-      <div class="dropdown-content">
-        <a href="#">Available</a>
-        <a href="#">Unavailable</a>
-
-      </div>
-    </div>
-
-{% endfor %}
-    </div>
-</div>
+{% endif %}
 
 
 

@@ -182,6 +182,28 @@ def register_form():
     return render_template("register_form.html")
 
 
+@app.route('/availability', methods=['GET'])
+def display_availability_page():
+    """Displays and artist's change availability page."""
+
+    # User availabilty dates = current_user.id
+
+    daysweek = current_user.daysweek
+
+    return render_template("availability.html", daysweek=daysweek)
+
+
+
+# @app.route('/changeavailability', methods=['GET', 'POST'])
+# def change_availability():
+#     """Gives an artist an option to change their availability."""
+
+
+
+#     return redirect("/availability")
+
+
+
 
 @app.route('/register', methods=['POST'])
 def register_process():
@@ -212,9 +234,8 @@ def register_process():
 def user_profile():
     """Individual user profile, pertainable to logged in user."""
 
-    days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
-    return render_template("profile.html", days=days)
+    return render_template("profile.html")
 
 
 ##################### Test Routes  vvvvvvvvvvvvvvv
