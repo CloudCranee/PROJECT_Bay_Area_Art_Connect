@@ -1,65 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<!-- This is all css and link imports needed for this page. -->
 <link href="/static/styles/general.css" rel="stylesheet" type="text/css">
-
 <script
   src="https://code.jquery.com/jquery-3.4.1.js"
   integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
   crossorigin="anonymous"></script>
-
 <link href="/static/styles/glDatePicker.default.css" rel="stylesheet" type="text/css">
+<script src="/static/js/glDatePicker.js"></script>
+<!-- End imports needed for this page. -->
 
 
-    <script src="/static/js/glDatePicker.js"></script>
+<!-- I believe this div is where the React will be rendering -->
+<div id="root">
+</div>
 
 
 
-
-<div class="container-fluid">
-        <div class="row justify-content-md-center">
-
-    I am unavailable these recurring days:<br>
-
-</div></div>
 
 <form action="/changeavailability" method="POST">
 
 <div class="container-fluid">
         <div class="row justify-content-md-center"> 
-
-{% for num, day in days.items() %}
-<div class="dropdown datechanger">
-      <button class="dropbtn">{{ day }}</button>
-      <div class="dropdown-content" id="selectableDOW">
-        <span id="{{num}}avail">Available</span>
-        <span id="{{num}}unavail">Unavailable</span>
-      </div>
-</div>
-{% endfor %}
-
-
-<!-- 
-
-{% for day in days %}
-
-    <div class="dropdown">
-      <button class="dropbtn">{{ day }}</button>
-      <div class="dropdown-content" id="selectableDOW">
-        <a href="#"><option value="{{ day }}avail">Available</option></a>
-        <a href="#"><option value="{{ day }}unavail">Unavailable</option></a>
-
-      </div>
-    </div>
-
-
-
-{% endfor %} -->
-
-TEST SELECTOR
-
-
-
 
 
 
@@ -78,23 +41,12 @@ TEST SELECTOR
 
 <div class="container-fluid">
         <div class="row justify-content-md-center">
-
-<input type="text" id="mydate" name="mydate" gldp-id="mydate" value="Current Availability:" />
-    <div gldp-el="mydate"
+            <input type="text" id="mydate" name="mydate" gldp-id="mydate" value="Current Availability:" />
+                <div gldp-el="mydate"
              style="width:400px; height:300px; position:absolute; top:70px; left:100px;">
         </div>
-
+  </div>
 </div>
-</div>
-
-</div>
-<select id="selectableDOW">
-  <option value="null"> All </option>
-  {% for num, day in days.items() %}
-<option value="{{num}}">{{day}}</option>
-{% endfor %}
-</select>
-<br>
 
 
 
@@ -105,10 +57,14 @@ TEST SELECTOR
 <script src="/static/react-dom.development.js"></script>
 <script src="/static/babel-standalone.js"></script>
 
-<script type="text/javascript"> const daysweek = {{ daysweek }} </script> 
+
+<!-- This script tag below is getting the jinja current user days list from the server-->
+<!-- If I refactor the React into a separate file this should no longer be needed.-->
+<!-- But I will have to find another way to get information from the db to React -->
+<script type="text/javascript"> const daysweek = '{{ daysweek }}' </script> 
+
 
 <script type="text/jsx">
-
     $(window).on('load', function()
     {
         var mydate = $('#mydate').glDatePicker(
@@ -122,14 +78,22 @@ TEST SELECTOR
     });
 
 
+</script>
+
+
+
+<!-- This is where the React magic happens -->
+<script type="text/jsx">
+
+
+
   $('#selectableDOW').change(function() {
     mydate.options.selectableDOW = eval($(this).val());
     mydate.render();
   });
 
 
-
-
+"use strict";
 
 
 function DayButtons(props) {
@@ -140,8 +104,8 @@ function DayButtons(props) {
       <div class="dropdown datechanger">
             <button class="dropbtn">{day}</button>
               <div class="dropdown-content" id="selectableDOW">
-                <span value="{numb}t">Available</span>
-                <span value="{numb}f">Unavailable</span>
+                <span value="{numb}t" onClick={props.onDayDropClick}>Available</span>
+                <span value="{numb}f" onClick={props.onDayDropClick}>Unavailable</span>
             </div>
       </div>
       );
@@ -154,68 +118,93 @@ function DayButtons(props) {
 
 
 
-
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-    availMon = daysweek[1],
-    availTue = daysweek[2],
-    availWed = daysweek[3],
-    availThu = daysweek[4],
-    availFri = daysweek[5],
-    availSat = daysweek[6],
-    availSun = daysweek[0]
+    availMon: daysweek[1],
+    availTue: daysweek[2],
+    availWed: daysweek[3],
+    availThu: daysweek[4],
+    availFri: daysweek[5],
+    availSat: daysweek[6],
+    availSun: daysweek[0]
   };
 
   this.changeDay = this.changeDay.bind(this);
 }
 
   changeDay(evt) {
-  const daySelected = evt.target.value;
+    const daySelected = evt.target.value;
 
-  this.setState((prevState) => {
-  const availMon = prevState.availMon.slice();
-  const availTue = prevState.availTue.slice();
-  const availWed = prevState.availWed.slice();
-  const availThu = prevState.availThu.slice();
-  const availFri = prevState.availFri.slice();
-  const availSat = prevState.availSat.slice();
-  const availSun = prevState.availSun.slice();
+    this.setState((prevState) => {
+      const availMon = prevState.availMon.slice();
+      const availTue = prevState.availTue.slice();
+      const availWed = prevState.availWed.slice();
+      const availThu = prevState.availThu.slice();
+      const availFri = prevState.availFri.slice();
+      const availSat = prevState.availSat.slice();
+      const availSun = prevState.availSun.slice();
 
-  if (daySelected[0] == 1) {
-    var availMon = daySelected[1];
-    return { availMon };
-} else if (daySelected[0] == 2) {
-    var availTue = daySelected[1];
-    return { availTue };
-} else if (daySelected[0] == 3) {
-    var availWed = daySelected[1];
-    return { availWed };
-} else if (daySelected[0] == 4) {
-    var availThu = daySelected[1];
-    return { availThu };
-} else if (daySelected[0] == 5) {
-    var availFri = daySelected[1];
-    return { availFri };
-} else if (daySelected[0] == 6) {
-    var availSat = daySelected[1];
-    return { availSat };
-} else {
-    var availSun = daySelected[1];
-    return { availSun };
-});
-
-}
+      if (daySelected[0] == 1) {
+        var availMon = daySelected[1];
+        return { availMon };
+    } else if (daySelected[0] == 2) {
+        var availTue = daySelected[1];
+        return { availTue };
+    } else if (daySelected[0] == 3) {
+        var availWed = daySelected[1];
+        return { availWed };
+    } else if (daySelected[0] == 4) {
+        var availThu = daySelected[1];
+        return { availThu };
+    } else if (daySelected[0] == 5) {
+        var availFri = daySelected[1];
+        return { availFri };
+    } else if (daySelected[0] == 6) {
+        var availSat = daySelected[1];
+        return { availSat };
+    } else {
+        var availSun = daySelected[1];
+        return { availSun };
+    });
+  }
 }
 
   render() {
+    return ( 
+      <div className="availabilityChanger">
+
+<div class="container-fluid">
+  <div class="row justify-content-md-center">
+    I am unavailable these recurring days:<br>
+  </div>
+</div>
+
+<div class="container-fluid">
+        <div class="row justify-content-md-center">
+          <DayButtons
+            onDayDropClick={this.changeDay}
+          />
+  </div>
+</div>
 
 
 
+
+
+</div>
+
+    );
+  }
 }
-}
 
+
+
+ReactDOM.render(
+  <availabilityChanger />,
+  document.getElementById('root')
+);
 
 
 </script>

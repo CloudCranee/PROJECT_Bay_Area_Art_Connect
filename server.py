@@ -183,6 +183,7 @@ def register_form():
 
 
 @app.route('/availability', methods=['GET'])
+@login_required
 def display_availability_page():
     """Displays and artist's change availability page."""
 
