@@ -195,13 +195,38 @@ def display_availability_page():
 
 
 
-# @app.route('/changeavailability', methods=['GET', 'POST'])
-# def change_availability():
-#     """Gives an artist an option to change their availability."""
+@app.route('/changeavailability', methods=['GET', 'POST'])
+def change_availability():
+    """Changes artist availability in database."""
+    
+    update_day = request.form["update"]
 
+    print(update_day)
 
+    day_bool = list(update_day)
 
-#     return redirect("/availability")
+    print(day_bool)
+
+    old_avail = list(current_user.daysweek)
+
+    print(old_avail)
+
+    old_avail[day_bool[0]] = day_bool[1]
+
+    print(old_avail)
+
+    new_avail = ''.join(old_avail)
+
+    current_user.daysweek = new_avail
+
+    print(current_user.daysweek)
+
+    db.session.commit()
+
+    flash("SUCCESS")
+
+    return redirect("/availability")
+
 
 
 
