@@ -3,7 +3,6 @@
     mydate.render();
   });
 
-
 {% extends 'base.html' %}
 {% block content %}
 
@@ -105,13 +104,23 @@ function DayButtons(props) {
       <div className="dropdown datechanger" key={numb}>
             <button className="dropbtn">{day}</button>
               <div className="dropdown-content" id="selectableDOW">
-                <span value={numb + 't'} onClick={props.onDayDropClick}>Available</span>
-                <span value={numb + 'f'} onClick={props.onDayDropClick}>Unavailable</span>
+                <span data-value={numb + 't'} onClick={props.onDayDropClick} onClick={props.updateDB} >Available</span>
+                <span data-value={numb + 'f'} onClick={props.onDayDropClick} onClick={props.updateDB} >Unavailable</span>
             </div>
       </div>
       );
     }
   return <div className="days">{buttons}</div>
+}
+
+
+
+
+
+let daysweek = [];
+let step;
+for (step = 0; step <7; step++) {
+  daysweek.push(daysweekL[step]);
 }
 
 
@@ -135,10 +144,40 @@ class App extends React.Component {
   this.changeDay = this.changeDay.bind(this);
 }
 
-  changeDay(evt) {
-    let daySelected = evt.target.value;
 
-    console.log(daySelected);
+
+
+
+
+
+
+  submissionRoute(evt) {
+    let updateAvailDays = {dates: this.state.availDays.join('')};
+
+    console.log(updateAvailDays);
+
+
+    $.post('/changeavailability', updateAvailDays, res => {
+      console.log("Request complete! Reponse:", res);
+    });
+  }
+
+
+
+
+
+
+
+
+  changeDay(evt) {
+    e.preventDefault();
+    let daySelected = evt.target.dataset.value;
+
+    fetch("</changeavailability>", {
+                    method: "POST",
+                    update: 'daySelected'
+                });
+
 
     this.setState((prevState) => {
       let availMon = prevState.availMon.slice();

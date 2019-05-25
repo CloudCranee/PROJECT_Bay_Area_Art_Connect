@@ -50,8 +50,9 @@
 <!-- This script tag below is getting the jinja current user days list from the server-->
 <!-- If I refactor the React into a separate file this should no longer be needed.-->
 <!-- But I will have to find another way to get information from the db to React -->
-<script type="text/javascript"> const daysweek = '{{ daysweek }}' </script> 
+<script type="text/javascript"> const daysweek = {{ daysweek|tojson }}; </script> 
 
+{{ daysweek }}
 
 <script type="text/jsx">
 
@@ -74,10 +75,8 @@
 
 <!-- This is where the React magic happens -->
 <script type="text/jsx">
-
-
-
 "use strict";
+
 
 
 function DayButtons(props) {
@@ -94,9 +93,15 @@ function DayButtons(props) {
       </div>
       );
     }
-  return <div className="days">{buttons}</div>
+  return <div className="days">{buttons}</div>;
 }
 
+
+
+function SubmitNewAvail(props) {
+
+return <input type="submit" value="Save Changes" className="btn" onClick={props.submitChanges} ></input>;
+}
 
 
 
@@ -104,12 +109,30 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-    availDays: daysweek.split("")
-  };
+      availDays: daysweek
+    };
 
-  this.changeDay = this.changeDay.bind(this);
+    this.changeDay = this.changeDay.bind(this);
+    this.submissionRoute = this.submissionRoute.bind(this);
+  }
 
-}
+
+
+  submissionRoute(evt) {
+    let updateAvailDays = {dates: this.state.availDays.join('')};
+
+    console.log(updateAvailDays);
+
+
+    $.post('/changeavailability', updateAvailDays, res => {
+      $("#msg").html("You have successfully updated your availability");
+    });
+  }
+
+
+
+
+
 
 
 
@@ -118,18 +141,15 @@ class App extends React.Component {
 
     this.setState((prevState) => {
       let availDays = prevState.availDays.slice();
-      console.log(daySelected)
+      console.log(daySelected);
 
-      console.log(availDays)
+      let indexNum = parseInt(daySelected[0]);
 
-      let indexNum = parseInt(daySelected[0])
+      console.log(indexNum);
 
-      console.log(indexNum)
-
-      availDays[indexNum] = daySelected[1]
+      availDays[indexNum] = daySelected[1];
       
-      console.log(availDays)
-
+      console.log(availDays);
 
       return { availDays };
   });
@@ -160,9 +180,9 @@ class App extends React.Component {
 
 <div className="container-fluid">
     <div className="row justify-content-md-center">
-      <form action="/changeavailability" method="POST">
-    <input type="submit" name={this.props.availDays} value="Save Changes" className="btn"></input>
-</form>
+      <SubmitNewAvail
+        submitChanges={this.submissionRoute}
+      />
 </div>
 </div>
 

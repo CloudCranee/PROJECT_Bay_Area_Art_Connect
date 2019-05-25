@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, session, abort, url_for
+from flask import Flask, render_template, request, jsonify, flash, redirect, session, abort, url_for
 app=Flask(__name__)
 from flask_bootstrap import Bootstrap
 from jinja2 import StrictUndefined
@@ -189,7 +189,9 @@ def display_availability_page():
 
     # User availabilty dates = current_user.id
 
-    daysweek = current_user.daysweek
+    daysweek = list(current_user.daysweek)
+    print(daysweek)
+
 
     return render_template("availability.html", daysweek=daysweek)
 
@@ -199,33 +201,19 @@ def display_availability_page():
 def change_availability():
     """Changes artist availability in database."""
     
-    update_day = request.form["update"]
+    new_avail = request.form.get("dates")
 
-    print(update_day)
-
-    day_bool = list(update_day)
-
-    print(day_bool)
-
-    old_avail = list(current_user.daysweek)
-
-    print(old_avail)
-
-    old_avail[day_bool[0]] = day_bool[1]
-
-    print(old_avail)
-
-    new_avail = ''.join(old_avail)
+    print(new_avail)
 
     current_user.daysweek = new_avail
 
-    print(current_user.daysweek)
-
     db.session.commit()
+    
+    daysweek = list(new_avail)
 
-    flash("SUCCESS")
+    flash("You have successfully updated your availability.")
 
-    return redirect("/availability")
+    return render_template("availability.html", daysweek=daysweek)
 
 
 
