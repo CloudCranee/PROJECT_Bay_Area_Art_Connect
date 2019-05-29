@@ -17,28 +17,18 @@
 </div>
 
 
-
-
-
-
 <div class="container-fluid">
         <div class="row justify-content-md-center">
-            <input type="text" id="mydate" name="mydate" gldp-id="mydate" value="Current Availability:" />
+            <div id="mydate" name="mydate" gldp-id="mydate">
                 <div gldp-el="mydate"
              style="width:400px; height:300px; position:absolute; top:70px; left:100px;">
+           </div>
         </div>
   </div>
 </div>
 
 
 
-<div class="container-fluid">
-    <div class="row justify-content-md-center">
-      <form action="/changeavailability" method="POST">
-    <input type="submit" value="ETXTEHER" class="btn"></input>
-</form>
-</div>
-</div>
 
 
 
@@ -54,30 +44,12 @@
 
 {{ daysweek }}
 
-<script type="text/jsx">
-
-    $(window).on('load', function()
-    {
-        var mydate = $('#mydate').glDatePicker(
-        {
-            showAlways: true,
-            selectableDOW: [0, 1, 2, 3, 4, 5, 6],
-           
-        }
-            );
-
-    });
-
-
-</script>
 
 
 
 <!-- This is where the React magic happens -->
 <script type="text/jsx">
 "use strict";
-
-
 
 function DayButtons(props) {
   const buttons = [];
@@ -112,6 +84,7 @@ class App extends React.Component {
       availDays: daysweek
     };
 
+    this.calendarRef = React.createRef();
     this.changeDay = this.changeDay.bind(this);
     this.submissionRoute = this.submissionRoute.bind(this);
   }
@@ -158,6 +131,39 @@ class App extends React.Component {
 
 
 
+
+  componentDidMount() {
+    var updateWeek = this.state.availDays;
+
+    console.log("from componentDidMount")
+    console.log(updateWeek);
+
+  function setDays(updateWeek) {
+    var selectableDOW_ = [];
+    for(let i = 0; i <7; i++){
+      if (updateWeek[i] == 't') {
+        selectableDOW_.push(i);
+        console.log(selectableDOW_);
+      }
+      console.log (selectableDOW_);
+    }
+    return selectableDOW_;
+  }
+
+    var sDOW = setDays(updateWeek);
+
+    const calendarEl = this.calendarRef.current;
+    $(calendarEl).glDatePicker(
+        {
+            showAlways: true,
+            selectableDOW: sDOW,
+           
+        }
+            );
+  }
+
+
+
   render() {
     return ( 
 <div className="availabilityChanger">
@@ -176,20 +182,21 @@ class App extends React.Component {
   </div>
 </div>
 
+<br />
+
+<div className="container-fluid">
+  <div className="myCalen" id="mydate" ref={this.calendarRef}>
+  </div>
+</div>
 
 
 <div className="container-fluid">
     <div className="row justify-content-md-center">
       <SubmitNewAvail
         submitChanges={this.submissionRoute}
-      />
-</div>
-</div>
-
-
-
-
-
+        />
+  </div>
+  </div>
 </div>
 
     );

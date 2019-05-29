@@ -35,6 +35,27 @@
   </div>
 
   <div class="form-group">
+    <label>
+      Location Zipcode:
+      <select>
+        {% for zipcode in zipcodes %}
+        <option value="{{zipcode}}">{{zipcode}}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>
+      Or select by location:
+      <select>
+        {% for location in locations %}
+        <option value="{{location}}">{{location}}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+
+
+  <div class="form-group">
     <input type="submit" value="Submit" class="btn">
   </div>
 

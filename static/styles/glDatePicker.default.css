@@ -26,6 +26,16 @@
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dadada',GradientType=0 );
 }
 
+
+.myCalen {
+  width: 400px;
+  height: 300px;
+  position: absolute;
+  top: 70px;
+  left: 100px;
+}
+
+
 /* Cell border */
 .gldp-default .border {
 	border-style: solid;

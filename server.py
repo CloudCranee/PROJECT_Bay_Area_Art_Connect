@@ -62,7 +62,23 @@ def display_artists():
 def new_post():
     """Renders a page with the option to post a new gig."""
 
-    return render_template("new_post.html")
+    zipcode_instances = Zipcode.query.all()
+
+    zipcodes = []
+
+    for zipcode in zipcode_instances:
+        zipcodes.append(zipcode.valid_zipcode)
+
+    locations = []
+
+    for zipcode in zipcode_instances:
+        locations.append(zipcode.location_name)
+
+    locations = list(set(locations))
+
+    locations.sort()
+
+    return render_template("new_post.html", zipcodes=zipcodes, locations=locations)
 
 
 @app.route('/creategig', methods=['POST'])
