@@ -164,6 +164,35 @@ class App extends React.Component {
 
 
 
+
+  componentDidUpdate() {
+    const updateWeek = this.state.availDays;
+    const calendarEl = this.calendarRef.current;
+
+    console.log("from componentDidUpdate")
+    console.log(updateWeek);
+
+
+    const selectableDOW_ = [];
+    for (let i = 0; i <7; i++ ){
+      if (updateWeek[i] == 't') {
+        selectableDOW_.push(i);
+        console.log(selectableDOW_);
+      }
+      console.log (selectableDOW_);
+    }
+
+    const datePicker = $(calendarEl).glDatePicker(true);
+
+    $.extend(datePicker.options, {
+      selectableDOW: selectableDOW_,
+    });
+    datePicker.render();
+  }
+
+
+
+
   render() {
     return ( 
 <div className="availabilityChanger">
