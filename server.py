@@ -4,7 +4,7 @@ from flask_bootstrap import Bootstrap
 from jinja2 import StrictUndefined
 from datetime import datetime
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_debugtoolbar import DebugToolbarExtension
@@ -107,28 +107,6 @@ def add_new_gig_to_database():
     return redirect("posts")
 
 
-
-@app.route('/logout')
-@login_required
-def logout():
-    """Logs a user out and redirects to homepage."""
-
-    # del session["user_id"]
-    logout_user()
-    flash("You have successfully logged out.")
-
-    return redirect('/')
-
-
-@app.route('/login_form')
-def present_login_form():
-    """Displays the login form. Eventually I would incorporate this on the 
-    homepage"""
-
-    return render_template("login_form.html")
-
-
-
 @app.route('/posts')
 @login_required
 def display_posts():
@@ -143,6 +121,12 @@ def display_posts():
     return render_template("posts.html", posts=posts)
 
 
+@app.route('/login_form')
+def present_login_form():
+    """Displays the login form. Eventually I would incorporate this on the 
+    homepage"""
+
+    return render_template("login_form.html")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -151,29 +135,33 @@ def login():
 
     email = request.form["email"]
     password = request.form["password"]
-
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email).one_or_none()
 
     if not user:
-        flash("No such user")
+        flash("Incorrect email or password.")
         return redirect("/login_form")
 
-    if user.password != password:
-        flash("Incorrect password")
+    if not check_password_hash(user.password, password):
+        flash("Incorrect email or password.")
         return redirect("/login_form")
 
     if user.is_authenticated:
         login_user(user)
-
-        flash("You are now logged in.")
 
         next = request.args.get('next')
         
         # if not is_safe_url(next):
         #     return abort(400)
 
+        last_active = datetime.now()
+        current_user.last_active = last_active
+        db.session.commit()
+
+        flash("You are now logged in.")
         return redirect('/')
-    return render_template('login.html', form=form)
+
+    flash("Unexpected Error.")
+    return redirect("/login_form")
 
 
     # if not user:
@@ -188,14 +176,17 @@ def login():
     # flash("You are now logged in.")
     # return redirect(f"/users/{user.id}")
 
+@app.route('/logout')
+@login_required
+def logout():
+    """Logs a user out and redirects to homepage."""
 
 
+    logout_user()
+    flash("You have successfully logged out.")
 
-@app.route('/signup', methods=['GET'])
-def register_form():
-    """Show form for user signup."""
+    return redirect('/')
 
-    return render_template("register_form.html")
 
 
 @app.route('/availability', methods=['GET'])
@@ -203,11 +194,7 @@ def register_form():
 def display_availability_page():
     """Displays and artist's change availability page."""
 
-    # User availabilty dates = current_user.id
-
     daysweek = list(current_user.daysweek)
-    print(daysweek)
-
 
     return render_template("availability.html", daysweek=daysweek)
 
@@ -229,9 +216,14 @@ def change_availability():
 
     flash("You have successfully updated your availability.")
 
-    return render_template("availability.html", daysweek=daysweek)
+    return render_template("profile.html")
 
 
+@app.route('/sign_up', methods=['GET'])
+def register_form():
+    """Show form for user signup."""
+
+    return render_template("register_form.html")
 
 
 
@@ -240,23 +232,64 @@ def register_process():
     """Process registration."""
 
     # Get form variables
-
     user_name = request.form["user_name"]
+
     password = request.form["password"]
-    email = request.form["email"]
-    isartist = request.form["isartist"]    
-    link_to_website = request.form["link_to_website"]
-    hourly_rate = request.form["hourly_rate"]
-    phone = request.form["phone"]
+    password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
 
-    new_user = User(user_name=user_name, password=password,
-                email=email, zipcode=zipcode, phone=phone)
+    email = (request.form["email"]).lower()
+    display_email = request.form["email"]
 
-    db.session.add(new_user)
-    db.session.commit()
+    if request.form["is_artist"] == 't':
+        is_artist = True
+    else:
+        is_artist = False  
 
-    flash(f"User {email} added.")
-    return redirect(f"/users/{new_user.user_name}")
+    if request.form["show_unpaid"] == 't':
+        show_unpaid = True
+    else:
+        show_unpaid = False  
+
+    last_active = datetime.now()
+
+    if request.form["link_to_website"]:
+        link_to_website = request.form["link_to_website"]
+    else:
+        link_to_website = None
+
+    if request.form["hourly_rate"]:
+        hourly_rate = request.form["hourly_rate"]
+    else:
+        hourly_rate = None
+
+    if request.form["phone"]:
+        phone = request.form["phone"]
+    else:
+        phone = None
+
+    if request.form["link_to_website"]:
+        link_to_website = request.form["link_to_website"]
+    else:
+        link_to_website = None
+
+    if request.form["bio"]:
+        bio = request.form["bio"]
+    else:
+        bio = None
+
+    if User.query.filter_by(email=email).one_or_none():
+        flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
+        return redirect("/")
+    
+    else:
+        new_user = User(user_name=user_name, password=password, email=email,
+            phone=phone, is_artist=is_artist,
+            last_active=last_active, show_unpaid=show_unpaid,
+            link_to_website=link_to_website, bio= bio, hourly_rate=hourly_rate)
+        db.session.add(new_user)
+        db.session.commit()
+        flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
+        return redirect("/")
 
 
 @app.route('/profile')
@@ -264,8 +297,57 @@ def register_process():
 def user_profile():
     """Individual user profile, pertainable to logged in user."""
 
+    email = current_user.display_email
+    elist = []
+    count = 100
+    liame = email[::-1]   #It's email backwards.
+    two_chars = []
 
-    return render_template("profile.html")
+    for c in liame:
+        count += 1
+        if c == '@':
+            count = 0
+        if count == 1 or count == 2:
+            two_chars.append(c)
+
+    elist.extend([ email[0], "*****", two_chars[1], two_chars[0] ])
+    
+    count = 0
+    for c in email:
+        if c == '@':
+            count = 1
+        if count == 1:
+            elist.append(c)
+
+        email = ''.join(elist)
+
+
+    return render_template("profile.html", email=email)
+
+
+@app.route('/update_info', methods=['POST'])
+def update_user_info():
+    """Updates all user info, except e-mail and password. """
+
+    if request.form["is_artist"] == 't':
+        is_artist = True
+    else:
+        is_artist = False  
+
+    current_user.is_artist = is_artist
+
+    if request.form["show_unpaid"] == 't':
+        show_unpaid = True
+    else:
+        show_unpaid = False  
+
+    current_user.show_unpaid = show_unpaid
+
+
+    db.session.commit()
+    
+    flash(f"Your information has been updated.")
+    return redirect('/profile')
 
 
 ##################### Test Routes  vvvvvvvvvvvvvvv

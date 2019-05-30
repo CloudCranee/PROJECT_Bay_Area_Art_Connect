@@ -9,6 +9,7 @@ from flask import Flask
 
 from random import randint
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from faker import Faker
 fake = Faker()
@@ -21,10 +22,11 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_name = db.Column(db.String(50), unique=True)
-    is_artist = db.Column(db.Boolean, unique=False, default=False)
-    password = db.Column(db.String(30))
+    password = db.Column(db.String(500))
     email = db.Column(db.String(50), unique=True)
+    display_email = db.Column(db.String(50), unique=True)
     phone = db.Column(db.String(30))
+    is_artist = db.Column(db.Boolean, unique=False, default=False)
     last_active = db.Column(db.DateTime, nullable = True)
     hourly_rate = db.Column(db.Integer, nullable = True)
     show_unpaid = db.Column(db.Boolean, unique=False, default=False)
@@ -157,8 +159,8 @@ def seed_users():
 
     for i in range(1, 51):
         fname = fake.name()
-        fpassword = randint(1, 9)
-        fpassword += i
+        fpassword = generate_password_hash('hello', method='pbkdf2:sha256', salt_length=8)
+
         fbio = fake.sentence() + " " + fake.sentence()
         fhourly_rate = randint(16, 125)
         fartistnum = randint(0, 1)
@@ -183,11 +185,12 @@ def seed_users():
             fartist = False
         else:
             fartist = True
-        femail = (fname[:3] + fname[-2:] + str(i) + '@gmail.com')
+        display_email = (fname[:3] + fname[-2:] + str(i) + '@gmail.com')
+        femail = display_email.lower()
         flast_active = fake.date_between(start_date="-1y", end_date="today")
         fuser = User(user_name=fname, is_artist=fartist, password=fpassword, bio=fbio,
                 hourly_rate=fhourly_rate, phone=fphone, email=femail,
-                last_active=flast_active)
+                last_active=flast_active, display_email=display_email)
         db.session.add(fuser) 
     print("Commiting all new users.")
     db.session.commit()

@@ -68,15 +68,23 @@
     </label>
   </div>
 
-  <div class="form-group">
-    <label>
-      Would you like your profile included on the artists page?
-      <br>
-      <input type="radio" name="isartist" value="yes"> Yes<br>
-      <input type="radio" name="isartist" value="no"> No<br>
-    </label>
-
+<h3>Do you wish to be publically listed as an artist? (This can be changed later)</h3>
+  <div class="form-group switch-field">
+        <input type="radio" id="radio-one" name="is_artist" value="t" checked/>
+        <label for="radio-one"><b>Yes</b></label>
+        <input type="radio" id="radio-two" name="is_artist" value="f" />
+        <label for="radio-two"><b>No</b></label>
+</div>
 <br>
+<h3>Show unpaid gigs?</h3>
+    <div class="form-group switch-field">
+        <input type="radio" id="radio-three" name="show_unpaid" value="t" checked/>
+        <label for="radio-three">Yes</label>
+        <input type="radio" id="radio-four" name="show_unpaid" value="f" />
+        <label for="radio-four">No</label>
+    </div>
+
+
 
   <div class="form-group">
     <label for="exampleFormControlFile1">Upload profile picture: NOTE TO BODE, IMPLEMENT MAX FILE SIZE</label>
@@ -86,7 +94,7 @@
 <br>
 
   <div class="form-group">
-    <input type="submit" value="Sign Up" class="btn btn-danger">
+    <input type="submit" value="Sign Up" class="btn">
   </div>
 
 </form>

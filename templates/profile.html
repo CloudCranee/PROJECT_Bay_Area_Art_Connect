@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<link href="/static/styles/general.css" rel="stylesheet" type="text/css">
+<a href='/users/{{current_user.id}}'> Click here to view your public profile.</a>
 
-    <h1> {{ current_user.user_name }} </h1>
+<h1>Account</h1> 
+<br></br>
+
+
+<h1> {{ current_user.user_name }} </h1>
 <p>
-   {{ current_user.email }}
+   {{ email }}
 <br>
    {{ current_user.bio }}
 </p>
@@ -21,7 +25,43 @@
 {% endif %}
 
 
+    <form action="/update_info" method="POST" class="form">
+        <h3>Do you wish to be listed as an active artist?</h3>
+    <div class="switch-field">
+  {% if current_user.is_artist %}
+        <input type="radio" id="radio-one" name="is_artist" value="t" checked/>
+        <label for="radio-one"><b>Yes</b></label>
+        <input type="radio" id="radio-two" name="is_artist" value="f" />
+        <label for="radio-two"><b>No</b></label>
+        {% else %}
+        <input type="radio" id="radio-one" name="is_artist" value="t"/>
+        <label for="radio-one">Yes</label>
+        <input type="radio" id="radio-two" name="is_artist" value="f" checked/>
+        <label for="radio-two">No</label>
+{% endif %}
+    </div>
 
+<h3>Show unpaid gigs?</h3>
+    <div class="switch-field">
+        {% if current_user.show_unpaid %}
+            <input type="radio" id="radio-three" name="show_unpaid" value="t" checked/>
+            <label for="radio-three">Yes</label>
+            <input type="radio" id="radio-four" name="show_unpaid" value="f" />
+            <label for="radio-four">No</label>
+        {% else %}
+            <input type="radio" id="radio-three" name="show_unpaid" value="t" />
+            <label for="radio-three">Yes</label>
+            <input type="radio" id="radio-four" name="show_unpaid" value="f" checked/>
+            <label for="radio-four">No</label>
+        {% endif %}
+
+    </div>
+
+ <div class="form-group">
+
+<input type="submit" value="Save Changes" className="btn"></input>
+</div>
+</form>
 
 
 <br>
