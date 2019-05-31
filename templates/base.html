@@ -48,12 +48,24 @@
 
     {% if current_user.is_authenticated %}
      <ul class="navbar-nav nav justify-content-end">
+
       <li class="nav-item active">
 
-        <a class="nav-link" href="/profile"><i class="fas fa-user-cog"></i> {{ current_user.user_name }}
+        <a class="nav-link" href="/users/{{ current_user.id }}"><i class="fa fa-user-circle" aria-hidden="true"></i> {{ current_user.user_name }}
         
         <span class="sr-only mr-sm-2">(current)</span></a>
+
       </li>
+
+      <li class="nav-item active">
+
+        <a class="nav-link" href="/profile"><i class="fa fa-cog" aria-hidden="true"></i> Settings
+        
+        <span class="sr-only mr-sm-2">(current)</span></a>
+
+      </li>
+
+
     </ul>
     <form action="/logout">
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Log Out</button>
@@ -75,7 +87,7 @@
 
 
   {% for flash in get_flashed_messages() %}
-    <div class="alert alert-danger" style="width:90%; margin:0 auto;">{{ flash }}</div>
+    <div class="alert alert-danger" id="alert" style="width:90%; margin:0 auto;">{{ flash }}</div>
   {% endfor %}
 
 {% block content %}

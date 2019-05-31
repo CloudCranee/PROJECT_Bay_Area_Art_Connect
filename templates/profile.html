@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<a href='/users/{{current_user.id}}'> Click here to view your public profile.</a>
-
 <h1>Account</h1> 
 <br></br>
 
@@ -56,6 +54,22 @@
         {% endif %}
 
     </div>
+  {% if current_user.is_artist %}
+
+    Appear in these search terms:
+
+  <div class="form-group">
+    {% for tag in tags %}
+      <input type="checkbox" name="tag" value="{{ tag.tag_id }}"
+      {% if tag in current_user.tags %} checked {% endif %}>
+      {{ tag.tag_name }}
+      {% endfor %}
+    </div>
+
+{% endif %}
+
+
+
 
  <div class="form-group">
 

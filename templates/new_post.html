@@ -8,14 +8,14 @@
   <div class="form-group">
     <label>
         Title:
-        <input type="text" name="post_title" class="form-control">
+        <input type="text" name="post_title" required class="form-control">
     </label>
   </div>
 
   <div class="form-group">
     <label>
         Description:
-        <input type="textarea" name="description" class="form-control" class="largetextbox">
+        <input type="textarea" name="description" required class="form-control" class="largetextbox">
     </label>
   </div>
 
@@ -26,33 +26,23 @@
     </label>
   </div> -->
 
-  <div class="form-group">
-    <label>
-        Zipcode:
-        (If the gig is over multiple locations, please just enter one.)
-        <input type="text" name="zipcode" class="form-control">
-    </label>
-  </div>
-
-  <div class="form-group">
-    <label>
-      Location Zipcode:
-      <select>
-        {% for zipcode in zipcodes %}
-        <option value="{{zipcode}}">{{zipcode}}</option>
-        {% endfor %}
-      </select>
-    </label>
 
     <label>
-      Or select by location:
-      <select>
+      Location:
+      <select name="location">
         {% for location in locations %}
         <option value="{{location}}">{{location}}</option>
         {% endfor %}
       </select>
     </label>
   </div>
+
+  <div class="form-group">
+    {% for tag in tags %}
+      <input type="checkbox" name="tag" value="{{ tag.tag_id }}">
+      {{ tag.tag_name }}
+      {% endfor %}
+    </div>
 
 
   <div class="form-group">
@@ -62,7 +52,6 @@
 
 </form>
 
-ADD TAGS
 
 
 

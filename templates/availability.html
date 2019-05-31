@@ -53,14 +53,16 @@
 
 function DayButtons(props) {
   const buttons = [];
+  const buttonDays = [{name: 'Mon', numb: 1}, {name: 'Tue', numb: 2}, {name: 'Wed', numb: 3},
+  {name: 'Thu', numb: 4}, {name: 'Fri', numb: 5}, {name: 'Sat', numb: 6}, {name: 'Sun', numb: 7}]
 
-  for (const [numb, day] of Object.entries({1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 0: 'Sun'})) {
+  for (let i = 0, len = buttonDays.length; i < len; i++) {
     buttons.push(
-      <div className="dropdown datechanger" key={numb}>
-            <button className="dropbtn">{day}</button>
+      <div className="dropdown datechanger" key={buttonDays[i].numb}>
+            <button className="dropbtn">{buttonDays[i].name}</button>
               <div className="dropdown-content" id="selectableDOW">
-                <span data-value={numb + 't'} onClick={props.onDayDropClick} >Available</span>
-                <span data-value={numb + 'f'} onClick={props.onDayDropClick} >Unavailable</span>
+                <span data-value={buttonDays[i].numb + 't'} onClick={props.onDayDropClick} >Available</span>
+                <span data-value={buttonDays[i].numb + 'f'} onClick={props.onDayDropClick} >Unavailable</span>
             </div>
       </div>
       );
@@ -98,7 +100,7 @@ class App extends React.Component {
 
 
     $.post('/changeavailability', updateAvailDays, res => {
-      $("#msg").html("You have successfully updated your availability");
+      $('#alert').html("You have successfully updated your availability");
     });
   }
 

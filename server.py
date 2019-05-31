@@ -21,7 +21,7 @@ app.jinja_env.undefined = StrictUndefined
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
-    ###WHAT DO HERE ???
+    ###Do I need to add more code here or is this complete?
 
 
 
@@ -46,13 +46,7 @@ def index():
 def display_artists():
     """Renders a page with all artists info."""
 
-    users = User.query.all()
-
-    artists = []
-
-    for user in users:
-        if user.is_artist == True:
-            artists.append(user)
+    artists = User.query.filter_by(is_artist=True).order_by(User.last_active.desc())
 
     return render_template("artists.html", artists=artists)
 
@@ -78,7 +72,10 @@ def new_post():
 
     locations.sort()
 
-    return render_template("new_post.html", zipcodes=zipcodes, locations=locations)
+    tags = Tag.query.all()
+
+    return render_template("new_post.html", zipcodes=zipcodes,
+                        locations=locations, tags=tags)
 
 
 @app.route('/creategig', methods=['POST'])
@@ -89,17 +86,22 @@ def add_new_gig_to_database():
     
     post_title = request.form["post_title"]
     description = request.form["description"]
-    zipcode = request.form["zipcode"]
+    location = request.form["location"]
+    zipcode = Zipcode.query.filter_by(location_name=location).first()
+
     post_date = datetime.now()
 
-
-    #CHECK IF THE ZIPCODE IS VALID USING AJAX/REACT/JS??
-    #ON THE ACTUAL NEW POST PAGE
-
     new_post = Post(post_title=post_title, description=description,
-        zipcode=zipcode, post_date=post_date)
+        zipcode=zipcode.valid_zipcode, post_date=post_date)
+
+    post_tags = request.form.getlist("tag")
+
+    for tag in post_tags:
+        associated_tag = Tag.query.get(tag)
+        new_post.tags.append(associated_tag)
 
     db.session.add(new_post)
+
     db.session.commit()
         
     flash("Thank you. Your new post is now live.")
@@ -199,7 +201,6 @@ def display_availability_page():
     return render_template("availability.html", daysweek=daysweek)
 
 
-
 @app.route('/changeavailability', methods=['GET', 'POST'])
 def change_availability():
     """Changes artist availability in database."""
@@ -216,7 +217,7 @@ def change_availability():
 
     flash("You have successfully updated your availability.")
 
-    return render_template("profile.html")
+    return redirect('/availability')
 
 
 @app.route('/sign_up', methods=['GET'])
@@ -321,8 +322,10 @@ def user_profile():
 
         email = ''.join(elist)
 
+    tags = Tag.query.all()
 
-    return render_template("profile.html", email=email)
+
+    return render_template("profile.html", email=email, tags=tags)
 
 
 @app.route('/update_info', methods=['POST'])
@@ -343,6 +346,18 @@ def update_user_info():
 
     current_user.show_unpaid = show_unpaid
 
+    new_tags_ids = request.form.getlist("tag")
+    new_tags_list = []
+
+    prev_tags = current_user.tags
+
+    print(prev_tags)
+
+    for tag in new_tags_ids:
+        associated_tag = Tag.query.get(tag)
+        new_tags_list.append(associated_tag)
+
+    current_user.tags = new_tags_list
 
     db.session.commit()
     

@@ -33,6 +33,8 @@ class User(UserMixin, db.Model):
     link_to_website = db.Column(db.String(50), nullable = True)
     bio = db.Column(db.String(500), nullable = True)
     daysweek = db.Column(db.String(7), default="ttttttt")
+    paid_confirm = db.Column(db.Integer, default=0)
+    # I will need to implement some logic where a user cannot confirm their own payment.
 
     def __repr__(self):
         """Provides the representaion of a User instance when printed"""
