@@ -135,7 +135,7 @@ def present_login_form():
 def login():
     """form to log in"""
 
-    email = request.form["email"]
+    email = (request.form["email"]).lower()
     password = request.form["password"]
     user = User.query.filter_by(email=email).one_or_none()
 
@@ -149,11 +149,6 @@ def login():
 
     if user.is_authenticated:
         login_user(user)
-
-        next = request.args.get('next')
-        
-        # if not is_safe_url(next):
-        #     return abort(400)
 
         last_active = datetime.now()
         current_user.last_active = last_active
@@ -215,9 +210,9 @@ def change_availability():
     
     daysweek = list(new_avail)
 
-    flash("You have successfully updated your availability.")
-
-    return redirect('/availability')
+    # flash("You have successfully updated your availability.")
+    # jsonify([True])
+    return redirect('/')
 
 
 @app.route('/sign_up', methods=['GET'])
@@ -285,7 +280,7 @@ def register_process():
     else:
         new_user = User(user_name=user_name, password=password, email=email,
             phone=phone, is_artist=is_artist,
-            last_active=last_active, show_unpaid=show_unpaid,
+            last_active=last_active, show_unpaid=show_unpaid, display_email=display_email,
             link_to_website=link_to_website, bio= bio, hourly_rate=hourly_rate)
         db.session.add(new_user)
         db.session.commit()

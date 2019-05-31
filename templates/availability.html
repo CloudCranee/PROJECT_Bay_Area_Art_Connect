@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
+
 <!-- This is all css and link imports needed for this page. -->
 <link href="/static/styles/general.css" rel="stylesheet" type="text/css">
 <script
@@ -54,7 +56,7 @@
 function DayButtons(props) {
   const buttons = [];
   const buttonDays = [{name: 'Mon', numb: 1}, {name: 'Tue', numb: 2}, {name: 'Wed', numb: 3},
-  {name: 'Thu', numb: 4}, {name: 'Fri', numb: 5}, {name: 'Sat', numb: 6}, {name: 'Sun', numb: 7}]
+  {name: 'Thu', numb: 4}, {name: 'Fri', numb: 5}, {name: 'Sat', numb: 6}, {name: 'Sun', numb: 0}]
 
   for (let i = 0, len = buttonDays.length; i < len; i++) {
     buttons.push(
@@ -100,7 +102,7 @@ class App extends React.Component {
 
 
     $.post('/changeavailability', updateAvailDays, res => {
-      $('#alert').html("You have successfully updated your availability");
+      console.log("Submission Successful");
     });
   }
 
@@ -198,6 +200,7 @@ class App extends React.Component {
   render() {
     return ( 
 <div className="availabilityChanger">
+
 
 <div className="container-fluid">
   <div className="row justify-content-md-center">
