@@ -85,7 +85,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      availDays: daysweek
+      availDays: daysweek,
+      showFlash: false
     };
 
     this.calendarRef = React.createRef();
@@ -102,14 +103,9 @@ class App extends React.Component {
 
 
     $.post('/changeavailability', updateAvailDays, res => {
-      console.log("Submission Successful");
+      this.setState({showFlash: true});
     });
   }
-
-
-
-
-
 
 
 
@@ -194,11 +190,16 @@ class App extends React.Component {
     datePicker.render();
   }
 
-
-
+renderShowFlash() {
+  if (this.state.showFlash) {
+  return <div class="alert alert-danger" id="alert" style="width:90%; margin:0 auto;">
+  "You have successfully updated your availability."</div>
+  }
+}
 
   render() {
-    return ( 
+    return (
+    {this.renderShowFlash()}
 <div className="availabilityChanger">
 
 

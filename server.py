@@ -33,6 +33,12 @@ def unauthorized_callback():
     return redirect('/')
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    """This is a custom 404 page."""
+
+    return redirect('/')
+
 
 @app.route('/')
 def index():
@@ -49,6 +55,19 @@ def display_artists():
     artists = User.query.filter_by(is_artist=True).order_by(User.last_active.desc())
 
     return render_template("artists.html", artists=artists)
+
+
+@app.route('/users/<int:id>')
+@login_required
+def display_public_user(id):
+    """Display user info if user is artist, or user is current_user"""
+
+    page_user = User.query.get(id)
+
+    if page_user.is_artist or current_user.id == id:
+        return render_template('user.html', user=page_user)
+    else:
+        return redirect('/')
 
 
 @app.route('/newpost')
@@ -180,9 +199,10 @@ def logout():
 
 
     logout_user()
+    flashclass = 'class="alert alert-success success"'
     flash("You have successfully logged out.")
 
-    return redirect('/')
+    return render_template("homepage.html", flashclass=flashclass)
 
 
 
@@ -210,9 +230,9 @@ def change_availability():
     
     daysweek = list(new_avail)
 
-    # flash("You have successfully updated your availability.")
-    # jsonify([True])
-    return redirect('/')
+    flash("You have successfully updated your availability.")
+
+    return redirect('/availability')
 
 
 @app.route('/sign_up', methods=['GET'])

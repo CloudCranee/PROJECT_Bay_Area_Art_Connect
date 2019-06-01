@@ -87,7 +87,7 @@
 
 
   {% for flash in get_flashed_messages() %}
-    <div class="alert alert-danger" id="alert" style="width:90%; margin:0 auto;">{{ flash }}</div>
+    <div {{ flashclass }} id="alert" style="width:90%; margin:0 auto;">{{ flash }}</div>
   {% endfor %}
 
 {% block content %}

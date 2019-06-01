@@ -1,23 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
+        {% for post in posts %}
 <div class="container-fluid">
     <div class="row justify-content-md-center">
-    {% for post in posts %}
-        <div class="col col-4">
-            <h3>
-                {{ post.post_title }}
-            </h3>
-                <p class="postdescription">
-                    {{ post.description }}
-                </p>
+
+            <div class="col col-4">
+                <h3>
+                    {{ post.post_title }}
+                </h3>
+                    <p class="postdescription">
+                        {{ post.description }}
+                    </p>
                     <p>
                         {% for tag in post.tags %}
                         <b>{{ tag.tag_name }}
                         {% endfor %}
                     </p>
-                </div>
+            </div>
+        </div>
+</div>    
             {% endfor %}
+            
+
             
 
 
