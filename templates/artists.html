@@ -8,10 +8,13 @@
             <h3>
                 {{ artist.user_name }}
             </h3>
-                <p class="postdescription">
-                    {{ artist.bio }}
                 </p>
                     <p>
+                        <p>
+                            <h2>
+                            <a href="/users/{{artist.id}}">Profile
+                            </a>
+                            </h2>                        
                         {% for tag in artist.tags %}
                         <b>{{ tag.tag_name }}
                         {% endfor %}

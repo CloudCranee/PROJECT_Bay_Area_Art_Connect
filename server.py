@@ -30,7 +30,7 @@ def unauthorized_callback():
     """If there is no user logged in,
     this will redirect the client back to the homepage."""
     flash("You will need to log in or create an account before viewing this page.")
-    return redirect('/')
+    return render_template("homepage.html")
 
 
 @app.errorhandler(404)
@@ -52,7 +52,7 @@ def index():
 def display_artists():
     """Renders a page with all artists info."""
 
-    artists = User.query.filter_by(is_artist=True).order_by(User.last_active.desc())
+    artists = User.query.filter(User.is_artist==True, User.verified==True).order_by(User.last_active.desc())
 
     return render_template("artists.html", artists=artists)
 
@@ -64,8 +64,10 @@ def display_public_user(id):
 
     page_user = User.query.get(id)
 
+    daysweek = list(current_user.daysweek)
+
     if page_user.is_artist or current_user.id == id:
-        return render_template('user.html', user=page_user)
+        return render_template('user.html', user=page_user, daysweek=daysweek)
     else:
         return redirect('/')
 
@@ -128,18 +130,30 @@ def add_new_gig_to_database():
     return redirect("posts")
 
 
-@app.route('/posts')
+@app.route('/gigs')
 @login_required
 def display_posts():
     """Displays a list of all posts
     TODO: (Pinterest style ((AJAX? REACT??)) infinte scroll.
     Sort by most recent post at the top."""
 
-    posts = Post.query.all()
+    overmorgen = datetime.now() + timedelta(days=2)
+    print(tomorrow)
 
-    posts.reverse()
+    posts = Post.query.filter(Post.active == True).all()
 
-    return render_template("posts.html", posts=posts)
+    for post in posts:
+        if post.gig_date_end < overmorgen:
+            post.active = False
+
+    db.session.commit()
+
+    if current.user.show_unpaid == True:
+        posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc())
+    else:
+        posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc())
+
+    return render_template("gigs.html", posts=posts)
 
 
 @app.route('/login_form')
@@ -221,8 +235,6 @@ def change_availability():
     """Changes artist availability in database."""
     
     new_avail = request.form.get("dates")
-
-    print(new_avail)
 
     current_user.daysweek = new_avail
 

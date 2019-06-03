@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- This is all css and link imports needed for this page. -->
+<link href="/static/styles/general.css" rel="stylesheet" type="text/css">
+<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+<link href="/static/styles/glDatePicker.default.css" rel="stylesheet" type="text/css">
+<script src="/static/js/glDatePicker.js"></script>
+<!-- End imports needed for this page. -->
+
+<h3>
+{{user.user_name}}
+</h3>
+<p>
+{{user.bio}}
+</p>
+{% for tag in user.tags %}
+{{ tag.tag_name }} |
+{% endfor %}
+
+<!-- I believe this div is where the React will be rendering -->
+<div id="root">
+</div>
+
+<script src="/static/react.development.js"></script>
+<script src="/static/react-dom.development.js"></script>
+<script src="/static/babel-standalone.js"></script>
+
+<script type="text/javascript"> const daysweek = {{ daysweek|tojson }}; </script>
+<!-- This is where the React magic happens -->
+<script type="text/jsx">
+"use strict";
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      availDays: daysweek,
+    };
+
+    this.calendarRef = React.createRef();
+  }
+
+  componentDidMount() {
+    var updateWeek = this.state.availDays;
+
+    console.log("from componentDidMount")
+    console.log(updateWeek);
+
+  function setDays(updateWeek) {
+    var selectableDOW_ = [];
+    for(let i = 0; i <7; i++){
+      if (updateWeek[i] == 't') {
+        selectableDOW_.push(i);
+        console.log(selectableDOW_);
+      }
+      console.log (selectableDOW_);
+    }
+    return selectableDOW_;
+  }
+
+    var sDOW = setDays(updateWeek);
+
+    const calendarEl = this.calendarRef.current;
+    $(calendarEl).glDatePicker(
+        {
+            showAlways: true,
+            selectableDOW: sDOW,
+           
+        }
+            );
+  }
+
+
+  render() {
+    return (
+<div className="container-fluid">
+  <div className="myCalen" id="mydate" ref={this.calendarRef}>
+  </div>
+</div>
+
+
+    );
+  }
+}
+
+
+ReactDOM.render(
+  <App />,
+  document.getElementById('root')
+);
+
+
+</script>
+
+
+
+{% endblock %}

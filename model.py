@@ -29,12 +29,12 @@ class User(UserMixin, db.Model):
     is_artist = db.Column(db.Boolean, unique=False, default=False)
     last_active = db.Column(db.DateTime, nullable = True)
     hourly_rate = db.Column(db.Integer, nullable = True)
-    show_unpaid = db.Column(db.Boolean, unique=False, default=False)
+    show_unpaid = db.Column(db.Boolean, unique=False, default=True)
     link_to_website = db.Column(db.String(50), nullable = True)
     bio = db.Column(db.String(500), nullable = True)
     daysweek = db.Column(db.String(7), default="ttttttt")
     paid_confirm = db.Column(db.Integer, default=0)
-    # I will need to implement some logic where a user cannot confirm their own payment.
+    verified = db.Column(db.Boolean, unique=False, default=False)
 
     def __repr__(self):
         """Provides the representaion of a User instance when printed"""
@@ -56,18 +56,20 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     post_title = db.Column(db.String(50))
     description = db.Column(db.String(1250))
-    post_date = db.Column(db.DateTime)
-    gig_date = db.Column(db.String(100))
-    isfixed = db.Column(db.Boolean, default=False)
+    creation_date = db.Column(db.DateTime)
+    gig_date_start = db.Column(db.DateTime)
+    gig_date_end = db.Column(db.DateTime)
     ishourly = db.Column(db.Boolean, default=False)
+    unpaid = db.Column(db.Boolean, default=True)
     pay = db.Column(db.Integer, nullable=True)
-    # If isfixed is True, ishourly must be false.
-    # If ishourly is True, is fixed must be false.
-    # If both isfixed and ishourly are false, pay will not display on page,
+    # If ishourly is False, there is a fixed budget.
+    # If pay == 0, it will not appear for user searches where show unpaid is false.
     # and "Rate Negotiable" will display instead.
     # Pay will be a dollar ammount, attached to either fixed budget,
     # or hourly pay.
-    filled = db.Column(db.Boolean, default=False)
+    active = db.Column(db.Boolean, default=True)
+    # If the position has been filled OR the date of the gig is passed, 
+    # OR the user deleted the post, this becomes False.
 
     zipcode = db.Column(db.Integer, db.ForeignKey("zipcodes.valid_zipcode"),
                         nullable = False)
@@ -105,7 +107,8 @@ class Unavailability(db.Model):
 
     un_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    date_ranges = db.Column(db.String(50))
+    start_range_date = db.Column(db.DateTime)
+    end_range_date = db.Column(db.DateTime)
 
     def __repr__(self):
         """Provides the representaion of an Unavailability instance when printed"""
@@ -215,7 +218,7 @@ def seed_posts():
         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
         fzipcode = fzipcodes[i]
         fpost = Post(user_id=fuser_id, description=fdescription,
-            zipcode=fzipcode, post_title=fpost_title, post_date=fpost_date,
+            zipcode=fzipcode, post_title=fpost_title, creation_date=fpost_date,
             pay=fpay)
         db.session.add(fpost)
     print("Commiting all new posts.")
@@ -225,7 +228,10 @@ def seed_posts():
 def seed_tags():
     """Seeds tags as listed below:"""
     tag_list = ['Photography', 'Cinematography', 'Video Editing', 'Music',
-                'Audio Recording', 'Dance', 'Acting', 'Graphic Design']
+                'Audio Recording', 'Dance', 'Acting', 'Graphic Design',
+                'Wedding', 'Painting', 'Sculpture', 'Film Crew',
+                'Drone Operator', 'Choreographer', 'MUA Makeup Artist',
+                'Hairstyist', 'Tattoo']
 
     for category in tag_list:
         tag_to_add = Tag(tag_name=category)
@@ -277,6 +283,9 @@ def seed_zipcodes():
         nv = v.replace('"', '')
         new_zcode = Zipcode(valid_zipcode=k, location_name=nv)
         db.session.add(new_zcode)
+
+    remote = Zipcode(valid_zipcode=00000, location_name='Remote')
+    db.session.add(remote)
 
     db.session.commit()
 

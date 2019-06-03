@@ -44,11 +44,6 @@
 <!-- But I will have to find another way to get information from the db to React -->
 <script type="text/javascript"> const daysweek = {{ daysweek|tojson }}; </script> 
 
-{{ daysweek }}
-
-
-
-
 <!-- This is where the React magic happens -->
 <script type="text/jsx">
 "use strict";
@@ -92,6 +87,7 @@ class App extends React.Component {
     this.calendarRef = React.createRef();
     this.changeDay = this.changeDay.bind(this);
     this.submissionRoute = this.submissionRoute.bind(this);
+    this.renderShowFlash = this.renderShowFlash.bind(this);
   }
 
 
@@ -129,9 +125,6 @@ class App extends React.Component {
 }
 
 
-
-
-
   componentDidMount() {
     var updateWeek = this.state.availDays;
 
@@ -164,7 +157,6 @@ class App extends React.Component {
 
 
 
-
   componentDidUpdate() {
     const updateWeek = this.state.availDays;
     const calendarEl = this.calendarRef.current;
@@ -192,15 +184,17 @@ class App extends React.Component {
 
 renderShowFlash() {
   if (this.state.showFlash) {
-  return <div class="alert alert-danger" id="alert" style="width:90%; margin:0 auto;">
-  "You have successfully updated your availability."</div>
+  return <div className="alert alert-success success" id="alert">
+  You have successfully updated your availability.</div>
   }
 }
 
   render() {
     return (
-    {this.renderShowFlash()}
-<div className="availabilityChanger">
+    <div>
+
+    <div>{this.renderShowFlash() }
+      </div>
 
 
 <div className="container-fluid">
