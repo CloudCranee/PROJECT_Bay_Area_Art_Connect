@@ -6,6 +6,7 @@ from datetime import datetime
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+import json
 
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Post, Zipcode, Tag
@@ -23,7 +24,7 @@ def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
     ###Do I need to add more code here or is this complete?
 
-
+#hi
 
 @login_manager.unauthorized_handler
 def unauthorized_callback():
@@ -37,8 +38,48 @@ def unauthorized_callback():
 def page_not_found(e):
     """This is a custom 404 page."""
 
-    return redirect('/')
+    flash("Error 404, page not found.")
 
+    return render_template("homepage.html")
+
+
+# @app.route('/bayjson.geojson')
+# def serve_static():
+#     with open('static/baysuburbs.geojson') as json_file:
+#         data_one = json.load(json_file)
+#     with open('static/sanjosesuburbs.geojson') as json_file:
+#         data_two = json.load(json_file)
+
+
+#     for locations in data_one["features"]:
+#         if (locations["properties"])["zip"] == "94558":
+#             data = locations
+
+#     for locations in data_two["features"]:
+#         if (locations["properties"])["ZCTA"] == "95123":
+#             data = locations
+
+#     return jsonify(data)
+
+@app.route('/maptest')
+def map_test():
+
+    with open('static/baysuburbs.geojson') as json_file:
+        data_one = json.load(json_file)
+    with open('static/sanjosesuburbs.geojson') as json_file:
+        data_two = json.load(json_file)
+
+    for locations in data_one["features"]:
+        if (locations["properties"])["zip"] == "94558":
+            data = locations
+
+    for locations in data_two["features"]:
+        if (locations["properties"])["ZCTA"] == "95123":
+            data = locations
+
+    zipdata = data
+
+    return render_template("maptest.html", zipdata=zipdata)   
 
 @app.route('/')
 def index():
@@ -64,12 +105,17 @@ def display_public_user(id):
 
     page_user = User.query.get(id)
 
+    if page_user == None:
+        flash("Error, page not found.")
+        return render_template("homepage.html")
+
     daysweek = list(current_user.daysweek)
 
     if page_user.is_artist or current_user.id == id:
         return render_template('user.html', user=page_user, daysweek=daysweek)
     else:
-        return redirect('/')
+        flash("Error, page not found.")
+        return render_template("homepage.html")
 
 
 @app.route('/newpost')
