@@ -125,11 +125,12 @@ class Zipcode(db.Model):
 
     valid_zipcode = db.Column(db.Integer, primary_key=True)
     location_name = db.Column(db.String(100))
+    region = db.Column(db.String(100))
 
     def __repr__(self):
         """Provides the representaion of a Zipcode instance when printed"""
 
-        return f"<Zipcode valid_zipcode={self.valid_zipcode}>"
+        return f"<Zipcode valid_zipcode={self.valid_zipcode} region={self.region}>"
 
 
 posts_tags = db.Table(
@@ -296,6 +297,69 @@ def seed_all():
     seed_tags()
     seed_users()
     seed_posts()
+
+    zips = Zipcode.query.all()
+
+    san_francisco = {'San Francisco'}
+    peninsula = {'Belmont', 'Brisbane', 'Burlingame', 'El Granada', 'Half Moon Bay',
+    'La Honda', 'Loma Mar', 'Los Altos', 'Daly City', 'Menlo Park', 'Atherton',
+    'Portola Valley', 'Millbrae', 'Montara', 'Moss Beach', 'Mountain View',
+    'Pacifica', 'Pescadero', 'Redwood City', 'San Bruno', 'San Carlos', 'San Gregorio',
+    'South San Francisco', 'Sunnyvale', 'Palo Alto', 'Stanford', 'San Mateo'}
+    north_bay_and_northland = {'American Canyon', 'Angwin', 'Calistoga', 'Fairfield',
+    'Napa', 'Oakville', 'Pope Valley', 'Deer Park', 'Rio Vista',
+    'Rutherford', 'Saint Helena', 'Suisun City', 'Suisun City', 'Vallejo',
+    'Walnut Creek', 'Yountville', 'San Rafael', 'Greenbrae', 'Belvedere Tiburon',
+    'Bodega', 'Bodega Bay', 'Bolinas', 'Corte Madera', 'Rohnert Park',
+    'Dillon Beach', 'Fairfax', 'Cotati', 'Forest Knolls', 'Inverness', 'Lagunitas',
+    'Larkspur', 'Marshall', 'Mill Valley', 'Novato', 'Nicasio', 'Olema', 'Penngrove',
+    'Petaluma', 'Point Reyes Station', 'Ross', 'San Anselmo', 'San Geronimo',
+    'San Quentin', 'Sausalito', 'Stinson Beach', 'Tomales', 'Valley Ford',
+    'Woodacre', 'Jenner', 'The Sea Ranch', 'Windsor', 'Villa Grande',
+    'Stewarts Point', 'Sonoma', 'Sebastopol', 'Rio Nido', 'Occidental', 'Monte Rio',
+    'Middletown', 'Kenwood', 'Healdsburg', 'Guerneville', 'Gualala', 'Graton',
+    'Glen Ellen', 'Geyserville', 'Fulton', 'Forestville', 'El Verano', 'Duncans Mills',
+    'Cloverdale', 'Clearlake', 'Cazadero', 'Camp Meeker', 'Boyes Hot Springs', 'Annapolis',
+    'Santa Rosa'}
+    east_bay = {'Alameda', 'Discovery Bay', 'Danville', 'Alamo', 'Antioch',
+    'Benicia', 'Bethel Island', 'Birds Landing', 'Brentwood', 'Byron',
+    'Canyon', 'Concord', 'Pleasant Hill', 'Crockett', 'Diablo', 'El Cerrito',
+    'Fremont', 'Hayward', 'Castro Valley', 'Hercules', 'Knightsen', 'Lafayette',
+    'Livermore', 'Martinez', 'Moraga', 'Newark', 'Oakley', 'Orinda', 'Pinole',
+    'Pittsburg', 'Pleasanton', 'Dublin', 'Port Costa', 'Moraga', 'Rodeo',
+    'San Leandro', 'San Ramon', 'San Lorenzo', 'Sunol', 'Union City',
+    'Oakland', 'Emeryville', 'Berkeley', 'Albany', 'Richmond', 'El Sobrante',
+    'Richmond', 'San Pablo', 'Clayton'}
+    south_bay = {'Alviso', 'Aptos', 'Ben Lomond', 'Boulder Creek', 'Brookdale',
+    'Campbell', 'Capitola', 'Castroville', 'Coyote', 'Cupertino', 'Davenport',
+    'Felton', 'Freedom', 'Gilroy', 'Hollister', 'Los Gatos', 'Milpitas',
+    'Morgan Hill', 'Mount Hermon', 'Paicines', 'San Juan Bautista', 'San Martin',
+    'Santa Clara', 'Santa Cruz', 'Scotts Valley', 'Saratoga', 'Soquel', 'Tres Pinos',
+    'Watsonville', 'San Jose', 'Mount Hamilton', 'Aromas'}
+    sacramento_stockon = {'Stockton', 'Acampo', 'Travis Afb', 'Clements',
+    'Farmington', 'French Camp', 'Holt', 'Linden', 'Lockeford', 'Lodi', 'Valley Springs',
+    'Victor', 'Wallace', 'Woodbridge', 'Tracy', 'Escalon', 'Lathrop', 'Manteca',
+    'Modesto', 'Oakdale', 'Ripon', 'Sacramento', 'Winters', 'Walnut Grove',
+    'Thornton', 'Pioneer', 'Loomis', 'Lincoln', 'Galt', 'Fair Oaks', 'Elmira',
+    'Dixon', 'Davis', 'Auburn', 'Vernalis', 'Riverbank', 'Vacaville'}
+
+    for zipco in zips:
+        if zipco.location_name in san_francisco:
+            zipco.region = 'San Francisco'
+        elif zipco.location_name in peninsula:
+            zipco.region = 'Peninsula'
+        elif zipco.location_name in north_bay_and_northland:
+            zipco.region = 'North Bay and Northland'
+        elif zipco.location_name in east_bay:
+            zipco.region = 'East Bay'
+        elif zipco.location_name in south_bay:
+            zipco.region = 'South Bay'
+        elif zipco.location_name in sacramento_stockon:
+            zipco.region = 'Sacramento and Stockton'
+        else:
+            zipco.region = 'Remote'
+
+    db.session.commit()
 
 
 
