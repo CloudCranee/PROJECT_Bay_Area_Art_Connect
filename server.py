@@ -5,11 +5,15 @@ from jinja2 import StrictUndefined
 from datetime import datetime, timedelta
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 import json
-
+import os
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Post, Zipcode, Tag
+from random import randint
+import boto3
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -19,12 +23,23 @@ app.secret_key = "thefriendswemadealongtheway"
 app.jinja_env.undefined = StrictUndefined
 
 
+## Change UPLOAD folder to our s3 bucket
+UPLOAD_FOLDER = '/static/img'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+###############
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
     ###Do I need to add more code here or is this complete?
 
-#hi
 
 @login_manager.unauthorized_handler
 def unauthorized_callback():
@@ -298,7 +313,6 @@ def display_active_gig(post_id):
 
 
 
-
 @app.route('/login_form')
 def present_login_form():
     """Displays the login form. Eventually I would incorporate this on the 
@@ -422,27 +436,27 @@ def register_process():
 
     last_active = datetime.now()
 
-    if request.form["link_to_website"]:
+    if request.form.get("link_to_website", False):
         link_to_website = request.form["link_to_website"]
     else:
         link_to_website = None
 
-    if request.form["hourly_rate"]:
+    if request.form.get("hourly_rate", False):
         hourly_rate = request.form["hourly_rate"]
     else:
         hourly_rate = None
 
-    if request.form["phone"]:
+    if request.form.get("phone", False):
         phone = request.form["phone"]
     else:
         phone = None
 
-    if request.form["link_to_website"]:
+    if request.form.get("link_to_website", False):
         link_to_website = request.form["link_to_website"]
     else:
         link_to_website = None
 
-    if request.form["bio"]:
+    if request.form.get("bio", False):
         bio = request.form["bio"]
     else:
         bio = None
@@ -460,6 +474,51 @@ def register_process():
         db.session.commit()
         flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
         return redirect("/")
+
+@app.route('/changepic')
+@login_required
+def display_change_profile_picture():
+    """Displays a form with a single option to upload a file"""
+
+    return render_template("changepic.html")
+
+
+@app.route('/uploadimg', methods=['POST'])
+@login_required
+def upload_image():
+    """Handles uploading an image"""
+
+    s3 = boto3.resource('s3')
+
+    file = request.files['file']
+    # if user does not select file, browser also
+    # submit an empty part without filename
+    user = User.query.get(current_user.id)
+    #implement Unique Here Storage Later
+
+    if file.filename == '':
+        flash('No selected file')
+        return redirect('/changepic')
+
+    if allowed_file(file.filename):
+
+        num = randint(10000000, 99999999)
+
+        file.filename = f'{current_user.email[0:4]}_profilepic_{num}'
+
+        # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        print("###################FILENAME################")
+        print(file.filename)
+
+        user.img_route = file.filename
+
+        db.session.commit()
+
+    # s3.Bucket(os.environ.get('S3_BUCKET')).put_object(Key=file.filename, Body=file)
+
+    s3.Bucket('bayart').put_object(Key=file.filename, Body=file)
+
+    return redirect('/profile')
 
 
 @app.route('/profile')
@@ -592,6 +651,6 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     app.run(host="0.0.0.0")

@@ -1,3 +1,6 @@
 env
 node-v10.15.3-linux-x64
 node_modules
+.aws
+.aws/credentials
+secrets.sh

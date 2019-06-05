@@ -35,6 +35,7 @@ class User(UserMixin, db.Model):
     daysweek = db.Column(db.String(7), default="ttttttt")
     paid_confirm = db.Column(db.Integer, default=0)
     verified = db.Column(db.Boolean, unique=False, default=False)
+    img_route = db.Column(db.String(200), default="default_user_icon.png")
 
     def __repr__(self):
         """Provides the representaion of a User instance when printed"""

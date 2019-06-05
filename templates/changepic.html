@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+<form action="/uploadimg" method="POST" enctype="multipart/form-data">
+
+  <div class="form-group">
+    <label for="exampleFormControlFile1">Upload profile picture: NOTE TO BODE, IMPLEMENT MAX FILE SIZE</label>
+    <input type="file" class="form-control-file" id="file" name="file" required class="form-control" accept="image/*">
+  </div>
+
+<br>
+
+  <div class="form-group">
+    <input type="submit" value="Upload" class="btn">
+  </div>
+
+</form>
+
+
+
+{% endblock %}
