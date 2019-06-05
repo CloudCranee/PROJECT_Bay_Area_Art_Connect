@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, flash, redirect, ses
 app=Flask(__name__)
 from flask_bootstrap import Bootstrap
 from jinja2 import StrictUndefined
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -61,25 +61,7 @@ def page_not_found(e):
 
 #     return jsonify(data)
 
-@app.route('/maptest')
-def map_test():
-
-    with open('static/baysuburbs.geojson') as json_file:
-        data_one = json.load(json_file)
-    with open('static/sanjosesuburbs.geojson') as json_file:
-        data_two = json.load(json_file)
-
-    for locations in data_one["features"]:
-        if (locations["properties"])["zip"] == "94558":
-            data = locations
-
-    for locations in data_two["features"]:
-        if (locations["properties"])["ZCTA"] == "95123":
-            data = locations
-
-    zipdata = data
-
-    return render_template("maptest.html", zipdata=zipdata)   
+  
 
 @app.route('/')
 def index():
@@ -123,7 +105,7 @@ def display_public_user(id):
 def new_post():
     """Renders a page with the option to post a new gig."""
 
-    zipcode_instances = Zipcode.query.all()
+    zipcode_instances = Zipcode.query.filter(Zipcode.location_name != 'Remote').all()
 
     zipcodes = []
 
@@ -135,11 +117,21 @@ def new_post():
     for zipcode in zipcode_instances:
         locations.append(zipcode.location_name)
 
+
+
     locations = list(set(locations))
 
     locations.sort()
 
+    locations.insert(0, "Remote")
+
     tags = Tag.query.all()
+
+    def sort_tag_name(val):
+        return val.tag_name
+
+    tags.sort(key = sort_tag_name)
+
 
     return render_template("new_post.html", zipcodes=zipcodes,
                         locations=locations, tags=tags)
@@ -155,11 +147,11 @@ def add_new_gig_to_database():
     description = request.form["description"]
     location = request.form["location"]
     zipcode = Zipcode.query.filter_by(location_name=location).first()
-
+    user_id = current_user.id
     post_date = datetime.now()
 
     new_post = Post(post_title=post_title, description=description,
-        zipcode=zipcode.valid_zipcode, post_date=post_date)
+        zipcode=zipcode.valid_zipcode, creation_date=post_date, user_id=user_id)
 
     post_tags = request.form.getlist("tag")
 
@@ -173,33 +165,138 @@ def add_new_gig_to_database():
         
     flash("Thank you. Your new post is now live.")
 
-    return redirect("posts")
+    return redirect("gigs")
 
 
 @app.route('/gigs')
 @login_required
-def display_posts():
+def display_gigs():
     """Displays a list of all posts
     TODO: (Pinterest style ((AJAX? REACT??)) infinte scroll.
     Sort by most recent post at the top."""
 
-    overmorgen = datetime.now() + timedelta(days=2)
-    print(tomorrow)
+    # overmorgen = datetime.now() + timedelta(days=2)
+    # print(overmorgen)
+    # print(type(overmorgen))
 
-    posts = Post.query.filter(Post.active == True).all()
+    # posts = Post.query.filter(Post.active == True).all()
 
-    for post in posts:
-        if post.gig_date_end < overmorgen:
-            post.active = False
+    # for post in posts:
+    #     if post.gig_date_end < overmorgen:
+    #         post.active = False
 
-    db.session.commit()
+    # db.session.commit()
 
-    if current.user.show_unpaid == True:
+    if current_user.show_unpaid == True:
         posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc())
     else:
         posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc())
 
     return render_template("gigs.html", posts=posts)
+
+
+@app.route('/searchgigs', methods=['GET', 'POST'])
+@login_required
+def display_gig_results():
+    """Basic string query gig search function"""
+
+    search_string = request.form["search"]
+    search_string = '%' + search_string + '%'
+
+    posts = Post.query.filter(((Post.description.ilike(search_string)) | (Post.post_title.ilike(search_string))), Post.active == True).all()
+
+    if posts == []:
+        flash("No posting matched your search criteria.")
+
+    return render_template("gigs.html", posts=posts)
+
+@app.route('/advancedgigsearch')
+@login_required
+def advanced_search_gig_page():
+
+    tags = Tag.query.all()
+
+    def sort_tag_name(val):
+        return val.tag_name
+
+    tags.sort(key = sort_tag_name)
+
+    locations = Zipcode.query.all()
+
+    locations = list(set([i.region for i in locations]))
+
+    locations.sort()
+
+    locations.insert(0, "Location:")
+    
+    return render_template('advancedgigsearch.html', tags=tags, locations=locations)
+
+
+@app.route('/searchgigsadvance', methods=['GET', 'POST'])
+@login_required
+def advanced_gigs_query():
+    """This route process an advanced gig search."""
+
+    if request.form.get("search", False):
+        search_string = '%' + request.form["search"] + '%'
+        s_posts = Post.query.filter(((Post.description.ilike(search_string)) | (Post.post_title.ilike(search_string))), Post.active == True).all()
+    else:
+        s_posts = Post.query.all()
+
+    if request.form.get("tag", False):
+        tags = request.form.getlist("tag")
+        t_posts = []
+        for tag in tags:
+            tag_one = Tag.query.filter(Tag.tag_name == tag).one()
+            t_posts.extend(tag_one.posts)
+    else:
+        t_posts = Post.query.all()
+
+    if request.form["location"] != "Location:":
+        location = request.form["location"]
+        list_of_tuples = db.session.query(Zipcode,Post).join(Post).filter(Zipcode.region == location).all()
+        l_posts = []
+        for i in list_of_tuples:
+            l_posts.append(i[1])
+    else:
+        l_posts = Post.query.all()
+
+    venn_s_t = [a for a in s_posts for b in t_posts if a == b]
+
+    posts = [c for c in venn_s_t for d in l_posts if c == d]
+
+    return render_template("gigs.html", posts=posts)
+
+@app.route('/gig/<int:post_id>')
+def display_active_gig(post_id):
+    """Displays a gig's page"""
+
+    gig = Post.query.filter_by(post_id = post_id).one()
+
+    data = None
+
+    print(gig.zipcode)
+    print(type(gig.zipcode))
+
+    with open('static/baysuburbs.geojson') as json_file:
+        data_one = json.load(json_file)
+    with open('static/sanjosesuburbs.geojson') as json_file:
+        data_two = json.load(json_file)
+
+    for locations in data_one["features"]:
+        if (locations["properties"])["zip"] == str(gig.zipcode):
+            data = locations
+
+    for locations in data_two["features"]:
+        if (locations["properties"])["ZCTA"] == str(gig.zipcode):
+            data = locations
+
+    print(data)
+    zipdata = data
+
+    return render_template("gig.html", zipdata=zipdata)
+
+
 
 
 @app.route('/login_form')
@@ -263,7 +360,6 @@ def logout():
     flash("You have successfully logged out.")
 
     return render_template("homepage.html", flashclass=flashclass)
-
 
 
 @app.route('/availability', methods=['GET'])
@@ -462,6 +558,27 @@ def save_date():
 
     return render_template("posts.html", posts=posts)
 
+
+@app.route('/maptest')
+def map_test():
+
+    with open('static/baysuburbs.geojson') as json_file:
+        data_one = json.load(json_file)
+    with open('static/sanjosesuburbs.geojson') as json_file:
+        data_two = json.load(json_file)
+
+    for locations in data_one["features"]:
+        if (locations["properties"])["zip"] == "94028":
+            data = locations
+
+    for locations in data_two["features"]:
+        if (locations["properties"])["ZCTA"] == "94028":
+            data = locations
+
+    print(data)
+    zipdata = data
+
+    return render_template("maptest.html", zipdata=zipdata) 
 
 ##################### Test Routes Finished ^^^^^^^^^
 

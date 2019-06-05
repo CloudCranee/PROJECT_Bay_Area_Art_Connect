@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
 <meta charset='utf-8' />
-<title>Add a GeoJSON polygon</title>
+<title>Individual Gig Display</title>
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css' rel='stylesheet' />
@@ -29,7 +30,7 @@ var map = new mapboxgl.Map({
 container: 'map',
 style: 'mapbox://styles/mapbox/streets-v11',
 center: [-122.407730, 37.784499],
-zoom: 17
+zoom: 9
 });
 
 map.on('load', function () {
@@ -52,5 +53,5 @@ map.on('load', function () {
     });
 
 </script>
- 
+
 {% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<br>
+
+<div class="container-fluid">
+    <div class="row justify-content-md-center">
+        <form action="/searchgigsadvance" method="POST">
+            <label><p>
+                <input type="text" name="search" class="form-control" placeholder="keyword"></p>
+            </label>
+
+
+
+
+  <div class="form-group">
+    <div class="col col-4">
+        Included in these tags:<p>
+        {% for tag in tags %}
+          <input type="checkbox" name="tag" value="{{ tag.tag_name }}">
+          {{ tag.tag_name }}
+      {% endfor %}
+    </p></div>
+</div>
+
+
+<p>
+      <select name="location">
+        {% for location in locations %}
+        <option value="{{location}}">{{location}}</option>
+        {% endfor %}
+      </select>
+</p>
+
+  <div class="form-group">
+    <div class="col col-4">
+                <p><input type="submit" value="Search" class="btn"> 
+        </p></form>
+    </div>
+</div>
+    </div>
+</div>
+
+
+
+{% endblock %}

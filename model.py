@@ -217,7 +217,7 @@ def seed_posts():
         fpost_title = fpone[:4] + '. This is the title of this post!'
         fdescription = fake.sentence() + " " + fake.sentence()
         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
-        fzipcode = fzipcodes[i]
+        fzipcode = fzipcodes[randint(1, 60)]
         fpost = Post(user_id=fuser_id, description=fdescription,
             zipcode=fzipcode, post_title=fpost_title, creation_date=fpost_date,
             pay=fpay)

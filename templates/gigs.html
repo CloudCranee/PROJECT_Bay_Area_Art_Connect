@@ -2,7 +2,21 @@
 {% block content %}
 
 
+<div class="container-fluid">
+    <div class="row justify-content-md-center">
+        <form action="/searchgigs" method="POST">
+            <label>
+                <input type="text" name="search" class="form-control" placeholder="Search" required class="form-control">
+            </label>
+                <input type="submit" value="Search" class="btn"> 
+                <a href="/advancedgigsearch">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                        Advanced Search</a>
+        </form>
+    </div>
+</div>
         {% for post in posts %}
+
 <div class="container-fluid">
     <div class="row justify-content-md-center">
 
@@ -11,11 +25,12 @@
                     {{ post.post_title }}
                 </h3>
                     <p class="postdescription">
-                        {{ post.description }}
+                        <a href="/gig/{{post.post_id}}">{{ post.description }}
+                    </a>
                     </p>
                     <p>
                         {% for tag in post.tags %}
-                        <b>{{ tag.tag_name }}
+                        <b>{{ tag.tag_name }}</b>
                         {% endfor %}
                     </p>
             </div>
