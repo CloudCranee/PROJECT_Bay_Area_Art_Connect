@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, jsonify, flash, redirect, session, abort, url_for
+from flask import Flask, render_template, request, jsonify, flash, redirect, session, abort, url_for, Request
 app=Flask(__name__)
+
 from flask_bootstrap import Bootstrap
 from jinja2 import StrictUndefined
 from datetime import datetime, timedelta
@@ -13,7 +14,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Post, Zipcode, Tag
 from random import randint
 import boto3
-
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -461,10 +463,34 @@ def register_process():
     else:
         bio = None
 
+    num = randint(10000000, 99999999)
+
+
+    message = Mail(
+    from_email='from_email@example.com',
+    to_emails='brittaslauritzen@gmail.com',
+    subject='Sending with Twilio SendGrid is Fun',
+    html_content='<strong>and easy to do anywhere, even with Python</strong>')
+
+    # f'<strong>and {num} easy to do anywhere, even with Python</strong>'
+
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
+
+
+
     if User.query.filter_by(email=email).one_or_none():
         flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
         return redirect("/")
-    
+    elif User.query.filter_by(user_name=user_name).one_or_none():
+        flash(f"Username already taken. Please try another.")
+        return redirect('/sign_up')
     else:
         new_user = User(user_name=user_name, password=password, email=email,
             phone=phone, is_artist=is_artist,
@@ -483,7 +509,7 @@ def display_change_profile_picture():
     return render_template("changepic.html")
 
 
-@app.route('/uploadimg', methods=['POST'])
+@app.route('/uploadimg', methods=['GET', 'POST'])
 @login_required
 def upload_image():
     """Handles uploading an image"""
@@ -491,6 +517,7 @@ def upload_image():
     s3 = boto3.resource('s3')
 
     file = request.files['file']
+
     # if user does not select file, browser also
     # submit an empty part without filename
     user = User.query.get(current_user.id)
@@ -506,10 +533,6 @@ def upload_image():
 
         file.filename = f'{current_user.email[0:4]}_profilepic_{num}'
 
-        # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        print("###################FILENAME################")
-        print(file.filename)
-
         user.img_route = file.filename
 
         db.session.commit()
@@ -517,7 +540,9 @@ def upload_image():
     # s3.Bucket(os.environ.get('S3_BUCKET')).put_object(Key=file.filename, Body=file)
 
     s3.Bucket('bayart').put_object(Key=file.filename, Body=file)
-
+    print("step 7")
+    flash("Image successfully uploaded.")
+    flashstyle = "alert-success"
     return redirect('/profile')
 
 

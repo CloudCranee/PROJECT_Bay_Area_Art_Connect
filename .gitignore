@@ -4,3 +4,4 @@ node_modules
 .aws
 .aws/credentials
 secrets.sh
+sendgrid.env

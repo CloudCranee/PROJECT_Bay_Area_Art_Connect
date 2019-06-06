@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
     <title>Bay Area Art Connect</title>
@@ -17,78 +18,83 @@
   src="https://code.jquery.com/jquery-3.4.1.js"
   integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
   crossorigin="anonymous"></script>
-
-
-
-</head>
-<body>
 <link href="/static/styles/general.css" rel="stylesheet" type="text/css">
 
+{% block head_content %}
+{% endblock %}
+
+</head>
+
+
+<body>
+
+<div class="wrapper">
 
 <!-- Nav Bar Start UNEDITED COPY PASTE FROM BOOTSTRAP-->
+  <div class="nav-wrapper">
+  <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #F3F3F3;">
+        <a class="navbar-brand" href="/">Bay Area Art Connect</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #F3F3F3;">
-  <a class="navbar-brand" href="/">Bay Area Art Connect</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+          <a class="nav-link" href="/gigs">Gigs <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+          <a class="nav-link" href="/artists">Artists <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item active">
+          <a class="nav-link" href="/newpost">Post a Gig <span class="sr-only mr-sm-2">(current)</span></a>
+          </li>
+          </ul>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/gigs">Gigs <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="/artists">Artists <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="/newpost">Post a Gig <span class="sr-only mr-sm-2">(current)</span></a>
-      </li>
-    </ul>
+              {% if current_user.is_authenticated %}
+               <ul class="navbar-nav nav justify-content-end">
 
-    {% if current_user.is_authenticated %}
-     <ul class="navbar-nav nav justify-content-end">
+                <li class="nav-item active">
 
-      <li class="nav-item active">
+                  <a class="nav-link" href="/users/{{ current_user.id }}"><i class="fa fa-user-circle" aria-hidden="true"></i> {{ current_user.user_name }}
+                  
+                  <span class="sr-only mr-sm-2">(current)</span></a>
 
-        <a class="nav-link" href="/users/{{ current_user.id }}"><i class="fa fa-user-circle" aria-hidden="true"></i> {{ current_user.user_name }}
-        
-        <span class="sr-only mr-sm-2">(current)</span></a>
+                </li>
 
-      </li>
+                <li class="nav-item active">
 
-      <li class="nav-item active">
+                  <a class="nav-link" href="/profile"><i class="fa fa-cog" aria-hidden="true"></i> Settings
+                  
+                  <span class="sr-only mr-sm-2">(current)</span></a>
 
-        <a class="nav-link" href="/profile"><i class="fa fa-cog" aria-hidden="true"></i> Settings
-        
-        <span class="sr-only mr-sm-2">(current)</span></a>
-
-      </li>
+                </li>
 
 
-    </ul>
-    <form action="/logout">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Log Out</button>
-    </form>
-    {% else %}
-    </ul>
-    <form action="/login_form">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Log In</button>
-    </form>
-     <form action="/sign_up">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Sign Up</button>
-    </form>
-    {% endif %}
+            </ul>
+            <form action="/logout">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Log Out</button>
+            </form>
+            {% else %}
+            </ul>
+            <form action="/login_form">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Log In</button>
+            </form>
+             <form action="/sign_up">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Sign Up</button>
+            </form>
+            {% endif %}
 
-  </div>
-</nav>
-
+          </div>
+  </nav>
+</div>
 <!-- Nav Bar End UNEDITED COPY PASTE FROM BOOTSTRAP-->
-
+</div>
 
   {% for flash in get_flashed_messages() %}
     <div class="alert alert-success" id="alert" style="width:90%; margin:0 auto;">{{ flash }}</div>
   {% endfor %}
+
 
 {% block content %}
 {% endblock %}

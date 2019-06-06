@@ -93,3 +93,18 @@
     border-radius: 0 4px 4px 0;
 }
 
+/*****************/
+/* Map Id */
+/*****************/
+
+#map {
+  position:absolute;
+  top:5;
+  bottom:5;
+  width:100%;
+}
+
+.main-content {
+  position: relative;
+  height: 100vh;
+}
