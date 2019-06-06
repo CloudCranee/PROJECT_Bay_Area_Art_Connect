@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-
+{% if current_user.verified == True %}
 
 <form action="/creategig" method="POST">
 
@@ -52,7 +52,12 @@
 
 </form>
 
+{% endif %}
 
-
+{% if current_user.verified == False %}
+<p>
+Please verify your e-mail address before posting a gig.
+</p>
+{% endif %}
 
 {% endblock %}

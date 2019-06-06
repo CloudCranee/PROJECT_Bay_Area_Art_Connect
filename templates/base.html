@@ -91,6 +91,22 @@
 <!-- Nav Bar End UNEDITED COPY PASTE FROM BOOTSTRAP-->
 </div>
 
+{% if current_user.is_authenticated %}
+{% if current_user.verified == False %}
+
+<div class="alert alert-info" id="alert" style="width:90%; margin:0 auto;">
+    Please verify your e-mail by inputting the verification code send to {{ current_user.display_email }}:
+      <span>
+          <form action="/verify" method="POST">
+            <input type="text" name="verification" class="form-control">
+            <input type="submit" value="verify" class="btn">
+          </form>
+      </span>
+</div>
+
+{% endif %}
+{% endif %}
+
   {% for flash in get_flashed_messages() %}
     <div class="alert alert-success" id="alert" style="width:90%; margin:0 auto;">{{ flash }}</div>
   {% endfor %}

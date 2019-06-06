@@ -88,7 +88,6 @@ def index():
 
 
 @app.route('/artists')
-@login_required
 def display_artists():
     """Renders a page with all artists info."""
 
@@ -98,7 +97,6 @@ def display_artists():
 
 
 @app.route('/users/<int:id>')
-@login_required
 def display_public_user(id):
     """Display user info if user is artist, or user is current_user"""
 
@@ -119,7 +117,7 @@ def display_public_user(id):
 
 @app.route('/newpost')
 @login_required
-def new_post():
+def display_new_post_form():
     """Renders a page with the option to post a new gig."""
 
     zipcode_instances = Zipcode.query.filter(Zipcode.location_name != 'Remote').all()
@@ -284,6 +282,7 @@ def advanced_gigs_query():
 
     return render_template("gigs.html", posts=posts)
 
+
 @app.route('/gig/<int:post_id>')
 def display_active_gig(post_id):
     """Displays a gig's page"""
@@ -312,7 +311,6 @@ def display_active_gig(post_id):
     zipdata = data
 
     return render_template("gig.html", zipdata=zipdata)
-
 
 
 @app.route('/login_form')
@@ -412,7 +410,6 @@ def register_form():
     return render_template("register_form.html")
 
 
-
 @app.route('/register', methods=['POST'])
 def register_process():
     """Process registration."""
@@ -463,14 +460,19 @@ def register_process():
     else:
         bio = None
 
-    num = randint(10000000, 99999999)
+    # num = randint(10000000, 99999999)
+
+    letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+
+    veri_code = letters[randint(0, len(letters))] + str(randint(100000, 999999))
+
 
 
     message = Mail(
-    from_email='from_email@example.com',
-    to_emails='brittaslauritzen@gmail.com',
-    subject='Sending with Twilio SendGrid is Fun',
-    html_content='<strong>and easy to do anywhere, even with Python</strong>')
+    from_email='moodypage.e@gmail.com',
+    to_emails='ecmccormack5@gmail.com',
+    subject='HI, I am Page. Yep. Still definitely Page.',
+    html_content='<strong>Hi. I am definitley Page. Give me all your money.</strong>')
 
     # f'<strong>and {num} easy to do anywhere, even with Python</strong>'
 
@@ -484,22 +486,40 @@ def register_process():
         print(e.message)
 
 
-
-    if User.query.filter_by(email=email).one_or_none():
-        flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
-        return redirect("/")
-    elif User.query.filter_by(user_name=user_name).one_or_none():
+    if User.query.filter_by(user_name=user_name).one_or_none():
         flash(f"Username already taken. Please try another.")
         return redirect('/sign_up')
+    elif User.query.filter_by(email=email).one_or_none():
+        flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
+        return redirect("/")
     else:
         new_user = User(user_name=user_name, password=password, email=email,
             phone=phone, is_artist=is_artist,
             last_active=last_active, show_unpaid=show_unpaid, display_email=display_email,
-            link_to_website=link_to_website, bio= bio, hourly_rate=hourly_rate)
+            link_to_website=link_to_website, bio= bio, hourly_rate=hourly_rate, veri_code=veri_code)
         db.session.add(new_user)
         db.session.commit()
         flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
         return redirect("/")
+
+
+@app.route('/verify', methods=['POST'])
+@login_required
+def verify_user():
+    """Checks user input against random verification code."""
+
+    input_code = request.form["verification"]
+
+    if current_user.veri_code == input_code:
+        current_user.verified = True
+        db.session.commit()
+        flash("Thank you for verification.")
+        return render_template("homepage.html")
+
+    flash("Your code does not match the verification code. Please try again.")
+    return render_template("homepage.html")
+
+
 
 @app.route('/changepic')
 @login_required

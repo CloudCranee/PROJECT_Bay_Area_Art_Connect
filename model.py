@@ -36,6 +36,7 @@ class User(UserMixin, db.Model):
     paid_confirm = db.Column(db.Integer, default=0)
     verified = db.Column(db.Boolean, unique=False, default=False)
     img_route = db.Column(db.String(200), default="default_user_icon.png")
+    veri_code = db.Column(db.String(50), default="A123456")
 
     def __repr__(self):
         """Provides the representaion of a User instance when printed"""
