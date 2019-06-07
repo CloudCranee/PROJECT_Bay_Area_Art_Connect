@@ -5,3 +5,4 @@ node_modules
 .aws/credentials
 secrets.sh
 sendgrid.env
+__pycache__

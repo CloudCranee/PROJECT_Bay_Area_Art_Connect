@@ -10,22 +10,28 @@
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css' rel='stylesheet' />
-
+<script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
 {% endblock %}
 
 {% block content %}
+
+
 
 <style>
 #map { position:absolute; top:0; bottom:0; width:100%; }
 </style>
 
+
  <div class="container-fluid">
     <div class="main-content">
-        <div class="col col-4">
-            <p>POST</p>
-        </div>
+
        <div class="col col-4" id='map'> 
             <script type="text/javascript">
+
+
+
+
+
                 mapboxgl.accessToken = 'pk.eyJ1IjoiYm9kZXJpaXMiLCJhIjoiY2p3Z3gwNWFtMDM2ZDQ4bXZ1a2VqOW5tMyJ9.9bMk93E5EgyG3ND6U15vEg';
 
                 var map = new mapboxgl.Map({
@@ -53,6 +59,40 @@
                                 }
                             });
                     });
+
+
+// Trying to implement turfjs. Paige has used the bbox, but it also looks like there's a centerOfMass import
+// If you don't care about zoom size?
+
+//                 let bboxLineString = turf.lineString(routeGeometry.features[0].geometry.coordinates);
+
+//                 let turfBox = turf.bbox(bboxLineString);
+
+//                 let turfbboxPolygon = turf.bboxPolygon(turfBox);
+
+//                 let coordsList = turfbboxPolygon.geometry.coordinates[0]
+
+//                 console.log("turfbboxPolygon",coordsList)
+
+//                 let allX = [] 
+//                 let allY = [] 
+
+
+//                 coordsList.forEach((coord) => {
+//                 allX.push(coord[0]);
+//                 allY.push(coord[1]);
+//                 })
+    
+
+// zipcode_polygon = map.getSource('zipcodes')._data
+
+// draw a bounding box around the zipcode_polygon
+
+// var line = turf.lineString([[-74, 40], [-78, 42], [-82, 35]]);
+// var bbox = turf.bbox(line);
+// var bboxPolygon = turf.bboxPolygon(bbox);
+
+
 
             </script>
     </div>

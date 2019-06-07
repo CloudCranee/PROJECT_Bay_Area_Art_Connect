@@ -10,15 +10,24 @@ from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 import json
 import os
+import io
+import requests
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Post, Zipcode, Tag
 from random import randint
+# Image upload and resizing tools
 import boto3
+from PIL import Image
+
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from sendgridpy import send_email, verify_email
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+s3 = boto3.resource('s3')
+s3_client = boto3.client('s3') 
 
 app.secret_key = "thefriendswemadealongtheway"
 
@@ -108,8 +117,18 @@ def display_public_user(id):
 
     daysweek = list(current_user.daysweek)
 
+    image = current_user.img_route
+
+    url = s3_client.generate_presigned_url('get_object',
+                                    Params={
+                                   'Bucket': 'bayart',
+                                   'Key': image,
+                               },
+                               ExpiresIn=9600)
+
+
     if page_user.is_artist or current_user.id == id:
-        return render_template('user.html', user=page_user, daysweek=daysweek)
+        return render_template('user.html', user=page_user, daysweek=daysweek, url=url)
     else:
         flash("Error, page not found.")
         return render_template("homepage.html")
@@ -460,47 +479,30 @@ def register_process():
     else:
         bio = None
 
-    # num = randint(10000000, 99999999)
-
     letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
 
-    veri_code = letters[randint(0, len(letters))] + str(randint(100000, 999999))
-
-
-
-    message = Mail(
-    from_email='moodypage.e@gmail.com',
-    to_emails='ecmccormack5@gmail.com',
-    subject='HI, I am Page. Yep. Still definitely Page.',
-    html_content='<strong>Hi. I am definitley Page. Give me all your money.</strong>')
-
-    # f'<strong>and {num} easy to do anywhere, even with Python</strong>'
-
-    try:
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-    except Exception as e:
-        print(e.message)
-
+    veri_code = letters[randint(0, len(letters)-1)] + str(randint(100000, 999999))
 
     if User.query.filter_by(user_name=user_name).one_or_none():
         flash(f"Username already taken. Please try another.")
         return redirect('/sign_up')
-    elif User.query.filter_by(email=email).one_or_none():
+    
+    if User.query.filter_by(email=email).one_or_none():
         flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
         return redirect("/")
-    else:
-        new_user = User(user_name=user_name, password=password, email=email,
-            phone=phone, is_artist=is_artist,
-            last_active=last_active, show_unpaid=show_unpaid, display_email=display_email,
-            link_to_website=link_to_website, bio= bio, hourly_rate=hourly_rate, veri_code=veri_code)
-        db.session.add(new_user)
-        db.session.commit()
-        flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
-        return redirect("/")
+
+    from_email = "BayAreaArtConnect@gmail.com"
+    # verify_email()
+    send_email(from_email, display_email, user_name, veri_code)
+
+    new_user = User(user_name=user_name, password=password, email=email,
+        phone=phone, is_artist=is_artist,
+        last_active=last_active, show_unpaid=show_unpaid, display_email=display_email,
+        link_to_website=link_to_website, bio= bio, hourly_rate=hourly_rate, veri_code=veri_code)
+    db.session.add(new_user)
+    db.session.commit()
+    flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
+    return redirect("/")
 
 
 @app.route('/verify', methods=['POST'])
@@ -520,7 +522,6 @@ def verify_user():
     return render_template("homepage.html")
 
 
-
 @app.route('/changepic')
 @login_required
 def display_change_profile_picture():
@@ -534,14 +535,8 @@ def display_change_profile_picture():
 def upload_image():
     """Handles uploading an image"""
 
-    s3 = boto3.resource('s3')
-
     file = request.files['file']
-
-    # if user does not select file, browser also
-    # submit an empty part without filename
     user = User.query.get(current_user.id)
-    #implement Unique Here Storage Later
 
     if file.filename == '':
         flash('No selected file')
@@ -550,17 +545,33 @@ def upload_image():
     if allowed_file(file.filename):
 
         num = randint(10000000, 99999999)
+        file_name = f'{current_user.email[0:4]}_profilepic_{num}'
+        
+        user.img_route = file_name
 
-        file.filename = f'{current_user.email[0:4]}_profilepic_{num}'
+        image = Image.open(file)
+        
+        image.thumbnail([400, 400])
 
-        user.img_route = file.filename
+        in_mem_file = io.BytesIO()
+
+        image.save(in_mem_file, format='JPEG', quality=95)
+
+        file = in_mem_file.getvalue()
+
+        # if user does not select file, browser also
+        # submit an empty part without filename
+
+        #implement Unique Here Storage Later
+
+
 
         db.session.commit()
 
     # s3.Bucket(os.environ.get('S3_BUCKET')).put_object(Key=file.filename, Body=file)
 
-    s3.Bucket('bayart').put_object(Key=file.filename, Body=file)
-    print("step 7")
+    s3.Bucket('bayart').put_object(Key=file_name, Body=file)
+
     flash("Image successfully uploaded.")
     flashstyle = "alert-success"
     return redirect('/profile')

@@ -2,6 +2,8 @@ blinker==1.4
 boto==2.49.0
 boto3==1.9.162
 botocore==1.12.162
+certifi==2019.3.9
+chardet==3.0.4
 click==6.7
 docutils==0.14
 dominate==2.3.5
@@ -11,6 +13,7 @@ Flask-Bootstrap==3.3.7.1
 Flask-DebugToolbar==0.10.1
 Flask-Login==0.4.1
 Flask-SQLAlchemy==2.3.2
+idna==2.8
 itsdangerous==0.24
 Jinja2==2.10
 jmespath==0.9.4
@@ -19,11 +22,13 @@ node==0.9.23
 npm==0.1.1
 odict==1.6.2
 optional-django==0.1.0
+Pillow==6.0.0
 pkg-resources==0.0.0
 plumber==1.5
 psycopg2-binary==2.7.5
 python-dateutil==2.8.0
 python-http-client==3.1.0
+requests==2.22.0
 s3transfer==0.2.1
 sendgrid==6.0.5
 six==1.12.0
