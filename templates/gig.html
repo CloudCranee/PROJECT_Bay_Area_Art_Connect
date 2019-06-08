@@ -4,13 +4,17 @@
 
 <script type="text/javascript"> const zipdata = {{ zipdata|tojson }}
 </script>
+<script type="text/javascript"> const mapcenter = {{ mapcenter|tojson }}
+</script>
+<script type="text/javascript"> const mapzoom = {{ mapzoom|tojson }}
+</script>
+
 
 <meta charset='utf-8' />
 <title>Individual Gig Display</title>
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css' rel='stylesheet' />
-<script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
 {% endblock %}
 
 {% block content %}
@@ -37,8 +41,8 @@
                 var map = new mapboxgl.Map({
                 container: 'map',
                 style: 'mapbox://styles/mapbox/streets-v11',
-                center: [-122.241026, 37.767857],
-                zoom: 9
+                center: mapcenter,
+                zoom: mapzoom
                 });
 
                 map.on('load', function () {
@@ -64,25 +68,6 @@
 // Trying to implement turfjs. Paige has used the bbox, but it also looks like there's a centerOfMass import
 // If you don't care about zoom size?
 
-//                 let bboxLineString = turf.lineString(routeGeometry.features[0].geometry.coordinates);
-
-//                 let turfBox = turf.bbox(bboxLineString);
-
-//                 let turfbboxPolygon = turf.bboxPolygon(turfBox);
-
-//                 let coordsList = turfbboxPolygon.geometry.coordinates[0]
-
-//                 console.log("turfbboxPolygon",coordsList)
-
-//                 let allX = [] 
-//                 let allY = [] 
-
-
-//                 coordsList.forEach((coord) => {
-//                 allX.push(coord[0]);
-//                 allY.push(coord[1]);
-//                 })
-    
 
 // zipcode_polygon = map.getSource('zipcodes')._data
 

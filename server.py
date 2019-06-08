@@ -18,7 +18,7 @@ from random import randint
 # Image upload and resizing tools
 import boto3
 from PIL import Image
-
+from area import area
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from sendgridpy import send_email, verify_email
@@ -306,12 +306,19 @@ def advanced_gigs_query():
 def display_active_gig(post_id):
     """Displays a gig's page"""
 
-    gig = Post.query.filter_by(post_id = post_id).one()
+    gig = Post.query.filter_by(post_id = post_id).one_or_none()
 
-    data = None
+    if gig == None:
+        if current_user.show_unpaid == True:
+            posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc())
+        else:
+            posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc())
+        flash("This gig does not exist.")
+        return render_template("gigs.html", posts=posts)
 
-    print(gig.zipcode)
-    print(type(gig.zipcode))
+    zipdata = None
+    mapzoom = 8
+    mapcenter = [-122.241026, 37.767857]
 
     with open('static/baysuburbs.geojson') as json_file:
         data_one = json.load(json_file)
@@ -320,16 +327,61 @@ def display_active_gig(post_id):
 
     for locations in data_one["features"]:
         if (locations["properties"])["zip"] == str(gig.zipcode):
-            data = locations
+            zipdata = locations
+            data_source = "data_one"
 
     for locations in data_two["features"]:
         if (locations["properties"])["ZCTA"] == str(gig.zipcode):
-            data = locations
+            zipdata = locations
+            data_source = "data_two"
 
-    print(data)
-    zipdata = data
+    if zipdata != None:
 
-    return render_template("gig.html", zipdata=zipdata)
+        areabox = zipdata["geometry"]
+        if (area(areabox) > 50000000):
+            # Area is Large. Greater than fifty million (X2, 345, 678)
+            mapzoom = 8
+        elif (area(areabox) <= 50000000) & (area(areabox) > 10000000):
+            # Area is Medium. Greater than ten million (X2, 345, 678)
+            mapzoom = 9
+        elif (area(areabox) <= 10000000) & (area(areabox) > 1500000):
+            # Area is Small. Greater than one million, 500 thousand (X, 234, 567)
+            mapzoom = 10
+        else:
+            # Area is Tiny. Less than one million, 500 thousand (X, 234, 567)
+            mapzoom = 11
+        if data_source == "data_one":
+            mapcenter = (((areabox["coordinates"])[0])[0])[0]
+        else:
+            mapcenter = ((areabox["coordinates"])[0])[0]
+
+    # Regions: Remote (0) | Peninsula | San Francisco
+    # East Bay | North Bay and Northland | South Bay
+    # Sacramento and Stockton
+
+    if zipdata == None:
+        mapcenter = None
+        zipdata = {"type": "FeatureCollection",
+                    "features": []}
+
+        for my_zip in Zipcode.query.filter_by(region = gig.zipcodes.region).all():
+
+            for location in data_one["features"]:
+                if (location["properties"])["zip"] == str(my_zip.valid_zipcode):
+                    zipdata["features"].append(location)
+                    if mapcenter == None:
+                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+
+            for location in data_two["features"]:
+                if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
+                    zipdata["features"].append(location)
+                    if mapcenter == None:
+                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+
+
+        mapzoom = 8
+
+    return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom)
 
 
 @app.route('/login_form')

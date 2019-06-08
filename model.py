@@ -219,7 +219,7 @@ def seed_posts():
         fpost_title = fpone[:4] + '. This is the title of this post!'
         fdescription = fake.sentence() + " " + fake.sentence()
         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
-        fzipcode = fzipcodes[randint(1, 60)]
+        fzipcode = fzipcodes[randint(1, 350)]
         fpost = Post(user_id=fuser_id, description=fdescription,
             zipcode=fzipcode, post_title=fpost_title, creation_date=fpost_date,
             pay=fpay)
@@ -311,7 +311,7 @@ def seed_all():
     north_bay_and_northland = {'American Canyon', 'Angwin', 'Calistoga', 'Fairfield',
     'Napa', 'Oakville', 'Pope Valley', 'Deer Park', 'Rio Vista',
     'Rutherford', 'Saint Helena', 'Suisun City', 'Suisun City', 'Vallejo',
-    'Walnut Creek', 'Yountville', 'San Rafael', 'Greenbrae', 'Belvedere Tiburon',
+    'Yountville', 'San Rafael', 'Greenbrae', 'Belvedere Tiburon',
     'Bodega', 'Bodega Bay', 'Bolinas', 'Corte Madera', 'Rohnert Park',
     'Dillon Beach', 'Fairfax', 'Cotati', 'Forest Knolls', 'Inverness', 'Lagunitas',
     'Larkspur', 'Marshall', 'Mill Valley', 'Novato', 'Nicasio', 'Olema', 'Penngrove',
@@ -331,7 +331,7 @@ def seed_all():
     'Pittsburg', 'Pleasanton', 'Dublin', 'Port Costa', 'Moraga', 'Rodeo',
     'San Leandro', 'San Ramon', 'San Lorenzo', 'Sunol', 'Union City',
     'Oakland', 'Emeryville', 'Berkeley', 'Albany', 'Richmond', 'El Sobrante',
-    'Richmond', 'San Pablo', 'Clayton'}
+    'Richmond', 'San Pablo', 'Clayton', 'Walnut Creek'}
     south_bay = {'Alviso', 'Aptos', 'Ben Lomond', 'Boulder Creek', 'Brookdale',
     'Campbell', 'Capitola', 'Castroville', 'Coyote', 'Cupertino', 'Davenport',
     'Felton', 'Freedom', 'Gilroy', 'Hollister', 'Los Gatos', 'Milpitas',
