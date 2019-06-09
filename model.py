@@ -10,6 +10,7 @@ from flask import Flask
 from random import randint
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import json
 
 from faker import Faker
 fake = Faker()
@@ -128,6 +129,7 @@ class Zipcode(db.Model):
     valid_zipcode = db.Column(db.Integer, primary_key=True)
     location_name = db.Column(db.String(100))
     region = db.Column(db.String(100))
+    loc_geojson = db.Column(db.String(999999))
 
     def __repr__(self):
         """Provides the representaion of a Zipcode instance when printed"""
@@ -287,18 +289,8 @@ def seed_zipcodes():
         new_zcode = Zipcode(valid_zipcode=k, location_name=nv)
         db.session.add(new_zcode)
 
-    remote = Zipcode(valid_zipcode=00000, location_name='Remote')
-    db.session.add(remote)
-
     db.session.commit()
 
-
-def seed_all():
-    db.create_all()
-    seed_zipcodes()
-    seed_tags()
-    seed_users()
-    seed_posts()
 
     zips = Zipcode.query.all()
 
@@ -360,6 +352,111 @@ def seed_all():
             zipco.region = 'Sacramento and Stockton'
         else:
             zipco.region = 'Remote'
+
+
+    db.session.commit()
+
+    all_locations = Zipcode.query.all()
+
+    step = 1
+    print("Step " + str(step))
+    step += 1
+
+    with open('static/baysuburbs.geojson') as json_file:
+        data_one = json.load(json_file)
+        print("Step " + str(step))
+        step += 1
+    with open('static/sanjosesuburbs.geojson') as json_file:
+        data_two = json.load(json_file)
+        print("Step " + str(step))
+        step += 1
+
+    #Grouping row geojson by suburb name.
+
+    for loc_row in all_locations:
+        print("Step " + str(step))
+        step += 1
+        zipdata = {"type": "FeatureCollection",
+                        "features": []}
+        found = False
+
+        for my_zip in Zipcode.query.filter_by(location_name = loc_row.location_name).all():
+            print("Step " + str(step))
+            step += 1
+
+            for location in data_one["features"]:
+
+                if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
+                    zipdata["features"].append(location)
+                    found = True
+                    break
+            
+            if found == False:
+                for location in data_two["features"]:
+
+                    if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
+                        zipdata["features"].append(location)
+                        found = True
+                        break
+
+
+        print("ADDED BY SUBURB NAME" + str(loc_row.location_name))
+        loc_row.loc_geojson = str(zipdata)
+        if len(loc_row.loc_geojson) < 100:
+            print("*************** SMALL ***************")
+            print(loc_row.loc_geojson)
+
+    # If neither the zipcode, nor other zipcode which share a suburb name with
+    # said zipcode are in the geojson, we group by region.
+
+    for loc_row in all_locations:
+        
+
+        if len(loc_row.loc_geojson) < 100:
+
+            print("SPECIAL CASE HAPPENING")
+            zipdata = {"type": "FeatureCollection",
+                        "features": []}
+            found = False
+
+            for my_zip in Zipcode.query.filter_by(region = loc_row.region).all():
+                print("Step " + str(step))
+                step += 1
+
+                for location in data_one["features"]:
+
+                    if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
+                        zipdata["features"].append(location)
+                        found = True
+                        break
+                
+                if found == False:
+                    for location in data_two["features"]:
+
+                        if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
+                            zipdata["features"].append(location)
+                            found = True
+                            break
+
+            print("ADDED BY REGION" + str(loc_row.region))
+            loc_row.loc_geojson = str(zipdata)
+
+
+
+    print("Step " + str(step))
+    step += 1
+    remote = Zipcode(valid_zipcode=00000, location_name='Remote')
+    db.session.add(remote)
+    db.session.commit()
+
+def seed_all():
+    db.create_all()
+    seed_zipcodes()
+    seed_tags()
+    seed_users()
+    seed_posts()
+
+    
 
     db.session.commit()
 

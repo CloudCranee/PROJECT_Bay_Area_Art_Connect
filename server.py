@@ -11,6 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 import os
 import io
+import ast
 import requests
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Post, Zipcode, Tag
@@ -141,7 +142,7 @@ def advanced_artist_search_page():
 def advanced_artist_query():
     """This route processed an advanced artist search."""
 
-    
+
     return render_template("artists.html", artists=artists)
 
 
@@ -362,93 +363,39 @@ def display_active_gig(post_id):
         flash("This gig does not exist.")
         return render_template("gigs.html", posts=posts)
 
-    zipdata = None
+    zipdata = gig.zipcodes.loc_geojson
+    zipdata = ast.literal_eval(zipdata)
     mapzoom = 8
     mapcenter = [-122.241026, 37.767857]
 
     if gig.zipcodes.location_name == "Remote":
         return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom)
 
+    areabox = ((zipdata["features"])[0])["geometry"]
+    if (area(areabox) > 50000000):
+        # Area is Large. Greater than fifty million (X2, 345, 678)
+        mapzoom = 8
+    elif (area(areabox) <= 50000000) & (area(areabox) > 10000000):
+        # Area is Medium. Greater than ten million (X2, 345, 678)
+        mapzoom = 9
+    elif (area(areabox) <= 10000000) & (area(areabox) > 1500000):
+        # Area is Small. Greater than one million, 500 thousand (X, 234, 567)
+        mapzoom = 10
+    else:
+        # Area is Tiny. Less than one million, 500 thousand (X, 234, 567)
+        mapzoom = 11
 
-    with open('static/baysuburbs.geojson') as json_file:
-        data_one = json.load(json_file)
-    with open('static/sanjosesuburbs.geojson') as json_file:
-        data_two = json.load(json_file)
-
-    for locations in data_one["features"]:
-        if (locations["properties"])["zip"] == str(gig.zipcode):
-            zipdata = locations
-            data_source = "data_one"
-
-    for locations in data_two["features"]:
-        if (locations["properties"])["ZCTA"] == str(gig.zipcode):
-            zipdata = locations
-            data_source = "data_two"
-
-    if zipdata != None:
-
-        areabox = zipdata["geometry"]
-        if (area(areabox) > 50000000):
-            # Area is Large. Greater than fifty million (X2, 345, 678)
-            mapzoom = 8
-        elif (area(areabox) <= 50000000) & (area(areabox) > 10000000):
-            # Area is Medium. Greater than ten million (X2, 345, 678)
-            mapzoom = 9
-        elif (area(areabox) <= 10000000) & (area(areabox) > 1500000):
-            # Area is Small. Greater than one million, 500 thousand (X, 234, 567)
-            mapzoom = 10
-        else:
-            # Area is Tiny. Less than one million, 500 thousand (X, 234, 567)
-            mapzoom = 11
-        if data_source == "data_one":
-            mapcenter = (((areabox["coordinates"])[0])[0])[0]
-        else:
-            mapcenter = ((areabox["coordinates"])[0])[0]
+    if ((areabox["coordinates"])[0])[0] is list:
+        mapcenter = (((areabox["coordinates"])[0])[0])[0]
+    else:
+        mapcenter = ((areabox["coordinates"])[0])[0]
 
     # Regions: Remote (0) | Peninsula | San Francisco
     # East Bay | North Bay and Northland | South Bay
     # Sacramento and Stockton
+    print(zipdata)
 
-    if zipdata == None:
-        mapcenter = None
-        zipdata = {"type": "FeatureCollection",
-                    "features": []}
-
-        for my_zip in Zipcode.query.filter_by(location_name = gig.zipcodes.location_name).all():
-
-            for location in data_one["features"]:
-                if (location["properties"])["zip"] == str(my_zip.valid_zipcode):
-                    zipdata["features"].append(location)
-                    if mapcenter == None:
-                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
-
-            for location in data_two["features"]:
-                if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
-                    zipdata["features"].append(location)
-                    if mapcenter == None:
-                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
-
-        mapzoom = 8
-
-    if zipdata == {"type": "FeatureCollection",
-                    "features": []}:
-
-        for my_zip in Zipcode.query.filter_by(region = gig.zipcodes.region).all():
-
-            for location in data_one["features"]:
-                if (location["properties"])["zip"] == str(my_zip.valid_zipcode):
-                    zipdata["features"].append(location)
-                    if mapcenter == None:
-                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
-
-            for location in data_two["features"]:
-                if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
-                    zipdata["features"].append(location)
-                    if mapcenter == None:
-                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
-
-
-        mapzoom = 8
+    zipdata = json.dumps(zipdata)
 
     return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom)
 
