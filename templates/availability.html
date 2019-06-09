@@ -19,19 +19,6 @@
 </div>
 
 
-<div class="container-fluid">
-        <div class="row justify-content-md-center">
-            <div id="mydate" name="mydate" gldp-id="mydate">
-                <div gldp-el="mydate"
-             style="width:400px; height:300px; position:absolute; top:70px; left:100px;">
-           </div>
-        </div>
-  </div>
-</div>
-
-
-
-
 
 
 <script src="/static/react.development.js"></script>
@@ -193,40 +180,40 @@ renderShowFlash() {
     return (
     <div>
 
-    <div>{this.renderShowFlash() }
+      <div>{this.renderShowFlash() }
       </div>
 
 
-<div className="container-fluid">
-  <div className="row justify-content-md-center">
-    I am unavailable these recurring days:<br />
-  </div>
-</div>
+      <div className="container-fluid">
+        <div className="row justify-content-md-center">
+        I am unavailable these recurring days:<br />
+        </div>
+      </div>
 
-<div className="container-fluid">
+      <div className="container-fluid">
         <div className="row justify-content-md-center">
           <DayButtons
             onDayDropClick={this.changeDay}
           />
-  </div>
-</div>
+        </div>
+      </div>
 
 <br />
 
-<div className="container-fluid">
-  <div className="myCalen" id="mydate" ref={this.calendarRef}>
-  </div>
-</div>
+      <div className="container-fluid">
+        <div className="myCalen" id="mydate" ref={this.calendarRef}>
+        </div>
+      </div>
 
 
-<div className="container-fluid">
-    <div className="row justify-content-md-center">
-      <SubmitNewAvail
+      <div className="container-fluid">
+        <div className="row justify-content-md-center">
+       <SubmitNewAvail
         submitChanges={this.submissionRoute}
         />
-  </div>
-  </div>
-</div>
+        </div>
+      </div>
+    </div>
 
     );
   }

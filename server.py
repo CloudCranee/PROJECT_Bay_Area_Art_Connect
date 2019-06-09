@@ -105,6 +105,47 @@ def display_artists():
     return render_template("artists.html", artists=artists)
 
 
+@app.route('/searchartists', methods=['GET', 'POST'])
+@login_required
+def display_artist_results():
+    """Basic string query artist search function"""
+
+    search_string = request.form["search"]
+    search_string = '%' + search_string + '%'
+
+    artists = User.query.filter(((User.bio.ilike(search_string))
+        | (User.user_name.ilike(search_string))), User.is_artist == True, User.verified==True).order_by(User.last_active.desc())
+
+    if artists == []:
+        flash("No artists matched your search.")
+
+    return render_template("artists.html", artists=artists)
+
+@app.route('/advancedartistsearch', methods=['GET', 'POST'])
+@login_required
+def advanced_artist_search_page():
+    """Displays the page for advanced artist search"""
+
+    tags = Tag.query.all()
+
+    def sort_tag_name(val):
+        return val.tag_name
+
+    tags.sort(key = sort_tag_name)
+    
+    return render_template('advancedartistssearch.html', tags=tags)
+
+
+@app.route('/searchartistsadvance', methods=['GET', 'POST'])
+@login_required
+def advanced_artist_query():
+    """This route processed an advanced artist search."""
+
+    
+    return render_template("artists.html", artists=artists)
+
+
+
 @app.route('/users/<int:id>')
 def display_public_user(id):
     """Display user info if user is artist, or user is current_user"""
@@ -271,11 +312,18 @@ def advanced_search_gig_page():
 def advanced_gigs_query():
     """This route process an advanced gig search."""
 
+    if current_user.show_unpaid == True:
+        s_posts = Post.query.filter(Post.active == True)
+        l_posts = Post.query.filter(Post.active == True)
+        t_posts = Post.query.filter(Post.active == True)
+    else:
+        s_posts = Post.query.filter(Post.active == True, Post.unpaid == False)
+        l_posts = Post.query.filter(Post.active == True, Post.unpaid == False)
+        t_posts = Post.query.filter(Post.active == True, Post.unpaid == False)
+
     if request.form.get("search", False):
         search_string = '%' + request.form["search"] + '%'
         s_posts = Post.query.filter(((Post.description.ilike(search_string)) | (Post.post_title.ilike(search_string))), Post.active == True).all()
-    else:
-        s_posts = Post.query.all()
 
     if request.form.get("tag", False):
         tags = request.form.getlist("tag")
@@ -283,8 +331,6 @@ def advanced_gigs_query():
         for tag in tags:
             tag_one = Tag.query.filter(Tag.tag_name == tag).one()
             t_posts.extend(tag_one.posts)
-    else:
-        t_posts = Post.query.all()
 
     if request.form["location"] != "Location:":
         location = request.form["location"]
@@ -292,12 +338,12 @@ def advanced_gigs_query():
         l_posts = []
         for i in list_of_tuples:
             l_posts.append(i[1])
-    else:
-        l_posts = Post.query.all()
 
     venn_s_t = [a for a in s_posts for b in t_posts if a == b]
-
     posts = [c for c in venn_s_t for d in l_posts if c == d]
+
+    if posts == []:
+            flash("No posting matched your search criteria.")
 
     return render_template("gigs.html", posts=posts)
 
@@ -319,6 +365,10 @@ def display_active_gig(post_id):
     zipdata = None
     mapzoom = 8
     mapcenter = [-122.241026, 37.767857]
+
+    if gig.zipcodes.location_name == "Remote":
+        return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom)
+
 
     with open('static/baysuburbs.geojson') as json_file:
         data_one = json.load(json_file)
@@ -363,6 +413,25 @@ def display_active_gig(post_id):
         mapcenter = None
         zipdata = {"type": "FeatureCollection",
                     "features": []}
+
+        for my_zip in Zipcode.query.filter_by(location_name = gig.zipcodes.location_name).all():
+
+            for location in data_one["features"]:
+                if (location["properties"])["zip"] == str(my_zip.valid_zipcode):
+                    zipdata["features"].append(location)
+                    if mapcenter == None:
+                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+
+            for location in data_two["features"]:
+                if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
+                    zipdata["features"].append(location)
+                    if mapcenter == None:
+                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+
+        mapzoom = 8
+
+    if zipdata == {"type": "FeatureCollection",
+                    "features": []}:
 
         for my_zip in Zipcode.query.filter_by(region = gig.zipcodes.region).all():
 

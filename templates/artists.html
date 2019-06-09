@@ -1,22 +1,41 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
+
 <div class="container-fluid">
     <div class="row justify-content-md-center">
+        <form action="/searchartists" method="POST">
+            <label>
+                <input type="text" name="search" class="form-control" placeholder="Search" required class="form-control">
+            </label>
+                <input type="submit" value="Search" class="btn"> 
+                <a href="/advancedartistsearch">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                        Advanced Search</a>
+        </form>
+    </div>
+</div>
+
+
+
     {% for artist in artists %}
+
+<div class="container-fluid">
+    <div class="row justify-content-md-center">
         <div class="col col-4">
-            <h3>
+            <h2>
                 {{ artist.user_name }}
-            </h3>
+            </h2>
                 </p>
                     <p>
                         <p>
-                            <h2>
+                            <h3>
                             <a href="/users/{{artist.id}}">Profile
                             </a>
-                            </h2>                        
+                            </h3>                        
                         {% for tag in artist.tags %}
-                        <b>{{ tag.tag_name }}
+                        <b>{{ tag.tag_name }}</b>
                         {% endfor %}
                     </p>
                 </div>
