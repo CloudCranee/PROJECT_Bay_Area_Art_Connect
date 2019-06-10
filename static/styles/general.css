@@ -24,8 +24,8 @@ a:hover {
 
 
 .alert-info {
-  color:#0c084C;
-  background-color:#cdeffc;
+  color:#000000;
+  background-color:#D9F6FC;
   border-color:#bee5eb
   }
 
@@ -41,7 +41,7 @@ a:hover {
   background-color:#096386;
   border-color:#096386
   }
-
+btn-outline-logo
   .btn-outline-primary.focus,
   .btn-outline-primary:focus {
     box-shadow:0 0 0 .2rem rgba(0,123,255,.5)
