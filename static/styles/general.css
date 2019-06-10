@@ -1,3 +1,64 @@
+/******************************/
+/* Links and Nav Bar override */
+/******************************/
+
+.nav-link {
+  color: #0C084C;
+}
+
+.nav-link:hover { 
+  color: #00B7A8;
+ }
+
+.navbar-light {
+  background-color: #F3F3F3;
+}
+
+a {
+  color: #096386;
+}
+
+a:hover { 
+  color: #00B7A8;
+ }
+
+
+.alert-info {
+  color:#0c084C;
+  background-color:#cdeffc;
+  border-color:#bee5eb
+  }
+
+.alert-info hr{border-top-color:#abdde5}.alert-info 
+
+.btn-outline-primary {
+  color:#096386;
+  border-color:#096386
+  }
+
+.btn-outline-primary:hover {
+  color:#fff;
+  background-color:#096386;
+  border-color:#096386
+  }
+
+  .btn-outline-primary.focus,
+  .btn-outline-primary:focus {
+    box-shadow:0 0 0 .2rem rgba(0,123,255,.5)
+    }
+
+.btn-outline-primary.disabled,
+.btn-outline-primary:disabled {
+  color:#096386;
+  background-color:transparent
+  }
+
+
+
+
+
+
+
 /********************/
 /* Dropdown Buttons */
 /********************/
@@ -46,8 +107,11 @@
 
 
 /*****************/
-/* Radio Buttons */
+/*  Buttons */
 /*****************/
+
+
+
 .switch-field {
     display: flex;
     margin-bottom: 36px;
@@ -81,7 +145,7 @@
 }
 
 .switch-field input:checked + label {
-    background-color: #a3fff7;
+    background-color: #cdeffc;
     box-shadow: none;
 }
 

@@ -563,42 +563,42 @@ def register_process():
     email = (request.form["email"]).lower()
     display_email = request.form["email"]
 
-    if request.form["is_artist"] == 't':
-        is_artist = True
-    else:
-        is_artist = False  
+    # if request.form["is_artist"] == 't':
+    #     is_artist = True
+    # else:
+    #     is_artist = False  
 
-    if request.form["show_unpaid"] == 't':
-        show_unpaid = True
-    else:
-        show_unpaid = False  
+    # if request.form["show_unpaid"] == 't':
+    #     show_unpaid = True
+    # else:
+    #     show_unpaid = False  
 
     last_active = datetime.now()
 
-    if request.form.get("link_to_website", False):
-        link_to_website = request.form["link_to_website"]
-    else:
-        link_to_website = None
+    # if request.form.get("link_to_website", False):
+    #     link_to_website = request.form["link_to_website"]
+    # else:
+    #     link_to_website = None
 
-    if request.form.get("hourly_rate", False):
-        hourly_rate = request.form["hourly_rate"]
-    else:
-        hourly_rate = None
+    # if request.form.get("hourly_rate", False):
+    #     hourly_rate = request.form["hourly_rate"]
+    # else:
+    #     hourly_rate = None
 
-    if request.form.get("phone", False):
-        phone = request.form["phone"]
-    else:
-        phone = None
+    # if request.form.get("phone", False):
+    #     phone = request.form["phone"]
+    # else:
+    #     phone = None
 
-    if request.form.get("link_to_website", False):
-        link_to_website = request.form["link_to_website"]
-    else:
-        link_to_website = None
+    # if request.form.get("link_to_website", False):
+    #     link_to_website = request.form["link_to_website"]
+    # else:
+    #     link_to_website = None
 
-    if request.form.get("bio", False):
-        bio = request.form["bio"]
-    else:
-        bio = None
+    # if request.form.get("bio", False):
+    #     bio = request.form["bio"]
+    # else:
+    #     bio = None
 
     letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
 
@@ -617,12 +617,15 @@ def register_process():
     send_email(from_email, display_email, user_name, veri_code)
 
     new_user = User(user_name=user_name, password=password, email=email,
-        phone=phone, is_artist=is_artist,
-        last_active=last_active, show_unpaid=show_unpaid, display_email=display_email,
-        link_to_website=link_to_website, bio= bio, hourly_rate=hourly_rate, veri_code=veri_code)
+        last_active=last_active, display_email=display_email,
+        veri_code=veri_code)
     db.session.add(new_user)
     db.session.commit()
-    flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
+
+    if new_user.is_authenticated:
+        login_user(new_user)
+
+    flash(f"Welcome {user_name}. Please check your {display_email} inbox for verification email.")
     return redirect("/")
 
 

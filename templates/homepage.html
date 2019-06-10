@@ -1,20 +1,65 @@
 {% extends 'base.html' %}
 {% block content %}
 
-This is the homepage,
 
 
 
 
         {% if "user_id" in session %}
-         <!--  <li><a href="/users/{{ session['user_id'] }}">Profile</a></li>
-          <li><a href="/logout">Logout</a></li>
-         -->
-         <p>A user is in session</p>
+
+A user is in session.
+
+
          {% else %}
-         <p>No user in session</p>
-         <!--  <li><a href="/register">Register</a></li>
-          <li><a href="/login">Login</a></li> -->
+
+
+<div class="well spaced" style="width:40%;">
+<h1>Register</h1>
+
+
+<form action="/register" method="POST">
+
+
+  <div class="form-group">
+    <label>
+        User Name
+        <input type="text" name="user_name" class="form-control" required class="form-control">
+    </label>
+  </div>
+
+<br>
+
+  <div class="form-group">
+    <label>
+      E-mail
+      <input type="text" name="email" class="form-control" required class="form-control">
+    </label>
+  </div>
+
+<br>
+
+  <div class="form-group">
+    <label>
+      Password
+      <input type="password" name="password" class="form-control" required class="form-control">
+    </label>
+  </div>
+
+<br>
+
+
+<br>
+
+  <div class="form-group">
+
+    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Sign Up">Sign Up</button>
+  </div>
+
+</form>
+</div>
+
+
+
         {% endif %}
 
 

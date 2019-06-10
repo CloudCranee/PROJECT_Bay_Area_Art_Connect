@@ -32,8 +32,14 @@
 
 <!-- Nav Bar Start UNEDITED COPY PASTE FROM BOOTSTRAP-->
   <div class="nav-wrapper">
-  <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #F3F3F3;">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+<form action="/sign_up">
+<button class="btn btn-outline-logo my-2 my-sm-0" type="submit">Bay Area Art Connect</button>
+</form>
+
         <a class="navbar-brand" href="/">Bay Area Art Connect</a>
+
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -72,18 +78,43 @@
 
 
             </ul>
+
             <form action="/logout">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Log Out</button>
+                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Log Out</button>
             </form>
             {% else %}
-            </ul>
-            <form action="/login_form">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Log In</button>
+<div class="navbar-nav nav justify-content-end">
+            
+
+            <form action="/login" method="POST">
+
+
+        <label>
+            <input type="email" name="email" required class="form-control" placeholder="Email">
+        </label>
+
+        
+        <label>
+            <input type="password" name="password" required class="form-control" placeholder="Password">
+        </label>
+
+<button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Log In</button>
+
             </form>
+
+
+            &#160;
+
              <form action="/sign_up">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Sign Up</button>
+                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Sign Up</button>
             </form>
+
+</div>
+
             {% endif %}
+
+
+
 
           </div>
   </nav>
