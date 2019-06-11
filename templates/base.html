@@ -18,6 +18,7 @@
   src="https://code.jquery.com/jquery-3.4.1.js"
   integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
   crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css?family=Lato:700|Poppins&display=swap" rel="stylesheet">
 <link href="/static/styles/general.css" rel="stylesheet" type="text/css">
 
 {% block head_content %}
@@ -34,6 +35,9 @@
   <div class="nav-wrapper">
   <nav class="navbar navbar-expand-lg navbar-light">
   
+
+<a class="navbar-brand" href="/">Bay Area Art Connect</a>
+
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -78,33 +82,33 @@
                 <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Log Out</button>
             </form>
             {% else %}
-<div class="navbar-nav nav justify-content-end">
-            
 
-            <form action="/login" method="POST">
+<ul class="navbar-nav nav justify-content-end">
+  <li class="nav-item active">
+
+      <form action="/login" method="POST" class="form-inline justify-content-end">
 
 
-        <label>
-            <input type="email" name="email" required class="form-control" placeholder="Email">
-        </label>
+            <i class="fas fa-envelope" aria-hidden="true"></i>&#160; <input type="email" name="email" required class="form-control col-2" placeholder="Email">
 
-        
-        <label>
-            <input type="password" name="password" required class="form-control" placeholder="Password">
-        </label>
+       
 
-<button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Log In</button>
+            &#160; <i class="fas fa-lock" aria-hidden="true"></i>&#160;<input type="password" name="password" required class="form-control col-2" placeholder="Password">
 
-            </form>
 
+&#160; <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Log In</button>
+
+      </form>
+</li>
+  <li class="nav-item active">
 
             &#160;
 
-             <form action="/sign_up">
+              <a href="/sign_up">
                 <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Sign Up</button>
-            </form>
-
-</div>
+            </a>
+</li>
+</ul>
 
             {% endif %}
 
@@ -120,14 +124,17 @@
 {% if current_user.is_authenticated %}
 {% if current_user.verified == False %}
 
-<div class="alert alert-info" id="alert" style="width:90%; margin:0 auto;">
-    Please verify your e-mail by inputting the verification code send to {{ current_user.display_email }}:
-      <span>
-          <form action="/verify" method="POST">
-            <input type="text" name="verification" class="form-control">
-            <input type="submit" value="verify" class="btn">
+
+
+<div class="alert alert-info justify-content-center" id="alert" style="width:90%; margin:0 auto;">
+    
+
+          <form action="/verify" method="POST" class="form-inline justify-content-center">
+            Please verify your email by inputting the verification code send to&#160; <b>{{ current_user.display_email }}</b>: &#160;
+            <input type="text" name="verification" class="form-control col-2" placeholder="Verification Code">
+            <input type="submit" value="Verify" class="btn">
           </form>
-      </span>
+
 </div>
 
 {% endif %}
@@ -137,6 +144,14 @@
     <div class="alert alert-success" id="alert" style="width:90%; margin:0 auto;">{{ flash }}</div>
   {% endfor %}
 
+
+
+<div class="squarea">A</div>
+<div class="squareb">B</div>
+<div class="squarec">C</div>
+<div class="squared">D</div>
+<div class="squaree">E</div>
+<div class="squaref">F</div>
 
 {% block content %}
 {% endblock %}

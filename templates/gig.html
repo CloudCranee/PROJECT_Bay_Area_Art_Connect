@@ -19,15 +19,36 @@
 
 {% block content %}
 
-
-
 <style>
 #map { position:absolute; top:0; bottom:0; width:100%; }
 </style>
 
+ 
+<div class="main-content">
 
- <div class="container-fluid">
-    <div class="main-content">
+    <div class="container">
+        <div class="row">
+             <div class="col col-4">
+
+                <section class="card">
+
+                    <div class="card-header justify-content-center">
+
+                        {{gig.post_title}}
+
+                    </div>
+                    <div class="card-body justify-content-center">
+                            <p class="card-text">
+
+                        {{ gig.description }}
+
+                            </p>
+                    </div>
+
+                </section>
+    </div>
+
+
 
        <div class="col col-4" id='map'> 
             <script type="text/javascript">
@@ -64,24 +85,10 @@
                             });
                     });
 
-
-// Trying to implement turfjs. Paige has used the bbox, but it also looks like there's a centerOfMass import
-// If you don't care about zoom size?
-
-
-// zipcode_polygon = map.getSource('zipcodes')._data
-
-// draw a bounding box around the zipcode_polygon
-
-// var line = turf.lineString([[-74, 40], [-78, 42], [-82, 35]]);
-// var bbox = turf.bbox(line);
-// var bboxPolygon = turf.bboxPolygon(bbox);
-
-
-
             </script>
     </div>
 
+</div>
     </div>
 </div>
 

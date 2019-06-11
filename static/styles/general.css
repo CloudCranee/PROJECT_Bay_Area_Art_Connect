@@ -1,17 +1,54 @@
+body {
+font-family: 'Poppins', sans-serif;
+background-color: #f3f3f3;
+}
+
+h1, h2, h3, h4, h5 {
+font-family: 'Lato', sans-serif;
+
+}
+
+.logo {
+font-family: 'Lato', sans-serif;
+
+}
+
+.text-align-center {
+text-align: center
+}
+
+
+.element-align-center {
+  align-items: center;
+  justify-content: center;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  left: 50%;
+  margin-left: -50px;
+}
 /******************************/
 /* Links and Nav Bar override */
 /******************************/
+/* box shadow Horz offset, vert offset, blur radius, spread radius */
 
-.nav-link {
-  color: #0C084C;
+.navbar {
+  background-color: #ffffff;
+  box-shadow: 1px 1px 10px 1px #d6d6d6;
+}
+
+.card-header {
+  background-color: #D9F6Fc;
+  border-bottom:1px solid #ffffff;  
 }
 
 .nav-link:hover { 
-  color: #00B7A8;
+  color: #FF8C26;
  }
 
 .navbar-light {
-  background-color: #F3F3F3;
+  background-color: #FFFFFF;
 }
 
 a {
@@ -29,17 +66,38 @@ a:hover {
   border-color:#bee5eb
   }
 
-.alert-info hr{border-top-color:#abdde5}.alert-info 
+.alert-info hr{border-top-color:#D9F6FC}.alert-info 
+
+.btn-warning {
+color:#ffffff;
+background-color:#0c7f99;
+border-color:#0c7f99;
+}
+
+.btn-warning {
+  color:#FFFFFF;
+  background-color:#0c7f99;
+  border-color:#0c7f99;
+  font-weight:bold;}
+
+.btn-warning:hover{color:#0c7f99;background-color:#FFFFFF;border-color:#0c7f99}
+
+.btn-warning.focus,.btn-warning:focus{
+  box-shadow:0 0 0 .2rem rgba(222,170,12,.5)}
+
+
+
+
 
 .btn-outline-primary {
-  color:#096386;
-  border-color:#096386
+  color:#0c7f99;
+  border-color:#0c7f99
   }
 
 .btn-outline-primary:hover {
   color:#fff;
-  background-color:#096386;
-  border-color:#096386
+  background-color:#0c7f99;
+  border-color:#0c7f99
   }
 btn-outline-logo
   .btn-outline-primary.focus,
@@ -53,18 +111,45 @@ btn-outline-logo
   background-color:transparent
   }
 
+.squarea {
+  height: 50px;
+  width: 50px;
+  background-color: #0c7f99;
+}
 
-
-
-
+.squareb {
+  height: 50px;
+  width: 50px;
+  background-color: #4fdFFF;
+}
+.squarec {
+  height: 50px;
+  width: 50px;
+  background-color: #D9F6Fc;
+}
+.squared {
+  height: 50px;
+  width: 50px;
+  background-color: #FF8C26;
+}
+.squaree {
+  height: 50px;
+  width: 50px;
+  background-color: #f3f3f3;
+}
+.squaref {
+  height: 50px;
+  width: 50px;
+  background-color: #064350;
+}
 
 
 /********************/
 /* Dropdown Buttons */
 /********************/
 .dropbtn {
-  background-color: #00b7a8;
-  color: white;
+  background-color: #D9F6Fc;
+  color: #064350;
   padding: 16px;
   font-size: 16px;
   border: none;
@@ -80,7 +165,7 @@ btn-outline-logo
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #f3f3f3;
+  background-color: #ffffff;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
@@ -97,13 +182,13 @@ btn-outline-logo
 }
 
 /* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #ddd;}
+.dropdown-buttons:hover {background-color: #ddd;}
 
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {display: block;}
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
-.dropdown:hover .dropbtn {background-color: #096386}
+.dropdown:hover .dropbtn {background-color: #76e6ff}
 
 
 /*****************/

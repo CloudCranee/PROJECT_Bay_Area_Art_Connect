@@ -19,28 +19,35 @@
 
 
 
-    {% for artist in artists %}
 
-<div class="container-fluid">
-    <div class="row justify-content-md-center">
-        <div class="col col-4">
-            <h2>
-                {{ artist.user_name }}
-            </h2>
+
+<div class="container justify-content-center">
+    <div class=" justify-content-center col">
+        {% for artist in artists %}
+        <section class="card justify-content-center row">
+            <div class="card-header justify-content-center">            
+                <h4>
+                   <a href="/users/{{artist.id}}"> {{ artist.user_name }}</a>
+                </h4>
+            </div>
+
+            <div class="card-body justify-content-center">
+                <p class="card-text">
+                    {{ artist.bio }}
+                    
                 </p>
-                    <p>
-                        <p>
-                            <h3>
-                            <a href="/users/{{artist.id}}">Profile
-                            </a>
-                            </h3>                        
-                        {% for tag in artist.tags %}
-                        <b>{{ tag.tag_name }}</b>
-                        {% endfor %}
-                    </p>
-                </div>
-            {% endfor %}
-            
+                
+                <p>
+                    {% for tag in artist.tags %}
+                    <b>{{ tag.tag_name }}</b>
+                    {% endfor %}
+                </p>
+            </div>
+        </section> 
+        {% endfor %}
+    </div>
+</div>            
+
 
 
 

@@ -196,12 +196,19 @@ def seed_users():
             fartist = False
         else:
             fartist = True
+
+        ver = randint(0,1)
+        if ver == 0:
+            verified = False
+        else:
+            verified = True
+
         display_email = (fname[:3] + fname[-2:] + str(i) + '@gmail.com')
         femail = display_email.lower()
         flast_active = fake.date_between(start_date="-1y", end_date="today")
         fuser = User(user_name=fname, is_artist=fartist, password=fpassword, bio=fbio,
                 hourly_rate=fhourly_rate, phone=fphone, email=femail,
-                last_active=flast_active, display_email=display_email)
+                last_active=flast_active, display_email=display_email, verified=verified)
         db.session.add(fuser) 
     print("Commiting all new users.")
     db.session.commit()

@@ -13,9 +13,10 @@
 <script src="/static/js/glDatePicker.js"></script>
 <!-- End imports needed for this page. -->
 
-
+<div class="main-content">
 <!-- I believe this div is where the React will be rendering -->
-<div id="root">
+  <div id="root">
+  </div>
 </div>
 
 
@@ -45,8 +46,8 @@ function DayButtons(props) {
       <div className="dropdown datechanger" key={buttonDays[i].numb}>
             <button className="dropbtn">{buttonDays[i].name}</button>
               <div className="dropdown-content" id="selectableDOW">
-                <span data-value={buttonDays[i].numb + 't'} onClick={props.onDayDropClick} >Available</span>
-                <span data-value={buttonDays[i].numb + 'f'} onClick={props.onDayDropClick} >Unavailable</span>
+                <span className="dropdown-buttons" data-value={buttonDays[i].numb + 't'} onClick={props.onDayDropClick} >Available</span>
+                <span className="dropdown-buttons" data-value={buttonDays[i].numb + 'f'} onClick={props.onDayDropClick} >Unavailable</span>
             </div>
       </div>
       );
@@ -178,40 +179,43 @@ renderShowFlash() {
 
   render() {
     return (
-    <div>
 
-      <div>{this.renderShowFlash() }
-      </div>
+    <div className="container">
 
-
-      <div className="container-fluid">
         <div className="row justify-content-md-center">
-        I am unavailable these recurring days:<br />
+             <div className="col">
+              {this.renderShowFlash() }
+              </div>
         </div>
-      </div>
 
-      <div className="container-fluid">
+
         <div className="row justify-content-md-center">
-          <DayButtons
-            onDayDropClick={this.changeDay}
-          />
-        </div>
-      </div>
 
-<br />
+              <div className="col">
 
-      <div className="container-fluid">
-        <div className="myCalen" id="mydate" ref={this.calendarRef}>
-        </div>
-      </div>
+                        <p className="text-align-center"> 
+                      I am unavailable these recurring days:<br />
+                       </p>
+
+                      <DayButtons
+                        onDayDropClick={this.changeDay}
+                      />
 
 
-      <div className="container-fluid">
-        <div className="row justify-content-md-center">
-       <SubmitNewAvail
-        submitChanges={this.submissionRoute}
-        />
-        </div>
+        <br />
+
+
+                       <SubmitNewAvail
+                        submitChanges={this.submissionRoute}
+                        />
+              </div>
+          
+
+                  <div className="col">
+                  <div className="myCalen" id="mydate" ref={this.calendarRef}>
+
+                  </div>
+</div>
       </div>
     </div>
 

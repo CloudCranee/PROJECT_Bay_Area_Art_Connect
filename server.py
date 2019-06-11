@@ -263,11 +263,13 @@ def display_gigs():
     # db.session.commit()
 
     if current_user.show_unpaid == True:
-        posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc())
+        posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc()).all()
     else:
-        posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc())
+        posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc()).all()
 
-    return render_template("gigs.html", posts=posts)
+    post_count = len(posts)
+
+    return render_template("gigs.html", posts=posts, post_count=post_count)
 
 
 @app.route('/searchgigs', methods=['GET', 'POST'])
@@ -283,7 +285,9 @@ def display_gig_results():
     if posts == []:
         flash("No posting matched your search criteria.")
 
-    return render_template("gigs.html", posts=posts)
+    post_count = len(posts)
+
+    return render_template("gigs.html", posts=posts, post_count=post_count)
 
 @app.route('/advancedgigsearch')
 @login_required
@@ -345,7 +349,9 @@ def advanced_gigs_query():
     if posts == []:
             flash("No posting matched your search criteria.")
 
-    return render_template("gigs.html", posts=posts)
+    post_count=len(posts)
+
+    return render_template("gigs.html", posts=posts, post_count=post_count)
 
 
 @app.route('/gig/<int:post_id>')
@@ -450,7 +456,7 @@ def display_active_gig(post_id):
 
         mapzoom = 8
 
-    return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom)
+    return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom, gig=gig)
 
 
 @app.route('/login_form')
@@ -600,7 +606,7 @@ def register_process():
     # else:
     #     bio = None
 
-    letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+    letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'X', 'Y', 'Z']
 
     veri_code = letters[randint(0, len(letters)-1)] + str(randint(100000, 999999))
 
