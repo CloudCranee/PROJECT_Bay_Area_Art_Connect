@@ -3,22 +3,28 @@
 
 
 
-<div class="container-fluid">
-    <div class="row justify-content-md-center">
-        <form action="/searchartists" method="POST">
-            <label>
-                <input type="text" name="search" class="form-control" placeholder="Search" required class="form-control">
-            </label>
-                <input type="submit" value="Search" class="btn"> 
+<div class="container">
+    <div class="row justify-content-md-center justify-content-center">
+        <form action="/searchartists" method="POST" class="form-inline col-6 justify-content-md-end justify-content-end">
+                <input type="text" name="search" class="form-control" placeholder="Search" required class="form-control">&#160;
+                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Search">Search</button>
+            
+            </form>
+            <div class="col-4 vert-control">
                 <a href="/advancedartistsearch">
                     <i class="fa fa-search" aria-hidden="true"></i>
-                        Advanced Search</a>
-        </form>
+                    Advanced Search</a>
+            </div>      
+        </div>
     </div>
 </div>
 
-
-
+<div class="container justify-content-end">
+    <div class="justify-content-end col">
+        <div class="row justify-content-end">
+        <h4></h4>
+    </div></div>
+</div>
 
 
 <div class="container justify-content-center">
@@ -39,7 +45,7 @@
                 
                 <p>
                     {% for tag in artist.tags %}
-                    <b>{{ tag.tag_name }}</b>
+                    <i class="fas fa-tag" aria-hidden="true"></i><b> {{ tag.tag_name }} </b>
                     {% endfor %}
                 </p>
             </div>

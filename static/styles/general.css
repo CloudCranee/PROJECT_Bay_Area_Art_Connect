@@ -28,6 +28,17 @@ text-align: center
   left: 50%;
   margin-left: -50px;
 }
+
+.vert-control {
+  display: block;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
 /******************************/
 /* Links and Nav Bar override */
 /******************************/
@@ -43,9 +54,14 @@ text-align: center
   border-bottom:1px solid #ffffff;  
 }
 
-.nav-link:hover { 
+.navbar-nav:hover .nav-item:hover .nav-link:hover { 
   color: #FF8C26;
  }
+
+/*This seems to not be working*/
+.navbar-brand:focus,.navbar-brand:hover {
+  color: #FF8C26;
+}
 
 .navbar-light {
   background-color: #FFFFFF;
@@ -56,7 +72,7 @@ a {
 }
 
 a:hover { 
-  color: #00B7A8;
+  color: #FF8C26;
  }
 
 
@@ -91,6 +107,7 @@ border-color:#0c7f99;
 
 .btn-outline-primary {
   color:#0c7f99;
+  background-color:#FFFFFF;
   border-color:#0c7f99
   }
 

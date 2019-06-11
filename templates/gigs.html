@@ -2,19 +2,19 @@
 {% block content %}
 
 
-<div class="container-fluid">
-    <div class="row justify-content-md-center">
-        <form action="/searchgigs" method="POST">
-            <label>
-                <input type="text" name="search" class="form-control" placeholder="Search" required class="form-control">
-            </label>
-
-            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Search">Search</button>
-
+<div class="container">
+    <div class="row justify-content-md-center justify-content-center">
+        <form action="/searchgigs" method="POST" class="form-inline col-6 justify-content-md-end justify-content-end">
+                <input type="text" name="search" class="form-control" placeholder="Search" required class="form-control">&#160;
+                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Search">Search</button>
+            
+            </form>
+            <div class="col-4 vert-control">
                 <a href="/advancedgigsearch">
                     <i class="fa fa-search" aria-hidden="true"></i>
-                        Advanced Search</a>
-        </form>
+                    Advanced Search</a>
+            </div>      
+        </div>
     </div>
 </div>
 
@@ -26,24 +26,44 @@
 </div>
 
 <div class="container justify-content-center">
-    <div class=" justify-content-center col">
+    <div class="justify-content-center col">
         {% for post in posts %}
         <section class="card justify-content-center row">
-            <div class="card-header justify-content-center">            
-                <h4>
+            <div class="card-header justify-content-center col">            
+                
+        <a href="/gig/{{post.post_id}}">
+
+                <h4 class="form-inline">
                     {{ post.post_title }}
                 </h4>
-            </div>
+        </a>
+                {% if current_user.is_authenticated %}
+                {% if current_user.id == post.user_id %}               
 
+                
+                <a class="form-inline" href="editgig/{{post.post_id}}">
+                    <i class="far fa-edit" aria-hidden="true"></i>
+                    Edit
+                </a>
+                
+
+                {% endif %}
+                {% endif %}
+
+            </div>
             <div class="card-body justify-content-center">
                 <p class="card-text">
-                    <a href="/gig/{{post.post_id}}">{{ post.description }}
-                    </a>
+                    {{ post.description }}
+                    
                 </p>
                 
                 <p>
+                <b>Region:</b> {{ post.zipcodes.region }}.&#160; <b>Location:</b> {{ post.zipcodes.location_name }}
+                </p>
+
+                <p>
                     {% for tag in post.tags %}
-                    <b>{{ tag.tag_name }}</b>
+                    <i class="fas fa-tag" aria-hidden="true"></i><b> {{ tag.tag_name }}</b>
                     {% endfor %}
                 </p>
             </div>

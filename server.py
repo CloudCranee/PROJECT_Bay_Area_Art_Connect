@@ -213,6 +213,7 @@ def display_new_post_form():
 
 
 @app.route('/creategig', methods=['POST'])
+@login_required
 def add_new_gig_to_database():
     """Adds a new gig to the database."""
 
@@ -241,6 +242,25 @@ def add_new_gig_to_database():
     flash("Thank you. Your new post is now live.")
 
     return redirect("gigs")
+
+
+@app.route('/editgig/<int:post_id>')
+@login_required
+def display_edit_gig_page(post_id):
+    """Displays the edit gig page."""
+
+    gig = Post.query.filter_by(post_id = post_id).one_or_none()
+
+    if gig == None or current_user.id != gig.user_id:
+        if current_user.show_unpaid == True:
+            posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc())
+        else:
+            posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc())
+        flash("You do not have access to edit this gig.")
+        return render_template("gigs.html", posts=posts)
+
+    #This html does not yet exist
+    return render_template("editgig.html", gig=gig)
 
 
 @app.route('/gigs')
@@ -738,6 +758,10 @@ def user_profile():
 
     tags = Tag.query.all()
 
+    def sort_tag_name(value):
+        return value.tag_name
+
+    tags.sort(key = sort_tag_name)
 
     return render_template("profile.html", email=email, tags=tags)
 
