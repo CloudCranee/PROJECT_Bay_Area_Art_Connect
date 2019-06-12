@@ -221,18 +221,33 @@ def seed_posts():
         fuser_id = randint(1,50)
         fpost_date = fake.date_between(start_date="-3y", end_date="today")
         is_pay = randint(0,1)
+
         if is_pay == 0:
-            fpay = None
+            fpay = 0
         else:
             fpay = randint(30,2000)
         fpone = fake.name()
+
+        gig_date_start = fake.date_between(start_date="-1y", end_date="+1y")
+
+        if (randint(0, 1)) == 1:
+            gig_date_end = gig_date_start
+        else:
+            gig_date_end = fake.date_between(start_date="-1y", end_date="+1y")
+
+        if fpay == 0:
+            unpaid = True
+        else:
+            unpaid = False    
+
         fpost_title = fpone[:4] + '. This is the title of this post!'
         fdescription = fake.sentence() + " " + fake.sentence()
         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
         fzipcode = fzipcodes[randint(1, 350)]
         fpost = Post(user_id=fuser_id, description=fdescription,
             zipcode=fzipcode, post_title=fpost_title, creation_date=fpost_date,
-            pay=fpay)
+            pay=fpay, gig_date_end=gig_date_end, gig_date_start=gig_date_start,
+            unpaid=unpaid)
         db.session.add(fpost)
     print("Commiting all new posts.")
     db.session.commit()

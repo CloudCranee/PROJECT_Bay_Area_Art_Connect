@@ -26,66 +26,87 @@
  
 <div class="main-content">
 
-    <div class="container">
-        <div class="row">
-             <div class="col col-4">
+    <div class="container forever-container">
 
-                <section class="card">
+        <div class="row forever-row">
 
-                    <div class="card-header justify-content-center">
+                <div class="col-6">
 
-                        {{gig.post_title}}
-
-                    </div>
-                    <div class="card-body justify-content-center">
-                            <p class="card-text">
-
-                        {{ gig.description }}
-
-                            </p>
-                    </div>
-
-                </section>
-    </div>
+                    <section class="card">
+                        <div class="card-header justify-content-center">
+                            {{gig.post_title}}
+                        </div>
+                        <div class="card-body justify-content-center">
+                                <p class="card-text">
+                            {{ gig.description }}
+                                </p>
 
 
+                <p>
+                <b>Region:</b> {{ gig.zipcodes.region }} &#160; <b>Location:</b> {{ gig.zipcodes.location_name }}
+                </p>
 
-       <div class="col col-4" id='map'> 
-            <script type="text/javascript">
+                <p>
+                {% if gig.unpaid == True %}
+                Unpaid
+                {% else %}
+                {% if gig.ishourly == True %}
+                ${{ gig.pay }} per hour
+                {% else %}
+                Est. Budget ${{ gig.pay }}
+                {% endif %}
+                {% endif %}
+                </p>
+
+                <p>
+                    {% for tag in gig.tags %}
+                    <i class="fas fa-tag" aria-hidden="true"></i><b> {{ tag.tag_name }}</b>
+                    {% endfor %}
+                </p>
+
+
+                        </div>
+                    </section>
+
+                </div>
 
 
 
+       <div class="col-6 justify-content-end">
+            <div id='map'>
+                <script type="text/javascript">
 
 
-                mapboxgl.accessToken = 'pk.eyJ1IjoiYm9kZXJpaXMiLCJhIjoiY2p3Z3gwNWFtMDM2ZDQ4bXZ1a2VqOW5tMyJ9.9bMk93E5EgyG3ND6U15vEg';
+                    mapboxgl.accessToken = 'pk.eyJ1IjoiYm9kZXJpaXMiLCJhIjoiY2p3Z3gwNWFtMDM2ZDQ4bXZ1a2VqOW5tMyJ9.9bMk93E5EgyG3ND6U15vEg';
 
-                var map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/streets-v11',
-                center: mapcenter,
-                zoom: mapzoom
-                });
-
-                map.on('load', function () {
-
-                    
-                    map.addSource('zipcodes', {
-                        "type": "geojson",
-                        "data": zipdata
-                    })
-
-                    map.addLayer({
-                    'id': 'zipcodes',
-                    'type': 'fill',
-                    'source': 'zipcodes',
-                        'paint': {
-                            'fill-color': '#096386',
-                            'fill-opacity': 0.8
-                                }
-                            });
+                    var map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/mapbox/streets-v11',
+                    center: mapcenter,
+                    zoom: mapzoom
                     });
 
-            </script>
+                    map.on('load', function () {
+
+                        
+                        map.addSource('zipcodes', {
+                            "type": "geojson",
+                            "data": zipdata
+                        })
+
+                        map.addLayer({
+                        'id': 'zipcodes',
+                        'type': 'fill',
+                        'source': 'zipcodes',
+                            'paint': {
+                                'fill-color': '#096386',
+                                'fill-opacity': 0.8
+                                    }
+                                });
+                        });
+
+                </script>
+            </div>
     </div>
 
 </div>

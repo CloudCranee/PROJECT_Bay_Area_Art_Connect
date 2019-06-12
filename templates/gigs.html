@@ -25,15 +25,17 @@
     </div></div>
 </div>
 
-<div class="container justify-content-center">
+
+<div class="container justify-content-center mb-5">
     <div class="justify-content-center col">
         {% for post in posts %}
         <section class="card justify-content-center row">
-            <div class="card-header justify-content-center col">            
+            <div class="card-header">  
+                <div class="row">      
                 
         <a href="/gig/{{post.post_id}}">
 
-                <h4 class="form-inline">
+                <h4 class="form-inline col">
                     {{ post.post_title }}
                 </h4>
         </a>
@@ -41,7 +43,7 @@
                 {% if current_user.id == post.user_id %}               
 
                 
-                <a class="form-inline" href="editgig/{{post.post_id}}">
+                <a class="text-right justify-content-md-end justify-content-end col vert-control" href="editgig/{{post.post_id}}">
                     <i class="far fa-edit" aria-hidden="true"></i>
                     Edit
                 </a>
@@ -49,7 +51,7 @@
 
                 {% endif %}
                 {% endif %}
-
+                </div>
             </div>
             <div class="card-body justify-content-center">
                 <p class="card-text">
@@ -58,7 +60,7 @@
                 </p>
                 
                 <p>
-                <b>Region:</b> {{ post.zipcodes.region }}.&#160; <b>Location:</b> {{ post.zipcodes.location_name }}
+                <b>Region:</b> {{ post.zipcodes.region }} &#160; <b>Location:</b> {{ post.zipcodes.location_name }}
                 </p>
 
                 <p>
@@ -73,8 +75,8 @@
 </div>            
 
             
-
-
+<div class="end-div">
+</div>
 
 
 {% endblock %}

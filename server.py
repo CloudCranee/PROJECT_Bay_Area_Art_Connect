@@ -267,20 +267,15 @@ def display_edit_gig_page(post_id):
 @login_required
 def display_gigs():
     """Displays a list of all posts
-    TODO: (Pinterest style ((AJAX? REACT??)) infinte scroll.
-    Sort by most recent post at the top."""
+    Sorts by most recent post at the top."""
 
-    # overmorgen = datetime.now() + timedelta(days=2)
-    # print(overmorgen)
-    # print(type(overmorgen))
+    posts = Post.query.filter(Post.active == True).all()
 
-    # posts = Post.query.filter(Post.active == True).all()
+    for post in posts:
+        if post.gig_date_end < (datetime.now() - timedelta(days=2)):
+            post.active = False
 
-    # for post in posts:
-    #     if post.gig_date_end < overmorgen:
-    #         post.active = False
-
-    # db.session.commit()
+    db.session.commit()
 
     if current_user.show_unpaid == True:
         posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc()).all()

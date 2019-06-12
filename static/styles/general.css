@@ -39,6 +39,34 @@ text-align: center
   line-height: 1.5;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
+
+.footer {
+  color: #f3f3f3;
+  background-color: #001133;
+  position: fixed;
+  bottom: 0;
+  padding-top:15px;
+  padding-bottom:15px;
+  margin-top: auto!important;
+  z-index: 7;
+}
+
+.end-div {
+ height: 3%;
+ padding-top:15px;
+ padding-bottom:15px;
+}
+.foot-link a {
+  color: #f3f3f3;
+}
+
+.forever-row {
+height: 100%;
+}
+
+.forever-container {
+  height: 90%;
+}
 /******************************/
 /* Links and Nav Bar override */
 /******************************/
@@ -274,3 +302,4 @@ btn-outline-logo
   position: relative;
   height: 100vh;
 }
+
