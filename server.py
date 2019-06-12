@@ -383,6 +383,16 @@ def display_active_gig(post_id):
         flash("This gig does not exist.")
         return render_template("gigs.html", posts=posts)
 
+    if gig.gig_date_start == None and gig.gig_date_end == None:
+        gig_date_start = None
+        gig_date_end = None
+    elif gig.gig_date_end == None:
+        gig_date_start = datetime.strftime(gig.gig_date_start, '%b %d, %Y') 
+        gig_date_end == None
+    else:
+        gig_date_start = datetime.strftime(gig.gig_date_start, '%b %d, %Y')
+        gig_date_end = datetime.strftime(gig.gig_date_end, '%b %d, %Y') 
+
     zipdata = None
     mapzoom = 8
     mapcenter = [-122.241026, 37.767857]
@@ -471,7 +481,7 @@ def display_active_gig(post_id):
 
         mapzoom = 8
 
-    return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom, gig=gig)
+    return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom, gig=gig, gig_date_start=gig_date_start, gig_date_end=gig_date_end)
 
 
 @app.route('/login_form')

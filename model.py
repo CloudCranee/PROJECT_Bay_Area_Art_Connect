@@ -217,7 +217,7 @@ def seed_users():
 
 def seed_posts():
     """Creates a series of fake posts. Must seed AFTER zipcodes and users."""
-    for i in range(1, 35):
+    for i in range(1, 51):
         fuser_id = randint(1,50)
         fpost_date = fake.date_between(start_date="-3y", end_date="today")
         is_pay = randint(0,1)
@@ -238,7 +238,12 @@ def seed_posts():
         if fpay == 0:
             unpaid = True
         else:
-            unpaid = False    
+            unpaid = False
+
+        if (randint(0, 1)) == 1:
+            ishourly = False
+        else:
+            ishourly = True
 
         fpost_title = fpone[:4] + '. This is the title of this post!'
         fdescription = fake.sentence() + " " + fake.sentence()
@@ -247,7 +252,7 @@ def seed_posts():
         fpost = Post(user_id=fuser_id, description=fdescription,
             zipcode=fzipcode, post_title=fpost_title, creation_date=fpost_date,
             pay=fpay, gig_date_end=gig_date_end, gig_date_start=gig_date_start,
-            unpaid=unpaid)
+            unpaid=unpaid, ishourly=ishourly)
         db.session.add(fpost)
     print("Commiting all new posts.")
     db.session.commit()

@@ -34,19 +34,40 @@
 
                     <section class="card">
                         <div class="card-header justify-content-center">
-                            {{gig.post_title}}
+                            <h3>{{gig.post_title}}</h3>
                         </div>
+
+
+
+
                         <div class="card-body justify-content-center">
+
+
+{% if gig_date_start == None %}
+{% else %}
+    <p class="card-text">
+    {% if gig_date_start == gig_date_end %}
+    Date: {{gig_date_start}}
+    {% else %}
+    From: {{gig_date_start}} to {{gig_date_end}}
+    {% endif %}
+    </p>
+{% endif %}
+
+
                                 <p class="card-text">
                             {{ gig.description }}
                                 </p>
 
 
-                <p>
-                <b>Region:</b> {{ gig.zipcodes.region }} &#160; <b>Location:</b> {{ gig.zipcodes.location_name }}
+
+
+                <p class="card-text">
+                <i class="fa fa-map-marker" aria-hidden="true"></i>
+ {{ gig.zipcodes.region }}, {{ gig.zipcodes.location_name }}
                 </p>
 
-                <p>
+                <p class="card-text">
                 {% if gig.unpaid == True %}
                 Unpaid
                 {% else %}
@@ -58,12 +79,15 @@
                 {% endif %}
                 </p>
 
-                <p>
+                <p class="card-text">
                     {% for tag in gig.tags %}
                     <i class="fas fa-tag" aria-hidden="true"></i><b> {{ tag.tag_name }}</b>
                     {% endfor %}
                 </p>
 
+                <p class="card-text">
+                <i class="fas fa-envelope" aria-hidden="true"></i>&#160;{{ gig.users.user_name }} at <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to={{ gig.users.display_email }}">{{ gig.users.display_email }}</a>
+                </p>
 
                         </div>
                     </section>
