@@ -13,16 +13,17 @@
 
 
 
-  <div class="form-group">
-    <div class="col col-4">
-        Included in these tags:<p>
-        {% for tag in tags %}
-          <input type="checkbox" name="tag" value="{{ tag.tag_name }}">
-          {{ tag.tag_name }}
-      {% endfor %}
-    </p></div>
-</div>
 
+  <div class="form-group container">
+    <ul class="ks-cboxtags">
+    {% for tag in tags %}
+    
+      <li><input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}">
+      <label for="{{ tag.tag_id }}"> {{ tag.tag_name }}</label></li>
+    
+      {% endfor %}
+    </ul>
+    </div>
 
 <p>
       <select name="location">
@@ -34,8 +35,7 @@
 
   <div class="form-group">
     <div class="col col-4">
-                <p><input type="submit" value="Search" class="btn"> 
-        </p></form>
+                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Search">Search</button></form>
     </div>
 </div>
     </div>

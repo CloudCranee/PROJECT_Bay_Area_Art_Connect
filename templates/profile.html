@@ -1,32 +1,58 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>Account</h1> 
-<br></br>
 
 
-<h1> {{ current_user.user_name }} </h1>
-<p>
-   {{ email }}
-<br>
-   {{ current_user.bio }}
+
+
+
+
+
+<div class="container justify-content-center">
+    <div class="justify-content-md-center col-7 col-md-auto">
+          <section class="card justify-content-center justify-content-md-center row">
+              <div class="card-header"> 
+
+                   <h1 class="text-align-center"> {{ current_user.user_name }} </h1>
+
+              </div>
+              <div class="text-align-center card-body justify-content-center">
+<form action="/update_info" method="POST" class="form">
+<p class="text-align-center form-group card-text">
+{{ current_user.display_email }}
 </p>
 
+<img class="profile-image" src="{{ url }}" alt="{{current_user.user_name}} Profile Picture"></img>
+<p class="form-group card-text">
 <a href="/changepic">Change your profile picture.</a>
-
-<p>
-  {% if current_user.is_artist %}
-
-    <a href="/availability"> Update your availability.</a>
-    <br>
 </p>
 
+
+
+<p class="form-group card-text">
+User Bio: <br></br>
+
+<textarea name="bio" rows="10" cols="30">
+
+{{ current_user.bio }}
+
+</textarea>
+</p>
+
+
+{% if current_user.is_artist %}
+<p class="form-group card-text">
+    <a href="/availability"> Update your availability.</a>
+</p>
 {% endif %}
 
+                
+<p class="form-group card-text">
+<h3>Do you wish to be listed as an active artist?</h3>
+</p>
 
-    <form action="/update_info" method="POST" class="form">
-        <h3>Do you wish to be listed as an active artist?</h3>
-    <div class="switch-field">
+       
+    <div class="justify-content-md-center text-align-center switch-field form-group card-text">
   {% if current_user.is_artist %}
         <input type="radio" id="radio-one" name="is_artist" value="t" checked/>
         <label for="radio-one"><b>Yes</b></label>
@@ -40,44 +66,60 @@
 {% endif %}
     </div>
 
+<p class="form-group card-text">
 <h3>Show unpaid gigs?</h3>
-    <div class="switch-field">
+</p>
+
+
+    <div class="justify-content-md-center text-align-center switch-field form-group card-text">
         {% if current_user.show_unpaid %}
-            <input type="radio" id="radio-three" name="show_unpaid" value="t" checked/>
+            <input type="radio" id="radio-three" name="show_unpaid" value="t" class="text-align-center" checked/>
             <label for="radio-three">Yes</label>
-            <input type="radio" id="radio-four" name="show_unpaid" value="f" />
+            <input type="radio" id="radio-four" name="show_unpaid" value="f" class="text-align-center"/>
             <label for="radio-four">No</label>
         {% else %}
-            <input type="radio" id="radio-three" name="show_unpaid" value="t" />
+            <input type="radio" id="radio-three" name="show_unpaid" value="t" class="text-align-center"/>
             <label for="radio-three">Yes</label>
-            <input type="radio" id="radio-four" name="show_unpaid" value="f" checked/>
+            <input type="radio" id="radio-four" name="show_unpaid" value="f" class="text-align-center" checked/>
             <label for="radio-four">No</label>
         {% endif %}
 
     </div>
+
+
+
+
+
   {% if current_user.is_artist %}
-
-    Appear in these search terms:
-
-  <div class="form-group">
+<p class="form-group card-text">
+    <h3>Appear in these search terms:</h3>
+</p>
+  <div class="form-group container card-text">
+    <ul class="ks-cboxtags">
     {% for tag in tags %}
-      <input type="checkbox" name="tag" value="{{ tag.tag_id }}"
+    
+      <li><input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}"
       {% if tag in current_user.tags %} checked {% endif %}>
-      {{ tag.tag_name }}
+      <label for="{{ tag.tag_id }}"> {{ tag.tag_name }}</label></li>
+    
       {% endfor %}
+    </ul>
     </div>
 
 {% endif %}
 
+                  <div class="form-group card-text">
 
+                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Save Changes" >Save Changes</button>
+                  </div>
 
-
- <div class="form-group">
-
-<input type="submit" value="Save Changes" className="btn"></input>
+              </form>
+          </div>
+      </section>
+    </div>
 </div>
-</form>
 
+<div class="end-div">
+</div>
 
-<br>
 {% endblock %}

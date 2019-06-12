@@ -13,49 +13,53 @@ A user is in session.
          {% else %}
 
 
-<div class="well spaced" style="width:40%;">
-<h1>Register</h1>
+<div class="container justify-content-center mb-5">
+    <div class="justify-content-center col">
+          <section class="card justify-content-center row">
+              <div class="card-header"> 
 
+                    <h1>Register</h1>
 
-<form action="/register" method="POST">
+              </div>
+              <div class="card-body justify-content-center">
+                <form action="/register" method="POST">
 
+                  <div class="form-group card-text">
+                    <label>
+                        User Name
+                        <input type="text" name="user_name" class="form-control" required class="form-control">
+                    </label>
+                  </div>
 
-  <div class="form-group">
-    <label>
-        User Name
-        <input type="text" name="user_name" class="form-control" required class="form-control">
-    </label>
-  </div>
+                <br>
 
-<br>
+                  <div class="form-group card-text">
+                    <label>
+                      E-mail
+                      <input type="text" name="email" class="form-control" required class="form-control">
+                    </label>
+                  </div>
 
-  <div class="form-group">
-    <label>
-      E-mail
-      <input type="text" name="email" class="form-control" required class="form-control">
-    </label>
-  </div>
+                <br>
 
-<br>
+                  <div class="form-group card-text">
+                    <label>
+                      Password
+                      <input type="password" name="password" class="form-control" required class="form-control">
+                    </label>
+                  </div>
 
-  <div class="form-group">
-    <label>
-      Password
-      <input type="password" name="password" class="form-control" required class="form-control">
-    </label>
-  </div>
+                <br>
 
-<br>
+                  <div class="form-group card-text">
 
+                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Sign Up">Sign Up</button>
+                  </div>
 
-<br>
-
-  <div class="form-group">
-
-    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Sign Up">Sign Up</button>
-  </div>
-
-</form>
+              </form>
+          </div>
+      </section>
+    </div>
 </div>
 
 

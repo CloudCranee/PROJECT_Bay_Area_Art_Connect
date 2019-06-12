@@ -19,32 +19,68 @@
 
 {% block content %}
 
- <div class="container-fluid">
-    <div class="main-content">
-        <div class="col col-4">
-
-<h3>
-{{user.user_name}}
-</h3>
-<p>
-{{user.bio}}
-</p>
-{% for tag in user.tags %}
-{{ tag.tag_name }} |
-{% endfor %}
-
-<div id="profile image">
-  <img src="{{ url }}" alt="{{user.user_name}} Profile Picture"></img>
-</div>
 
 
-<!-- I believe this div is where the React will be rendering -->
-<div id="root">
-</div>
 
+<div class="main-content">
+
+  <div class="container forever-container">
+
+    <div class="row forever-row">
+
+      <div class="col-6">
+
+        <section class="card">
+
+          <div class="card-header justify-content-center">
+
+            
+            <h3 class="text-align-center">
+              {{user.user_name}}
+            </h3>
+          </div>
+
+          <div class="card-body justify-content-center row">
+
+            <img class="col profile-image " src="{{ url }}" alt="{{user.user_name}} Profile Picture"></img>
+
+            <p class="col card-text user-bio ">
+              {{user.bio}}
+            </p>
+
+            <p class="card-text">
+              {% for tag in user.tags %}
+              <i class="fas fa-tag" aria-hidden="true"></i><b> {{ tag.tag_name }}</b>
+              {% endfor %}
+            </p>
+
+          </div>
+
+        </section>
+        </div>
+
+        <div class="col-6 justify-content-end">
+            <section class="card">
+
+                  <div class="card-header justify-content-center">
+                  <h4 class="text-align-center">
+                  Artist's Recurring Availability:</h4>
+                  </div>
+
+                    <div class="card-body map-holder" id="root">
+                        <!-- <div id="root">
+                        </div> -->
+                  </div>
+            </section>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>
+
+
+
 
 <script src="/static/react.development.js"></script>
 <script src="/static/react-dom.development.js"></script>
@@ -98,9 +134,10 @@ class App extends React.Component {
 
   render() {
     return (
-<div className="container-fluid">
-  <div className="myCalen" id="mydate" ref={this.calendarRef}>
-  </div>
+<div>
+              <div className="myCalen" id="mydate" ref={this.calendarRef}>
+
+                  </div>
 </div>
 
 

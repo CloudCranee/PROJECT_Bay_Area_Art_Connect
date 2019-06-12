@@ -1,98 +1,60 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="well spaced" style="width:40%;">
-<h1>Register</h1>
-
-<form action="/register" method="POST">
-
-  <div class="form-group">
-    <label>
-        User Name (required)
-        <input type="text" name="user_name" class="form-control" required class="form-control">
-    </label>
-  </div>
-
-<br>
-
-  <div class="form-group">
-    <label>
-      E-mail (required)
-      <input type="text" name="email" class="form-control" required class="form-control">
-    </label>
-  </div>
-
-<br>
-
-  <div class="form-group">
-    <label>
-      Password (required)
-      <input type="password" name="password" class="form-control" required class="form-control">
-    </label>
-  </div>
-
-<br>
 
 
-  <div class="form-group">
-    <label>
-      Phone Number
-      <input type="number" name="phone" class="form-control">
-    </label>
-  </div>
 
-<br>
+<div class="container justify-content-center mb-5">
+    <div class="justify-content-center col">
+          <section class="card justify-content-center row">
+              <div class="card-header"> 
 
+                    <h1>Register</h1>
 
-  <div class="form-group">
-    <label>
-      Hourly Rate:<br>
-      (This will be used to filter artist searches. This is in no way legaly binding.)
-      <input type="number" name="hourly_rate" class="form-control">
-    </label>
-  </div>
+              </div>
+              <div class="card-body justify-content-center">
+                <form action="/register" method="POST">
 
-<br>
+                  <div class="form-group card-text">
+                    <label>
+                        User Name
+                        <input type="text" name="user_name" class="form-control" required class="form-control">
+                    </label>
+                  </div>
 
-  <div class="form-group">
-    <label>
-      Link to website/portfolio:
-      <input type="text" name="link_to_website" class="form-control">
-    </label>
-  </div>
+                <br>
 
-<br>
+                  <div class="form-group card-text">
+                    <label>
+                      E-mail
+                      <input type="text" name="email" class="form-control" required class="form-control">
+                    </label>
+                  </div>
 
-  <div class="form-group">
-    <label>
-      Bio:
-      <input type="text-area" name="bio" class="form-control">
-    </label>
-  </div>
+                <br>
 
-<h3>Do you wish to be publically listed as an artist? (This can be changed later)</h3>
-  <div class="form-group switch-field">
-        <input type="radio" id="radio-one" name="is_artist" value="t" checked/>
-        <label for="radio-one"><b>Yes</b></label>
-        <input type="radio" id="radio-two" name="is_artist" value="f" />
-        <label for="radio-two"><b>No</b></label>
-</div>
-<br>
-<h3>Show unpaid gigs?</h3>
-    <div class="form-group switch-field">
-        <input type="radio" id="radio-three" name="show_unpaid" value="t" checked/>
-        <label for="radio-three">Yes</label>
-        <input type="radio" id="radio-four" name="show_unpaid" value="f" />
-        <label for="radio-four">No</label>
+                  <div class="form-group card-text">
+                    <label>
+                      Password
+                      <input type="password" name="password" class="form-control" required class="form-control" autocomplete='off'>
+                    </label>
+                  </div>
+
+                <br>
+
+                  <div class="form-group card-text">
+
+                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Sign Up">Sign Up</button>
+                  </div>
+
+              </form>
+          </div>
+      </section>
     </div>
-
-
-<br>
-
-  <div class="form-group">
-    <input type="submit" value="Sign Up" class="btn">
-  </div>
-
-</form>
 </div>
+
+
+
+
+
 
 {% endblock %}

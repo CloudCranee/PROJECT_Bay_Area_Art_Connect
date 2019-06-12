@@ -156,9 +156,9 @@ def display_public_user(id):
         flash("Error, page not found.")
         return render_template("homepage.html")
 
-    daysweek = list(current_user.daysweek)
+    daysweek = list(page_user.daysweek)
 
-    image = current_user.img_route
+    image = page_user.img_route
 
     url = s3_client.generate_presigned_url('get_object',
                                     Params={
@@ -345,11 +345,16 @@ def advanced_gigs_query():
         s_posts = Post.query.filter(((Post.description.ilike(search_string)) | (Post.post_title.ilike(search_string))), Post.active == True).all()
 
     if request.form.get("tag", False):
+        print("step 1")
         tags = request.form.getlist("tag")
+        print(tags)
         t_posts = []
         for tag in tags:
-            tag_one = Tag.query.filter(Tag.tag_name == tag).one()
+            print(tag)
+            tag_one = Tag.query.filter(Tag.tag_id == tag).one()
+            print(tag_one)
             t_posts.extend(tag_one.posts)
+
 
     if request.form["location"] != "Location:":
         location = request.form["location"]
@@ -706,7 +711,7 @@ def upload_image():
 
         image = Image.open(file)
         
-        image.thumbnail([400, 400])
+        image.thumbnail([230, 230])
 
         in_mem_file = io.BytesIO()
 
@@ -768,7 +773,19 @@ def user_profile():
 
     tags.sort(key = sort_tag_name)
 
-    return render_template("profile.html", email=email, tags=tags)
+
+
+    image = current_user.img_route
+
+    url = s3_client.generate_presigned_url('get_object',
+                                    Params={
+                                   'Bucket': 'bayart',
+                                   'Key': image,
+                               },
+                               ExpiresIn=9600)
+
+
+    return render_template("profile.html", email=email, tags=tags, url=url)
 
 
 @app.route('/update_info', methods=['POST'])

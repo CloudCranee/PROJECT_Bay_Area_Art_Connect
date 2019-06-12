@@ -59,7 +59,7 @@ function DayButtons(props) {
 
 function SubmitNewAvail(props) {
 
-return <input type="submit" value="Save Changes" className="btn" onClick={props.submitChanges} ></input>;
+return <input type="submit" value="Save Changes" className="btn btn-outline-primary" onClick={props.submitChanges} ></input>;
 }
 
 
@@ -196,18 +196,19 @@ renderShowFlash() {
                         <p className="text-align-center"> 
                       I am unavailable these recurring days:<br />
                        </p>
-
+<p className="text-align-center">
                       <DayButtons
                         onDayDropClick={this.changeDay}
                       />
-
+</p>
 
         <br />
 
-
+        <p className="text-align-center">
                        <SubmitNewAvail
                         submitChanges={this.submissionRoute}
                         />
+                      </p>
               </div>
           
 
