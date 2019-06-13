@@ -357,12 +357,9 @@ def submits_gig_edit(post_id):
         gig.unpaid = True
 
     active = request.form["active"]
-    print(active)
     if active == 'yes':
-        print("STAYING ACTIVE")
         gig.active = True
     else:
-        print("DELETING")
         gig.active = False
 
     db.session.commit()
@@ -459,14 +456,14 @@ def advanced_gigs_query():
         s_posts = Post.query.filter(((Post.description.ilike(search_string)) | (Post.post_title.ilike(search_string))), Post.active == True).all()
 
     if request.form.get("tag", False):
-        print("step 1")
+
         tags = request.form.getlist("tag")
-        print(tags)
+
         t_posts = []
         for tag in tags:
-            print(tag)
+
             tag_one = Tag.query.filter(Tag.tag_id == tag).one()
-            print(tag_one)
+
             t_posts.extend(tag_one.posts)
 
 
@@ -969,18 +966,13 @@ def update_user_info():
         link_to_website = request.form["link_to_website"]
         if link_to_website[0:8].lower() == "https://":
             current_user.link_to_website = link_to_website
-            print("step 1")
-            print(link_to_website)
         elif link_to_website[0:3].lower() == "www": 
             link_to_website = "https://" + link_to_website
             current_user.link_to_website = link_to_website
-            print("step 2")
-            print(link_to_website)
         else:
             link_to_website = "https://www." + link_to_website
             current_user.link_to_website = link_to_website
-            print("step 3")
-            print(link_to_website)
+
 
     if request.form.get("phone", False):
         current_user.phone = request.form["phone"]
@@ -999,7 +991,6 @@ if __name__ == "__main__":
     # that we invoke the DebugToolbarExtension
 
     # Do not debug for demo
-    app.debug = True
 
     connect_to_db(app)
 
