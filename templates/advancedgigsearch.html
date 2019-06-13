@@ -29,8 +29,7 @@
           <ul class="ks-cboxtags">
             {% for tag in tags %}
               <li>
-                <input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}"
-                {% if tag in current_user.tags %} checked {% endif %}>
+                <input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}">
                 <label for="{{ tag.tag_id }}"> {{ tag.tag_name }}</label>
               </li>
             {% endfor %}

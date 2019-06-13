@@ -132,8 +132,8 @@
     
 
           <form action="/verify" method="POST" class="form-inline justify-content-center">
-            Please verify your email by inputting the verification code send to&#160; <b>{{ current_user.display_email }}</b>: &#160;
-            <input type="text" name="verification" class="form-control col-2" placeholder="Verification Code">
+            Please verify your email by entering the code send to&#160; <b>{{ current_user.display_email }}</b> &#160;
+            <input type="text" name="verification" class="form-control col-3" placeholder="Verification Code">
             <input type="submit" value="Verify" class="btn">
           </form>
 
@@ -143,9 +143,15 @@
 {% endif %}
 
   {% for flash in get_flashed_messages() %}
+
+
 <div class="container">
-    <div class="alert alert-success" id="alert" style="width:90%; margin:0 auto;">{{ flash }}</div>
+    <div class="text-center alert alert-success justify-content-center" id="alert" style="width:90%; margin:0 auto;">
+    {{ flash }}
   </div>
+  </div>
+
+
   {% endfor %}
 
 

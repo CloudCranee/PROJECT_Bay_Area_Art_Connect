@@ -29,7 +29,7 @@ class User(UserMixin, db.Model):
     is_artist = db.Column(db.Boolean, unique=False, default=False)
     last_active = db.Column(db.DateTime, nullable = True)
     hourly_rate = db.Column(db.Integer, nullable = True)
-    show_unpaid = db.Column(db.Boolean, unique=False, default=True)
+    show_unpaid = db.Column(db.Boolean, unique=False, default=False)
     link_to_website = db.Column(db.String(50), nullable = True)
     bio = db.Column(db.String(500), nullable = True)
     daysweek = db.Column(db.String(7), default="ttttttt")
@@ -59,8 +59,8 @@ class Post(db.Model):
 
     post_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    post_title = db.Column(db.String(50))
-    description = db.Column(db.String(1250))
+    post_title = db.Column(db.String(200))
+    description = db.Column(db.String(1500))
     creation_date = db.Column(db.DateTime)
     gig_date_start = db.Column(db.DateTime)
     gig_date_end = db.Column(db.DateTime)
@@ -168,11 +168,15 @@ def connect_to_db(app):
 def seed_users():
     """Creates a series of fake posts. Must seed BEFORE posts."""
 
-    for i in range(1, 51):
+    tagsls = Tag.query.all()
+
+    for i in range(1, 100):
+
         fname = fake.name()
+
         fpassword = generate_password_hash('hello', method='pbkdf2:sha256', salt_length=8)
 
-        fbio = fake.sentence() + " " + fake.sentence()
+        fbio = fake.sentence() + " " + fake.text() + " " + fake.sentence()
         fhourly_rate = randint(16, 125)
         fartistnum = randint(0, 1)
         
@@ -197,19 +201,31 @@ def seed_users():
         else:
             fartist = True
 
-        ver = randint(0,1)
-        if ver == 0:
-            verified = False
+        if i % 2 == 0:
+            daysweek = "ttttttt"
+        elif i % 3 == 0:
+            daysweek = "tffffft"
         else:
-            verified = True
+            daysweek = "fttttff"
+
+        link_to_website = fake.url()
+
+        verified = True
+
+        img_route = 'fakeuser' + str(randint(1,35)) + '.jpg'
 
         display_email = (fname[:3] + fname[-2:] + str(i) + '@gmail.com')
         femail = display_email.lower()
         flast_active = fake.date_between(start_date="-1y", end_date="today")
         fuser = User(user_name=fname, is_artist=fartist, password=fpassword, bio=fbio,
                 hourly_rate=fhourly_rate, phone=fphone, email=femail,
-                last_active=flast_active, display_email=display_email, verified=verified)
-        db.session.add(fuser) 
+                last_active=flast_active, display_email=display_email,
+                img_route=img_route, verified=verified,
+                daysweek=daysweek, link_to_website=link_to_website)
+
+        db.session.add(fuser)
+        fuser.tags.append(tagsls[randint(0, (len(tagsls)-1))])
+
     print("Commiting all new users.")
     db.session.commit()
 
@@ -217,7 +233,9 @@ def seed_users():
 
 def seed_posts():
     """Creates a series of fake posts. Must seed AFTER zipcodes and users."""
-    for i in range(1, 51):
+    tags = Tag.query.all()
+
+    for i in range(1, 80):
         fuser_id = randint(1,50)
         fpost_date = fake.date_between(start_date="-3y", end_date="today")
         is_pay = randint(0,1)
@@ -245,8 +263,8 @@ def seed_posts():
         else:
             ishourly = True
 
-        fpost_title = fpone[:4] + '. This is the title of this post!'
-        fdescription = fake.sentence() + " " + fake.sentence()
+        fpost_title = fake.sentence()
+        fdescription = fake.sentence() + " " + fake.text() + " " + fake.text() + " " + fake.sentence() + " " + fake.text()
         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
         fzipcode = fzipcodes[randint(1, 350)]
         fpost = Post(user_id=fuser_id, description=fdescription,
@@ -254,6 +272,9 @@ def seed_posts():
             pay=fpay, gig_date_end=gig_date_end, gig_date_start=gig_date_start,
             unpaid=unpaid, ishourly=ishourly)
         db.session.add(fpost)
+
+        fpost.tags.append(tags[randint(0, (len(tags)-1))])
+
     print("Commiting all new posts.")
     db.session.commit()
 

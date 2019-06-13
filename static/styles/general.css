@@ -57,6 +57,9 @@ text-align: center;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+.linkbuffer{
+  margin: 10px;
+}
 .footer {
   color: #f3f3f3;
   background-color: #001133;

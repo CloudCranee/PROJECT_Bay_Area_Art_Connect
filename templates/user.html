@@ -43,20 +43,21 @@
 <div class="text-align-center card-body justify-content-center">
 
 
-<img class="profile-image" src="{{ url }}" alt="{{current_user.user_name}} Profile Picture"></img>
+<img class="profile-image" src="{{ url }}" alt="{{user.user_name}} Profile Picture"></img>
 
 <div class="card-text justify-content-center row">
             <p class="row card-text user-bio">
               <br>
               {{user.bio}}
-              <br></br>
+              <br>
             </p>
               </div>
 
 {% if user.link_to_website != None %}
 <div class="card-text justify-content-center row">
-            <p class="row card-text">
-              <br>
+   <br></br>
+            <p class="row card-text linkbuffer">
+             
               <a href="{{ user.link_to_website }}">{{ user.link_to_website[8:] }}</a>
             </p>
               </div>

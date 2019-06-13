@@ -172,7 +172,7 @@ class App extends React.Component {
 
 renderShowFlash() {
   if (this.state.showFlash) {
-  return <div className="alert alert-success success" id="alert">
+  return <div className="text-center alert alert-success justify-content-center" id="alert">
   You have successfully updated your availability.</div>
   }
 }
@@ -182,54 +182,54 @@ renderShowFlash() {
 
 
 <div>
- <div>
+ <div className="container">
     {this.renderShowFlash() }
   </div>
-<div class="main-content">
+<div className="main-content">
 
  
 
-  <div class="container forever-container">
-    <div class="row forever-row">
+  <div className="container forever-container">
+    <div className="row forever-row">
       
-      <div class="col-6">
-        <section class="card">
+      <div className="col-6">
+        <section className="card">
 
-          <div class="card-header justify-content-center">
-            <h4 class="text-align-center">
+          <div className="card-header justify-content-center">
+            <h4 className="text-align-center">
             I am unavailable these recurring days:<br />
             </h4>
           </div>
 
-          <div class="text-align-center card-body justify-content-center button-buffer">    
-            <p className="text-align-center">
+          <div className="text-align-center card-body justify-content-center button-buffer">    
+            <div className="text-align-center">
               <DayButtons
               onDayDropClick={this.changeDay}
               />
-            </p>
+            </div>
           </div>
 
           <br />
 
-          <div class="text-align-center card-text justify-content-center">
-            <div class="card-text justify-content-center row">
-              <p className="text-align-center">
+          <div className="text-align-center card-text justify-content-center">
+            <div className="card-text justify-content-center row">
+              <div className="text-align-center end-div">
               <SubmitNewAvail
               submitChanges={this.submissionRoute}
               />
-              </p>
+              </div>
             </div>
           </div>
           
         </section>
 </div>
-      <div class="col-6">
-        <section class="card">
-          <div class="card-header justify-content-center">
-            <h4 class="text-align-center">
+      <div className="col-6">
+        <section className="card">
+          <div className="card-header justify-content-center">
+            <h4 className="text-align-center">
             Your Recurring Availability:</h4>
           </div>
-          <div class="card-body map-holder">
+          <div className="card-body map-holder">
             <div className="myCalen" id="mydate" ref={this.calendarRef}></div>
           </div>
         </section>

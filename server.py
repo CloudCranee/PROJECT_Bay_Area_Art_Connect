@@ -195,10 +195,9 @@ def display_public_user(id):
                                    'Bucket': 'bayart',
                                    'Key': image,
                                },
-                               ExpiresIn=9600)
+                               ExpiresIn=30000)
 
-
-    if page_user.is_artist or current_user.id == id:
+    if page_user.is_artist or (current_user.is_authenticated and current_user.id == id):
         return render_template('user.html', user=page_user, daysweek=daysweek, url=url)
     else:
         flash("Error, page not found.")
@@ -444,12 +443,10 @@ def display_active_gig(post_id):
     for locations in data_one["features"]:
         if (locations["properties"])["zip"] == str(gig.zipcode):
             zipdata = locations
-            data_source = "data_one"
 
     for locations in data_two["features"]:
         if (locations["properties"])["ZCTA"] == str(gig.zipcode):
             zipdata = locations
-            data_source = "data_two"
 
     if zipdata != None:
 
@@ -466,10 +463,10 @@ def display_active_gig(post_id):
         else:
             # Area is Tiny. Less than one million, 500 thousand (X, 234, 567)
             mapzoom = 11
-        if data_source == "data_one":
-            mapcenter = (((areabox["coordinates"])[0])[0])[0]
-        else:
+        if type(((areabox["coordinates"])[0])[0]) is list and type((((areabox["coordinates"])[0])[0])[0]) is float:
             mapcenter = ((areabox["coordinates"])[0])[0]
+        else:
+            mapcenter = (((areabox["coordinates"])[0])[0])[0]
 
     # Regions: Remote (0) | Peninsula | San Francisco
     # East Bay | North Bay and Northland | South Bay
@@ -486,13 +483,22 @@ def display_active_gig(post_id):
                 if (location["properties"])["zip"] == str(my_zip.valid_zipcode):
                     zipdata["features"].append(location)
                     if mapcenter == None:
-                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+                        if type((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0]) is list and type(((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]) is float:
+                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])
+                        else:
+                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+
+
+                        
 
             for location in data_two["features"]:
                 if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
                     zipdata["features"].append(location)
                     if mapcenter == None:
-                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+                        if type((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0]) is list and type(((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]) is float:
+                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])
+                        else:
+                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
 
         mapzoom = 8
 
@@ -505,14 +511,19 @@ def display_active_gig(post_id):
                 if (location["properties"])["zip"] == str(my_zip.valid_zipcode):
                     zipdata["features"].append(location)
                     if mapcenter == None:
-                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+                        if type((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0]) is list and type(((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]) is float:
+                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])
+                        else:
+                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
 
             for location in data_two["features"]:
                 if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
                     zipdata["features"].append(location)
                     if mapcenter == None:
-                        mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
-
+                        if type((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0]) is list and type(((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]) is float:
+                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])
+                        else:
+                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
 
         mapzoom = 8
 
@@ -705,8 +716,14 @@ def verify_user():
     if current_user.veri_code == input_code:
         current_user.verified = True
         db.session.commit()
+
+        if current_user.show_unpaid == True:
+            posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc()).all()
+        else:
+            posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc()).all()
+        post_count = len(posts)
         flash("Thank you for verification.")
-        return render_template("homepage.html")
+        return render_template("gigs.html", posts=posts, post_count=post_count)
 
     flash("Your code does not match the verification code. Please try again.")
     return render_template("homepage.html")
@@ -879,53 +896,8 @@ def update_user_info():
     return redirect('/profile')
 
 
-##################### Test Routes  vvvvvvvvvvvvvvv
+###############################################################
 
-
-@app.route('/calendar')
-def show_calendar():
-    """This is a page to test my calendar plug in."""
-
-    return render_template("calendar_test.html")
-
-
-@app.route('/savedate', methods=['POST'])
-def save_date():
-    """This is a TEST route to test my calendar plug in."""
-
-    mydate = str(request.form["mydate"])
-
-    flash(f"Date {mydate} selected.")
-
-
-    posts = Post.query.all()
-    posts.reverse()
-
-    return render_template("posts.html", posts=posts)
-
-
-@app.route('/maptest')
-def map_test():
-
-    with open('static/baysuburbs.geojson') as json_file:
-        data_one = json.load(json_file)
-    with open('static/sanjosesuburbs.geojson') as json_file:
-        data_two = json.load(json_file)
-
-    for locations in data_one["features"]:
-        if (locations["properties"])["zip"] == "94028":
-            data = locations
-
-    for locations in data_two["features"]:
-        if (locations["properties"])["ZCTA"] == "94028":
-            data = locations
-
-    print(data)
-    zipdata = data
-
-    return render_template("maptest.html", zipdata=zipdata) 
-
-##################### Test Routes Finished ^^^^^^^^^
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point

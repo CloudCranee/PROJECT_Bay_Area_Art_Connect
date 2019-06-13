@@ -21,11 +21,14 @@
 {% if current_user.verified == False %}
 
 <div class="card-text alert alert-warning alert-dismissible fade show">
-    <strong>To be listed as an active artist you need to verify your email.</strong> 
+    <strong>To edit your profile you first need to verify your email address.</strong> 
     <button type="button" class="close" data-dismiss="alert">&times;</button>
 </div>
 
-  {% endif %}
+{% else %}
+
+
+
 
 
 <form action="/update_info" method="POST" class="form">
@@ -140,6 +143,7 @@ Phone: <br>
                   </div>
 
               </form>
+              {% endif %}
           </div>
       </section>
     </div>
