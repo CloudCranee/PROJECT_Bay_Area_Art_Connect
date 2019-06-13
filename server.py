@@ -622,6 +622,16 @@ def present_login_form():
 
     return render_template("login_form.html")
 
+@app.route('/betauser')
+def login_beta_user():
+    """Logs in a user to a pre-verified fake account"""
+    
+    unum = randint(1, 40)
+    user = User.query.get(unum)
+    login_user(user)
+
+    flash("You are now logged in.")
+    return redirect('/')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

@@ -255,7 +255,17 @@ border-color:#0c7f99;
 
 
 
+.btn-orange {
+  color: #000000;
+  background-color: #FF8C26;
+  border: 2px solid #000000;
+}
 
+.btn-orange:hover {
+  color: #FF8C26;
+  background-color: #000000;
+  border: 2px solid #FF8C26;
+}
 
 .btn-outline-primary {
   color:#0c7f99;
