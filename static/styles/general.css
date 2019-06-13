@@ -1,3 +1,6 @@
+
+
+
 body {
 font-family: 'Poppins', sans-serif;
 background-color: #f3f3f3;
@@ -7,6 +10,7 @@ h1, h2, h3, h4, h5 {
 font-family: 'Lato', sans-serif;
 
 }
+
 
 .logo {
 font-family: 'Lato', sans-serif;
@@ -20,10 +24,8 @@ text-align: center;
 .profile-image {
   display: inline-block;
   position: relative;
-  max-width:230px;
-  max-height:230px;
   width: 230px;
-  height: 230px;
+  height: auto;
   padding-top: 6px;
   padding-right: 6px;
   padding-bottom: 6px;
@@ -31,7 +33,6 @@ text-align: center;
   border-style: solid;
   border-width: 2px;
   border-color: #828282;
-
 }
 
 .element-align-center {
@@ -70,8 +71,15 @@ text-align: center;
 .end-div {
  height: 3%;
  padding-top:15px;
+ padding-bottom:30px;
+}
+
+.start-div {
+ height: 3%;
+ padding-top:15px;
  padding-bottom:15px;
 }
+
 .foot-link a {
   color: #f3f3f3;
 }
@@ -85,13 +93,21 @@ height: 100%;
 }
 
 .user-bio {
-  text-align: right;
+  text-align: center;
+  width: 95%;
 }
 
 .map-holder {
-  height: 430px;
+  display: block;
+  height: 450px;
+  margin-left: auto;
+  margin-right: auto;
+ /* width: 50%;*/
 }
-
+/*
+.map-column {
+  width: 20px;
+}*/
 
 input[type=text]:focus {
   -webkit-box-shadow: 1px 1px 20px 6px #FF8C26;
@@ -122,14 +138,14 @@ input[type=email]:focus {
   border: 0px;
 }
 
-input[type=text-area]:focus {
+text-area:focus {
   -webkit-box-shadow: 1px 1px 20px 6px #FF8C26;
   -moz-box-shadow: 1px 1px 20px 6px #FF8C26;
   box-shadow: 1px 1px 20px 6px #FF8C26;
   border: 0px;
 }
 
-textarea:focus {
+.textarea:focus {
   -webkit-box-shadow: 1px 1px 20px 6px #FF8C26;
   -moz-box-shadow: 1px 1px 20px 6px #FF8C26;
   box-shadow: 1px 1px 20px 6px #FF8C26;
@@ -143,6 +159,13 @@ textarea:focus {
   top: 70px;
   left: 100px;
 */
+
+.button-buffer{
+  padding-bottom: 80px;
+
+}
+
+
 /******************************/
 /* Links and Nav Bar override */
 /******************************/
@@ -153,10 +176,32 @@ textarea:focus {
   box-shadow: 1px 1px 10px 1px #d6d6d6;
 }
 
+
 .card-header {
   background-color: #D9F6Fc;
-  border-bottom:1px solid #ffffff;  
 }
+
+
+.gigshadow {
+   box-shadow: 1px 1px 10px 1px #d6d6d6; 
+}
+
+/*
+.card-header {
+  background-color: #D9F6Fc;
+  border:1px solid #E0E0E0; 
+  box-shadow: 1px -1px 10px 1px #d6d6d6;
+ 
+}
+
+.card-body {
+  border:1px solid #E0E0E0; 
+  box-shadow: 1px -1px 10px 1px #d6d6d6;
+ 
+} */
+
+
+
 
 .navbar-nav:hover .nav-item:hover .nav-link:hover { 
   color: #FF8C26;
@@ -384,6 +429,7 @@ btn-outline-logo
 
 #map {
   position:absolute;
+
   top:5;
   bottom:5;
   width:100%;
@@ -398,6 +444,7 @@ btn-outline-logo
 /*****************/
 /* Checkboxes */
 /*****************/
+
 
 
 ul.ks-cboxtags {
@@ -459,6 +506,13 @@ ul.ks-cboxtags li input[type="checkbox"]:checked + label {
 ul.ks-cboxtags li input[type="checkbox"] {
   display: absolute;
 }
+
+/*ul.ks-cboxtags li input[type="checkbox"]:disabled {
+ color: white;
+ border: 2px solid #696969;
+}*/
+
+
 ul.ks-cboxtags li input[type="checkbox"] {
   position: absolute;
   opacity: 0;
@@ -466,3 +520,4 @@ ul.ks-cboxtags li input[type="checkbox"] {
 ul.ks-cboxtags li input[type="checkbox"]:focus + label {
   border: 2px solid #FF8C26;
 }
+

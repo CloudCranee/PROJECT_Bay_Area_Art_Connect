@@ -31,6 +31,8 @@
 
 <div class="wrapper">
 
+
+
 <!-- Nav Bar Start UNEDITED COPY PASTE FROM BOOTSTRAP-->
   <div class="nav-wrapper">
   <nav class="navbar navbar-expand-lg navbar-light">
@@ -125,7 +127,7 @@
 {% if current_user.verified == False %}
 
 
-
+<div class="container">
 <div class="alert alert-info justify-content-center" id="alert" style="width:90%; margin:0 auto;">
     
 
@@ -136,29 +138,30 @@
           </form>
 
 </div>
-
+</div>
 {% endif %}
 {% endif %}
 
   {% for flash in get_flashed_messages() %}
+<div class="container">
     <div class="alert alert-success" id="alert" style="width:90%; margin:0 auto;">{{ flash }}</div>
+  </div>
   {% endfor %}
 
 
-
+<!-- 
 <div class="squarea">A</div>
 <div class="squareb">B</div>
 <div class="squarec">C</div>
 <div class="squared">D</div>
 <div class="squaree">E</div>
 <div class="squaref">F</div>
+ -->
 
+  <div class="start-div">
+</div>
 {% block content %}
 {% endblock %}
-
-
-
-
 
 <div class="end-div">
 </div>

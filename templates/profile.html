@@ -17,6 +17,17 @@
 
               </div>
               <div class="text-align-center card-body justify-content-center">
+
+{% if current_user.verified == False %}
+
+<div class="card-text alert alert-warning alert-dismissible fade show">
+    <strong>To be listed as an active artist you need to verify your email.</strong> 
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+</div>
+
+  {% endif %}
+
+
 <form action="/update_info" method="POST" class="form">
 <p class="text-align-center form-group card-text">
 {{ current_user.display_email }}
@@ -27,44 +38,37 @@
 <a href="/changepic">Change your profile picture.</a>
 </p>
 
-
-
-<p class="form-group card-text">
-User Bio: <br></br>
-
-<textarea name="bio" rows="10" cols="30">
-
-{{ current_user.bio }}
-
-</textarea>
-</p>
-
-
 {% if current_user.is_artist %}
 <p class="form-group card-text">
     <a href="/availability"> Update your availability.</a>
 </p>
 {% endif %}
 
-                
+
 <p class="form-group card-text">
-<h3>Do you wish to be listed as an active artist?</h3>
+User Bio: <br></br>
+
+<textarea name="bio" rows="10" cols="30">{% if current_user.bio != None %} {{ current_user.bio }} {% endif %}</textarea>
 </p>
 
-       
-    <div class="justify-content-md-center text-align-center switch-field form-group card-text">
-  {% if current_user.is_artist %}
-        <input type="radio" id="radio-one" name="is_artist" value="t" checked/>
-        <label for="radio-one"><b>Yes</b></label>
-        <input type="radio" id="radio-two" name="is_artist" value="f" />
-        <label for="radio-two"><b>No</b></label>
-        {% else %}
-        <input type="radio" id="radio-one" name="is_artist" value="t"/>
-        <label for="radio-one">Yes</label>
-        <input type="radio" id="radio-two" name="is_artist" value="f" checked/>
-        <label for="radio-two">No</label>
-{% endif %}
-    </div>
+<div>
+<p class="form-group card-text">
+Website: <br></br>
+
+
+<input type="text" name="link_to_website" {% if current_user.link_to_website != None %} value="{{ current_user.link_to_website }}" {% endif %} ></input>
+</p>
+</div>
+<br>
+<div>
+<p class="form-group card-text">
+Phone: <br>
+
+<input type="text" name="phone" {% if current_user.phone != None %} value="{{ current_user.phone }}" {% endif %} ></input>
+</p>
+</div>
+
+<br>
 
 <p class="form-group card-text">
 <h3>Show unpaid gigs?</h3>
@@ -86,27 +90,49 @@ User Bio: <br></br>
 
     </div>
 
+{% if current_user.verified %}
+                
+  <p class="form-group card-text">
+  <h3>Do you wish to be listed as an active artist?</h3>
+  </p>
+
+         
+      <div class="justify-content-md-center text-align-center switch-field form-group card-text">
+    {% if current_user.is_artist %}
+          <input type="radio" id="radio-one" name="is_artist" value="t" checked/>
+          <label for="radio-one"><b>Yes</b></label>
+          <input type="radio" id="radio-two" name="is_artist" value="f" />
+          <label for="radio-two"><b>No</b></label>
+          {% else %}
+          <input type="radio" id="radio-one" name="is_artist" value="t"/>
+          <label for="radio-one">Yes</label>
+          <input type="radio" id="radio-two" name="is_artist" value="f" checked/>
+          <label for="radio-two">No</label>
+  {% endif %}
+      </div>
+
+{% endif %}
 
 
 
 
-  {% if current_user.is_artist %}
+
+
 <p class="form-group card-text">
-    <h3>Appear in these search terms:</h3>
+    <h3 class="tags">Appear in these Artist search terms:</h3>
 </p>
   <div class="form-group container card-text">
-    <ul class="ks-cboxtags">
+    <ul class="ks-cboxtags tags">
     {% for tag in tags %}
     
-      <li><input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}"
-      {% if tag in current_user.tags %} checked {% endif %}>
+      <li><input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}" class="tags"
+      {% if tag in current_user.tags %} checked {% endif %} > </input>
       <label for="{{ tag.tag_id }}"> {{ tag.tag_name }}</label></li>
     
       {% endfor %}
     </ul>
     </div>
 
-{% endif %}
 
                   <div class="form-group card-text">
 
@@ -121,5 +147,28 @@ User Bio: <br></br>
 
 <div class="end-div">
 </div>
+
+<script type="text/javascript">
+
+function artistOn() {
+  $('.tags').show();
+}
+
+function artistOff() {
+  $('.tags').hide();
+}
+
+    $(document).ready(function(){
+            if($('#radio-two').prop("checked") == true){
+              $('.tags').hide()
+      };
+    });
+
+$('#radio-one').on('click', artistOn);
+
+$('#radio-two').on('click', artistOff);
+
+</script>
+
 
 {% endblock %}

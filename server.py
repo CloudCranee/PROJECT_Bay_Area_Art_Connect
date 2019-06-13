@@ -36,7 +36,7 @@ app.jinja_env.undefined = StrictUndefined
 
 ## Change UPLOAD folder to our s3 bucket
 UPLOAD_FOLDER = '/static/img'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'webp'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -92,17 +92,21 @@ def page_not_found(e):
 @app.route('/')
 def index():
     """Homepage."""
-
-    return render_template("homepage.html")
+    if current_user.is_authenticated:
+        return redirect("gigs")
+    else:
+        return render_template("homepage.html")
 
 
 @app.route('/artists')
 def display_artists():
     """Renders a page with all artists info."""
 
-    artists = User.query.filter(User.is_artist==True, User.verified==True).order_by(User.last_active.desc())
+    artists = User.query.filter(User.is_artist==True, User.verified==True).order_by(User.last_active.desc()).all()
 
-    return render_template("artists.html", artists=artists)
+    artistcount = len(artists)
+
+    return render_template("artists.html", artists=artists, artistcount=artistcount)
 
 
 @app.route('/searchartists', methods=['GET', 'POST'])
@@ -114,12 +118,14 @@ def display_artist_results():
     search_string = '%' + search_string + '%'
 
     artists = User.query.filter(((User.bio.ilike(search_string))
-        | (User.user_name.ilike(search_string))), User.is_artist == True, User.verified==True).order_by(User.last_active.desc())
+        | (User.user_name.ilike(search_string))), User.is_artist == True, User.verified==True).order_by(User.last_active.desc()).all()
 
     if artists == []:
         flash("No artists matched your search.")
 
-    return render_template("artists.html", artists=artists)
+    artistcount = len(artists)
+
+    return render_template("artists.html", artists=artists, artistcount=artistcount)
 
 @app.route('/advancedartistsearch', methods=['GET', 'POST'])
 @login_required
@@ -141,8 +147,32 @@ def advanced_artist_search_page():
 def advanced_artist_query():
     """This route processed an advanced artist search."""
 
-    
-    return render_template("artists.html", artists=artists)
+
+    s_users = User.query.filter(User.is_artist == True, User.verified==True).order_by(User.last_active.desc()).all()
+    t_users = User.query.filter(User.is_artist == True, User.verified==True).order_by(User.last_active.desc()).all()
+
+    if request.form.get("search", False):
+        search_string = '%' + request.form["search"] + '%'
+        s_users = User.query.filter(((User.bio.ilike(search_string))
+        | (User.user_name.ilike(search_string))), User.is_artist == True, User.verified==True).order_by(User.last_active.desc()).all()
+
+    if request.form.get("tag", False):
+        tags = request.form.getlist("tag")
+        t_users = []
+        for tag in tags:
+
+            tag_one = Tag.query.filter(Tag.tag_id == tag).one()
+
+            t_users.extend(tag_one.users)
+
+    artists = [a for a in s_users for b in t_users if a == b]
+
+    if artists == []:
+            flash("No posting matched your search criteria.")
+
+    artistcount = len(artists)
+
+    return render_template("artists.html", artists=artists, artistcount=artistcount)
 
 
 
@@ -272,7 +302,7 @@ def display_gigs():
     posts = Post.query.filter(Post.active == True).all()
 
     for post in posts:
-        if post.gig_date_end < (datetime.now() - timedelta(days=2)):
+        if post.gig_date_end and post.gig_date_end < (datetime.now() - timedelta(days=2)):
             post.active = False
 
     db.session.commit()
@@ -403,7 +433,7 @@ def display_active_gig(post_id):
     mapcenter = [-122.241026, 37.767857]
 
     if gig.zipcodes.location_name == "Remote":
-        return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom)
+        return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom, gig=gig, gig_date_start=gig_date_start, gig_date_end=gig_date_end)
 
 
     with open('static/baysuburbs.geojson') as json_file:
@@ -711,7 +741,7 @@ def upload_image():
 
         image = Image.open(file)
         
-        image.thumbnail([230, 230])
+        image.thumbnail([400, 400])
 
         in_mem_file = io.BytesIO()
 
@@ -728,6 +758,9 @@ def upload_image():
 
         db.session.commit()
 
+    else:
+        flash("Incorrent image format.")
+        return redirect('/changepic')
     # s3.Bucket(os.environ.get('S3_BUCKET')).put_object(Key=file.filename, Body=file)
 
     s3.Bucket('bayart').put_object(Key=file_name, Body=file)
@@ -782,7 +815,7 @@ def user_profile():
                                    'Bucket': 'bayart',
                                    'Key': image,
                                },
-                               ExpiresIn=9600)
+                               ExpiresIn=30000)
 
 
     return render_template("profile.html", email=email, tags=tags, url=url)
@@ -811,13 +844,34 @@ def update_user_info():
 
     prev_tags = current_user.tags
 
-    print(prev_tags)
-
     for tag in new_tags_ids:
         associated_tag = Tag.query.get(tag)
         new_tags_list.append(associated_tag)
 
     current_user.tags = new_tags_list
+
+    if request.form.get("bio", False):
+        current_user.bio = request.form["bio"]
+
+    if request.form.get("link_to_website", False):
+        link_to_website = request.form["link_to_website"]
+        if link_to_website[0:8].lower() == "https://":
+            current_user.link_to_website = link_to_website
+            print("step 1")
+            print(link_to_website)
+        elif link_to_website[0:3].lower() == "www": 
+            link_to_website = "https://" + link_to_website
+            current_user.link_to_website = link_to_website
+            print("step 2")
+            print(link_to_website)
+        else:
+            link_to_website = "https://www." + link_to_website
+            current_user.link_to_website = link_to_website
+            print("step 3")
+            print(link_to_website)
+
+    if request.form.get("phone", False):
+        current_user.phone = request.form["phone"]
 
     db.session.commit()
     

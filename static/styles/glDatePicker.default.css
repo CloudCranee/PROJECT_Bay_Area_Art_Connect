@@ -29,9 +29,9 @@
 .myCalen {
   width: 400px;
 /*  height: 300px;*/
-  position: absolute;
-  top: 70px;
-  left: 100px;
+  position: relative;
+/*  top: 70px;
+  left: 100px;*/
 }
 
 

@@ -34,7 +34,7 @@
 
                     <section class="card">
                         <div class="card-header justify-content-center">
-                            <h3>{{gig.post_title}}</h3>
+                            <h3>{{ gig.post_title }}</h3>
                         </div>
 
 
@@ -47,9 +47,9 @@
 {% else %}
     <p class="card-text">
     {% if gig_date_start == gig_date_end %}
-    Date: {{gig_date_start}}
+    Date: {{ gig_date_start }}
     {% else %}
-    From: {{gig_date_start}} to {{gig_date_end}}
+    From: {{ gig_date_start }} to {{gig_date_end}}
     {% endif %}
     </p>
 {% endif %}
@@ -81,7 +81,7 @@
 
                 <p class="card-text">
                     {% for tag in gig.tags %}
-                    <i class="fas fa-tag" aria-hidden="true"></i><b> {{ tag.tag_name }}</b>
+                    <i class="fas fa-tag" aria-hidden="true"></i> {{ tag.tag_name }}
                     {% endfor %}
                 </p>
 

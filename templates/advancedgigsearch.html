@@ -1,46 +1,50 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<br>
-
-<div class="container-fluid">
-    <div class="row justify-content-md-center">
-        <form action="/searchgigsadvance" method="POST">
-            <label><p>
-                <input type="text" name="search" class="form-control" placeholder="keyword"></p>
-            </label>
-
-
-
-
-
-  <div class="form-group container">
-    <ul class="ks-cboxtags">
-    {% for tag in tags %}
-    
-      <li><input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}">
-      <label for="{{ tag.tag_id }}"> {{ tag.tag_name }}</label></li>
-    
-      {% endfor %}
-    </ul>
+<div class="container justify-content-center">
+  <div class="justify-content-md-center col-7 col-md-auto">
+    <section class="card justify-content-center justify-content-md-center row">
+      <div class="card-header"> 
+        <h1 class="text-align-center"> Search Gigs</h1>
+      </div>
+      <div class="text-align-center card-body justify-content-center">
+        <form action="/searchgigsadvance" method="POST" class="form">
+          <p class="text-align-center form-group card-text">
+          <input type="text" name="search" placeholder="Keyword">
+          </p>
+          <p class="text-align-center form-group card-text">
+            Location:
+          </p>
+          <p class="text-align-center form-group card-text">
+            <select name="location" class="selectpicker dropbtn">
+              {% for location in locations %}
+                <option value="{{location}}" class=".dropdown-content">{{location}}</option>
+              {% endfor %}
+            </select>
+          </p>
+        <p class="form-group card-text">
+          <h3>Search Tags:</h3>
+        </p>
+        <div class="form-group container card-text">
+          <ul class="ks-cboxtags">
+            {% for tag in tags %}
+              <li>
+                <input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}"
+                {% if tag in current_user.tags %} checked {% endif %}>
+                <label for="{{ tag.tag_id }}"> {{ tag.tag_name }}</label>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="form-group card-text">
+          <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Search" >Search</button>
+        </div>
+        </form>
+        </div>
+        </section>
+      </div>
     </div>
-
-<p>
-      <select name="location">
-        {% for location in locations %}
-        <option value="{{location}}">{{location}}</option>
-        {% endfor %}
-      </select>
-</p>
-
-  <div class="form-group">
-    <div class="col col-4">
-                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Search">Search</button></form>
-    </div>
+  <div class="end-div">
 </div>
-    </div>
-</div>
-
-
 
 {% endblock %}

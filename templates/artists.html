@@ -22,13 +22,13 @@
 <div class="container justify-content-end">
     <div class="justify-content-end col">
         <div class="row justify-content-end">
-        <h4></h4>
+        <h4>{{ artistcount }} Active Artists</h4>
     </div></div>
 </div>
 
 
 <div class="container justify-content-center mb-5">
-    <div class=" justify-content-center col">
+    <div class=" justify-content-center col gigshadow">
         {% for artist in artists %}
         <section class="card justify-content-center row">
             <div class="card-header justify-content-center">            
@@ -45,7 +45,7 @@
                 
                 <p>
                     {% for tag in artist.tags %}
-                    <i class="fas fa-tag" aria-hidden="true"></i><b> {{ tag.tag_name }} </b>
+                    <i class="fas fa-tag" aria-hidden="true"></i> {{ tag.tag_name }}
                     {% endfor %}
                 </p>
             </div>

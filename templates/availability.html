@@ -180,50 +180,68 @@ renderShowFlash() {
   render() {
     return (
 
-    <div className="container">
 
-        <div className="row justify-content-md-center">
-             <div className="col">
-              {this.renderShowFlash() }
-              </div>
-        </div>
+<div>
+ <div>
+    {this.renderShowFlash() }
+  </div>
+<div class="main-content">
 
+ 
 
-        <div className="row justify-content-md-center">
+  <div class="container forever-container">
+    <div class="row forever-row">
+      
+      <div class="col-6">
+        <section class="card">
 
-              <div className="col">
+          <div class="card-header justify-content-center">
+            <h4 class="text-align-center">
+            I am unavailable these recurring days:<br />
+            </h4>
+          </div>
 
-                        <p className="text-align-center"> 
-                      I am unavailable these recurring days:<br />
-                       </p>
-<p className="text-align-center">
-                      <DayButtons
-                        onDayDropClick={this.changeDay}
-                      />
-</p>
+          <div class="text-align-center card-body justify-content-center button-buffer">    
+            <p className="text-align-center">
+              <DayButtons
+              onDayDropClick={this.changeDay}
+              />
+            </p>
+          </div>
 
-        <br />
+          <br />
 
-        <p className="text-align-center">
-                       <SubmitNewAvail
-                        submitChanges={this.submissionRoute}
-                        />
-                      </p>
-              </div>
+          <div class="text-align-center card-text justify-content-center">
+            <div class="card-text justify-content-center row">
+              <p className="text-align-center">
+              <SubmitNewAvail
+              submitChanges={this.submissionRoute}
+              />
+              </p>
+            </div>
+          </div>
           
-
-                  <div className="col">
-                  <div className="myCalen" id="mydate" ref={this.calendarRef}>
-
-                  </div>
+        </section>
 </div>
+      <div class="col-6">
+        <section class="card">
+          <div class="card-header justify-content-center">
+            <h4 class="text-align-center">
+            Your Recurring Availability:</h4>
+          </div>
+          <div class="card-body map-holder">
+            <div className="myCalen" id="mydate" ref={this.calendarRef}></div>
+          </div>
+        </section>
       </div>
     </div>
+  </div>
+</div>
+</div>
 
     );
   }
 }
-
 
 
 ReactDOM.render(
