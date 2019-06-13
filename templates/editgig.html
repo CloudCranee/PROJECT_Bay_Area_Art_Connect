@@ -1,35 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% if current_user.verified == True %}
-
-
-
-
-
-
 
 <div class="container justify-content-center">
     <div class="justify-content-md-center col-7 col-md-auto">
           <section class="card justify-content-center justify-content-md-center row">
 
               <div class="card-header"> 
-                  <h1 class="text-align-center">Post a Gig</h1>
+                <h3 class="text-align-center">Edit:</h3> 
+                  <h2 class="text-align-center">{{ gig.post_title }}</h2>
               </div>
 
               <div class="text-align-center card-body justify-content-center">
 
-                  <form action="/creategig" method="POST">
+                  <form action="/submitgigedit/{{ gig.post_id }}" method="POST">
 
 <p class="form-group card-text">
         Title:<br></br>
-        <input type="text" name="post_title" required></input>
+        <input type="text" name="post_title" value="{{gig.post_title}}"></input>
 
 
 </p>
                       <p class="text-align-center form-group card-text">
         Description:<br></br>
-        <textarea name="description" required class="textarea" rows="15" cols="45">
+        <textarea name="description" required class="textarea" rows="15" cols="45">{{gig.description}}
  </textarea>   
                       </p>
 
@@ -59,9 +53,9 @@ Is this gig paid:
 </p>
 <div class="justify-content-md-center text-align-center switch-field form-group card-text">
 
-            <input type="radio" id="radio-three" name="unpaid" value="f" class="text-align-center"/>
+            <input type="radio" id="radio-three" name="unpaid" value="f" class="text-align-center" {% if gig.unpaid == False %} checked {% endif %}/>
             <label for="radio-three">Yes</label>
-            <input type="radio" id="radio-four" name="unpaid" value="t" class="text-align-center" checked/>
+            <input type="radio" id="radio-four" name="unpaid" value="t" class="text-align-center" {% if gig.unpaid == True %} checked {% endif %}/>
             <label for="radio-four">No</label>
 </div>
 
@@ -73,7 +67,7 @@ Is this gig paid:
     <ul class="ks-cboxtags">
     {% for tag in tags %}
     
-      <li><input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}">
+      <li><input type="checkbox" name="tag" id="{{ tag.tag_id }}" value="{{ tag.tag_id }}" {% if tag in gig.tags %} checked {% endif %}>
       <label for="{{ tag.tag_id }}"> {{ tag.tag_name }}</label></li>
     
       {% endfor %}
@@ -81,9 +75,19 @@ Is this gig paid:
     </div>
 
 
+<p class="form-group card-text">
+  Do you wish to delete your gig posting?
+</p>
+<div class="form-group card-text">
+    <select name="active" class="selectpicker dropbtn selectdanger">
+      <option value="yes" class=".dropdown-content selectdangercontent">Keep Gig Active</option>
+        <option value="no" class=".dropdown-content selectdangercontent">DELETE</option>
+      </select>
+
+</div>
 
 
-                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="post" >Post Gig</button>
+                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="post" >Save Changes</button>
 
 
                   </form>
@@ -104,18 +108,5 @@ Is this gig paid:
 
 
 
-
-{% endif %}
-
-
-{% if current_user.verified == False %}
-
-<div class="container">
-<div class="card-text alert alert-warning alert-dismissible fade show">
-    <strong>Please verify your email address before posting a gig.</strong> 
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-</div>
-</div>
-{% endif %}
 
 {% endblock %}

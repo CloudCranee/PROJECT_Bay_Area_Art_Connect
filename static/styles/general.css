@@ -373,6 +373,23 @@ btn-outline-logo
 .dropdown:hover .dropbtn {background-color: #76e6ff}
 
 
+.selectdanger {
+  color: #000000;
+  background-color: #FF8C26;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.selectdangercontent {
+  position: absolute;
+  color: #000000;
+  background-color: #FF8C26;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+
 /*****************/
 /*  Buttons */
 /*****************/
@@ -523,4 +540,6 @@ ul.ks-cboxtags li input[type="checkbox"] {
 ul.ks-cboxtags li input[type="checkbox"]:focus + label {
   border: 2px solid #FF8C26;
 }
+
+
 

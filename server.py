@@ -251,12 +251,19 @@ def add_new_gig_to_database():
     post_title = request.form["post_title"]
     description = request.form["description"]
     location = request.form["location"]
+    unpaid = request.form["location"]
+    if unpaid == 'f':
+        unpaid = False
+    else:    
+        unpaid = True
+
     zipcode = Zipcode.query.filter_by(location_name=location).first()
     user_id = current_user.id
     post_date = datetime.now()
 
     new_post = Post(post_title=post_title, description=description,
-        zipcode=zipcode.valid_zipcode, creation_date=post_date, user_id=user_id)
+        zipcode=zipcode.valid_zipcode, creation_date=post_date, user_id=user_id,
+        unpaid=unpaid)
 
     post_tags = request.form.getlist("tag")
 
@@ -288,8 +295,86 @@ def display_edit_gig_page(post_id):
         flash("You do not have access to edit this gig.")
         return render_template("gigs.html", posts=posts)
 
-    #This html does not yet exist
-    return render_template("editgig.html", gig=gig)
+    locations = Zipcode.query.all()
+
+    locations = list(set([i.location_name for i in locations]))
+
+    locations.sort()
+
+    locations.insert(0, gig.zipcodes.location_name)
+
+    tags = Tag.query.all()
+
+    def sort_tag_name(val):
+        return val.tag_name
+
+    tags.sort(key = sort_tag_name)
+
+    return render_template("editgig.html", gig=gig, locations=locations, tags=tags)
+
+
+@app.route('/submitgigedit/<int:post_id>', methods = ['POST'])
+@login_required
+def submits_gig_edit(post_id):
+    """Submits gig edits"""
+
+    gig = Post.query.filter_by(post_id = post_id).one_or_none()
+
+    if gig == None or current_user.id != gig.user_id:
+        if current_user.show_unpaid == True:
+            posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc())
+        else:
+            posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc())
+        flash("You do not have access to edit this gig.")
+        return render_template("gigs.html", posts=posts)
+
+    new_tags_ids = request.form.getlist("tag")
+    new_tags_list = []
+
+    prev_tags = current_user.tags
+
+    for tag in new_tags_ids:
+        associated_tag = Tag.query.get(tag)
+        new_tags_list.append(associated_tag)
+
+    gig.tags = new_tags_list
+
+    if request.form.get("post_title", False):
+        gig.post_title = request.form["post_title"]
+
+    if request.form.get("description", False):
+        gig.description = request.form["description"]
+
+    if request.form.get("location", False):
+        location = request.form["location"]
+        zipcode = Zipcode.query.filter_by(location_name=location).first()
+        gig.zipcode = zipcode.valid_zipcode
+
+    unpaid = request.form["location"]
+    if unpaid == 'f':
+        gig.unpaid = False
+    else:    
+        gig.unpaid = True
+
+    active = request.form["active"]
+    print(active)
+    if active == 'yes':
+        print("STAYING ACTIVE")
+        gig.active = True
+    else:
+        print("DELETING")
+        gig.active = False
+
+    db.session.commit()
+    
+    if current_user.show_unpaid == True:
+        posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc()).all()
+    else:
+        posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc()).all()
+    post_count = len(posts)
+
+    flash(f"Your gig edits have been saved.")
+    return render_template("gigs.html", posts=posts, post_count=post_count)
 
 
 @app.route('/gigs')
