@@ -1,10 +1,29 @@
-from flask import Flask, render_template, request, jsonify, flash, redirect, session, abort, url_for, Request
-app=Flask(__name__)
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify,
+    flash,
+    redirect,
+    session,
+    abort,
+    url_for,
+    Request,
+)
+
+app = Flask(__name__)
 
 from flask_bootstrap import Bootstrap
 from jinja2 import StrictUndefined
 from datetime import datetime, timedelta
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    login_required,
+    logout_user,
+    current_user,
+)
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
@@ -15,6 +34,7 @@ import requests
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, User, Post, Zipcode, Tag
 from random import randint
+
 # Image upload and resizing tools
 import boto3
 from PIL import Image
@@ -26,36 +46,37 @@ from sendgridpy import send_email, verify_email
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-s3 = boto3.resource('s3')
-s3_client = boto3.client('s3') 
+s3 = boto3.resource("s3")
+s3_client = boto3.client("s3")
 
 app.secret_key = "thefriendswemadealongtheway"
 
 app.jinja_env.undefined = StrictUndefined
 
+## s3 bucket
+UPLOAD_FOLDER = "/static/img"
+ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif", "webp"])
 
-## Change UPLOAD folder to our s3 bucket
-UPLOAD_FOLDER = '/static/img'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'webp'])
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 ###############
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
-    ###Do I need to add more code here or is this complete?
 
 
 @login_manager.unauthorized_handler
 def unauthorized_callback():
     """If there is no user logged in,
     this will redirect the client back to the homepage."""
+
     flash("You will need to log in or create an account before viewing this page.")
     return render_template("homepage.html")
 
@@ -69,27 +90,7 @@ def page_not_found(e):
     return render_template("homepage.html")
 
 
-# @app.route('/bayjson.geojson')
-# def serve_static():
-#     with open('static/baysuburbs.geojson') as json_file:
-#         data_one = json.load(json_file)
-#     with open('static/sanjosesuburbs.geojson') as json_file:
-#         data_two = json.load(json_file)
-
-
-#     for locations in data_one["features"]:
-#         if (locations["properties"])["zip"] == "94558":
-#             data = locations
-
-#     for locations in data_two["features"]:
-#         if (locations["properties"])["ZCTA"] == "95123":
-#             data = locations
-
-#     return jsonify(data)
-
-  
-
-@app.route('/')
+@app.route("/")
 def index():
     """Homepage."""
     if current_user.is_authenticated:
@@ -98,27 +99,38 @@ def index():
         return render_template("homepage.html")
 
 
-@app.route('/artists')
+@app.route("/artists")
 def display_artists():
     """Renders a page with all artists info."""
 
-    artists = User.query.filter(User.is_artist==True, User.verified==True).order_by(User.last_active.desc()).all()
+    artists = (
+        User.query.filter(User.is_artist == True, User.verified == True)
+        .order_by(User.last_active.desc())
+        .all()
+    )
 
     artistcount = len(artists)
 
     return render_template("artists.html", artists=artists, artistcount=artistcount)
 
 
-@app.route('/searchartists', methods=['GET', 'POST'])
+@app.route("/searchartists", methods=["GET", "POST"])
 @login_required
 def display_artist_results():
     """Basic string query artist search function"""
 
     search_string = request.form["search"]
-    search_string = '%' + search_string + '%'
+    search_string = "%" + search_string + "%"
 
-    artists = User.query.filter(((User.bio.ilike(search_string))
-        | (User.user_name.ilike(search_string))), User.is_artist == True, User.verified==True).order_by(User.last_active.desc()).all()
+    artists = (
+        User.query.filter(
+            ((User.bio.ilike(search_string)) | (User.user_name.ilike(search_string))),
+            User.is_artist == True,
+            User.verified == True,
+        )
+        .order_by(User.last_active.desc())
+        .all()
+    )
 
     if artists == []:
         flash("No artists matched your search.")
@@ -127,7 +139,8 @@ def display_artist_results():
 
     return render_template("artists.html", artists=artists, artistcount=artistcount)
 
-@app.route('/advancedartistsearch', methods=['GET', 'POST'])
+
+@app.route("/advancedartistsearch", methods=["GET", "POST"])
 @login_required
 def advanced_artist_search_page():
     """Displays the page for advanced artist search"""
@@ -137,24 +150,41 @@ def advanced_artist_search_page():
     def sort_tag_name(val):
         return val.tag_name
 
-    tags.sort(key = sort_tag_name)
-    
-    return render_template('advancedartistssearch.html', tags=tags)
+    tags.sort(key=sort_tag_name)
+
+    return render_template("advancedartistssearch.html", tags=tags)
 
 
-@app.route('/searchartistsadvance', methods=['GET', 'POST'])
+@app.route("/searchartistsadvance", methods=["GET", "POST"])
 @login_required
 def advanced_artist_query():
     """This route processed an advanced artist search."""
 
-
-    s_users = User.query.filter(User.is_artist == True, User.verified==True).order_by(User.last_active.desc()).all()
-    t_users = User.query.filter(User.is_artist == True, User.verified==True).order_by(User.last_active.desc()).all()
+    s_users = (
+        User.query.filter(User.is_artist == True, User.verified == True)
+        .order_by(User.last_active.desc())
+        .all()
+    )
+    t_users = (
+        User.query.filter(User.is_artist == True, User.verified == True)
+        .order_by(User.last_active.desc())
+        .all()
+    )
 
     if request.form.get("search", False):
-        search_string = '%' + request.form["search"] + '%'
-        s_users = User.query.filter(((User.bio.ilike(search_string))
-        | (User.user_name.ilike(search_string))), User.is_artist == True, User.verified==True).order_by(User.last_active.desc()).all()
+        search_string = "%" + request.form["search"] + "%"
+        s_users = (
+            User.query.filter(
+                (
+                    (User.bio.ilike(search_string))
+                    | (User.user_name.ilike(search_string))
+                ),
+                User.is_artist == True,
+                User.verified == True,
+            )
+            .order_by(User.last_active.desc())
+            .all()
+        )
 
     if request.form.get("tag", False):
         tags = request.form.getlist("tag")
@@ -168,15 +198,14 @@ def advanced_artist_query():
     artists = [a for a in s_users for b in t_users if a == b]
 
     if artists == []:
-            flash("No posting matched your search criteria.")
+        flash("No posting matched your search criteria.")
 
     artistcount = len(artists)
 
     return render_template("artists.html", artists=artists, artistcount=artistcount)
 
 
-
-@app.route('/users/<int:id>')
+@app.route("/users/<int:id>")
 def display_public_user(id):
     """Display user info if user is artist, or user is current_user"""
 
@@ -190,26 +219,23 @@ def display_public_user(id):
 
     image = page_user.img_route
 
-    url = s3_client.generate_presigned_url('get_object',
-                                    Params={
-                                   'Bucket': 'bayart',
-                                   'Key': image,
-                               },
-                               ExpiresIn=30000)
+    url = s3_client.generate_presigned_url(
+        "get_object", Params={"Bucket": "bayart", "Key": image}, ExpiresIn=30000
+    )
 
     if page_user.is_artist or (current_user.is_authenticated and current_user.id == id):
-        return render_template('user.html', user=page_user, daysweek=daysweek, url=url)
+        return render_template("user.html", user=page_user, daysweek=daysweek, url=url)
     else:
         flash("Error, page not found.")
         return render_template("homepage.html")
 
 
-@app.route('/newpost')
+@app.route("/newpost")
 @login_required
 def display_new_post_form():
     """Renders a page with the option to post a new gig."""
 
-    zipcode_instances = Zipcode.query.filter(Zipcode.location_name != 'Remote').all()
+    zipcode_instances = Zipcode.query.filter(Zipcode.location_name != "Remote").all()
 
     zipcodes = []
 
@@ -220,8 +246,6 @@ def display_new_post_form():
 
     for zipcode in zipcode_instances:
         locations.append(zipcode.location_name)
-
-
 
     locations = list(set(locations))
 
@@ -234,36 +258,41 @@ def display_new_post_form():
     def sort_tag_name(val):
         return val.tag_name
 
-    tags.sort(key = sort_tag_name)
+    tags.sort(key=sort_tag_name)
+
+    return render_template(
+        "new_post.html", zipcodes=zipcodes, locations=locations, tags=tags
+    )
 
 
-    return render_template("new_post.html", zipcodes=zipcodes,
-                        locations=locations, tags=tags)
-
-
-@app.route('/creategig', methods=['POST'])
+@app.route("/creategig", methods=["POST"])
 @login_required
 def add_new_gig_to_database():
     """Adds a new gig to the database."""
 
     user_id = current_user.id
-    
+
     post_title = request.form["post_title"]
     description = request.form["description"]
     location = request.form["location"]
     unpaid = request.form["location"]
-    if unpaid == 'f':
+    if unpaid == "f":
         unpaid = False
-    else:    
+    else:
         unpaid = True
 
     zipcode = Zipcode.query.filter_by(location_name=location).first()
     user_id = current_user.id
     post_date = datetime.now()
 
-    new_post = Post(post_title=post_title, description=description,
-        zipcode=zipcode.valid_zipcode, creation_date=post_date, user_id=user_id,
-        unpaid=unpaid)
+    new_post = Post(
+        post_title=post_title,
+        description=description,
+        zipcode=zipcode.valid_zipcode,
+        creation_date=post_date,
+        user_id=user_id,
+        unpaid=unpaid,
+    )
 
     post_tags = request.form.getlist("tag")
 
@@ -274,24 +303,28 @@ def add_new_gig_to_database():
     db.session.add(new_post)
 
     db.session.commit()
-        
+
     flash("Thank you. Your new post is now live.")
 
     return redirect("gigs")
 
 
-@app.route('/editgig/<int:post_id>')
+@app.route("/editgig/<int:post_id>")
 @login_required
 def display_edit_gig_page(post_id):
     """Displays the edit gig page."""
 
-    gig = Post.query.filter_by(post_id = post_id).one_or_none()
+    gig = Post.query.filter_by(post_id=post_id).one_or_none()
 
     if gig == None or current_user.id != gig.user_id:
         if current_user.show_unpaid == True:
-            posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc())
+            posts = Post.query.filter(Post.active == True).order_by(
+                Post.creation_date.desc()
+            )
         else:
-            posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc())
+            posts = Post.query.filter(
+                Post.active == True, Post.unpaid == False
+            ).order_by(Post.creation_date.desc())
         flash("You do not have access to edit this gig.")
         return render_template("gigs.html", posts=posts)
 
@@ -308,23 +341,27 @@ def display_edit_gig_page(post_id):
     def sort_tag_name(val):
         return val.tag_name
 
-    tags.sort(key = sort_tag_name)
+    tags.sort(key=sort_tag_name)
 
     return render_template("editgig.html", gig=gig, locations=locations, tags=tags)
 
 
-@app.route('/submitgigedit/<int:post_id>', methods = ['POST'])
+@app.route("/submitgigedit/<int:post_id>", methods=["POST"])
 @login_required
 def submits_gig_edit(post_id):
     """Submits gig edits"""
 
-    gig = Post.query.filter_by(post_id = post_id).one_or_none()
+    gig = Post.query.filter_by(post_id=post_id).one_or_none()
 
     if gig == None or current_user.id != gig.user_id:
         if current_user.show_unpaid == True:
-            posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc())
+            posts = Post.query.filter(Post.active == True).order_by(
+                Post.creation_date.desc()
+            )
         else:
-            posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc())
+            posts = Post.query.filter(
+                Post.active == True, Post.unpaid == False
+            ).order_by(Post.creation_date.desc())
         flash("You do not have access to edit this gig.")
         return render_template("gigs.html", posts=posts)
 
@@ -351,30 +388,38 @@ def submits_gig_edit(post_id):
         gig.zipcode = zipcode.valid_zipcode
 
     unpaid = request.form["location"]
-    if unpaid == 'f':
+    if unpaid == "f":
         gig.unpaid = False
-    else:    
+    else:
         gig.unpaid = True
 
     active = request.form["active"]
-    if active == 'yes':
+    if active == "yes":
         gig.active = True
     else:
         gig.active = False
 
     db.session.commit()
-    
+
     if current_user.show_unpaid == True:
-        posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc()).all()
+        posts = (
+            Post.query.filter(Post.active == True)
+            .order_by(Post.creation_date.desc())
+            .all()
+        )
     else:
-        posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc()).all()
+        posts = (
+            Post.query.filter(Post.active == True, Post.unpaid == False)
+            .order_by(Post.creation_date.desc())
+            .all()
+        )
     post_count = len(posts)
 
     flash(f"Your gig edits have been saved.")
     return render_template("gigs.html", posts=posts, post_count=post_count)
 
 
-@app.route('/gigs')
+@app.route("/gigs")
 @login_required
 def display_gigs():
     """Displays a list of all posts
@@ -383,30 +428,46 @@ def display_gigs():
     posts = Post.query.filter(Post.active == True).all()
 
     for post in posts:
-        if post.gig_date_end and post.gig_date_end < (datetime.now() - timedelta(days=2)):
+        if post.gig_date_end and post.gig_date_end < (
+            datetime.now() - timedelta(days=2)
+        ):
             post.active = False
 
     db.session.commit()
 
     if current_user.show_unpaid == True:
-        posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc()).all()
+        posts = (
+            Post.query.filter(Post.active == True)
+            .order_by(Post.creation_date.desc())
+            .all()
+        )
     else:
-        posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc()).all()
+        posts = (
+            Post.query.filter(Post.active == True, Post.unpaid == False)
+            .order_by(Post.creation_date.desc())
+            .all()
+        )
 
     post_count = len(posts)
 
     return render_template("gigs.html", posts=posts, post_count=post_count)
 
 
-@app.route('/searchgigs', methods=['GET', 'POST'])
+@app.route("/searchgigs", methods=["GET", "POST"])
 @login_required
 def display_gig_results():
     """Basic string query gig search function"""
 
     search_string = request.form["search"]
-    search_string = '%' + search_string + '%'
+    search_string = "%" + search_string + "%"
 
-    posts = Post.query.filter(((Post.description.ilike(search_string)) | (Post.post_title.ilike(search_string))), Post.active == True).all()
+    posts = Post.query.filter(
+        (
+            (Post.description.ilike(search_string))
+            | (Post.post_title.ilike(search_string))
+        ),
+        Post.active == True,
+    ).all()
 
     if posts == []:
         flash("No posting matched your search criteria.")
@@ -415,7 +476,8 @@ def display_gig_results():
 
     return render_template("gigs.html", posts=posts, post_count=post_count)
 
-@app.route('/advancedgigsearch')
+
+@app.route("/advancedgigsearch")
 @login_required
 def advanced_search_gig_page():
 
@@ -424,7 +486,7 @@ def advanced_search_gig_page():
     def sort_tag_name(val):
         return val.tag_name
 
-    tags.sort(key = sort_tag_name)
+    tags.sort(key=sort_tag_name)
 
     locations = Zipcode.query.all()
 
@@ -433,11 +495,11 @@ def advanced_search_gig_page():
     locations.sort()
 
     locations.insert(0, "Location:")
-    
-    return render_template('advancedgigsearch.html', tags=tags, locations=locations)
+
+    return render_template("advancedgigsearch.html", tags=tags, locations=locations)
 
 
-@app.route('/searchgigsadvance', methods=['GET', 'POST'])
+@app.route("/searchgigsadvance", methods=["GET", "POST"])
 @login_required
 def advanced_gigs_query():
     """This route process an advanced gig search."""
@@ -452,8 +514,14 @@ def advanced_gigs_query():
         t_posts = Post.query.filter(Post.active == True, Post.unpaid == False)
 
     if request.form.get("search", False):
-        search_string = '%' + request.form["search"] + '%'
-        s_posts = Post.query.filter(((Post.description.ilike(search_string)) | (Post.post_title.ilike(search_string))), Post.active == True).all()
+        search_string = "%" + request.form["search"] + "%"
+        s_posts = Post.query.filter(
+            (
+                (Post.description.ilike(search_string))
+                | (Post.post_title.ilike(search_string))
+            ),
+            Post.active == True,
+        ).all()
 
     if request.form.get("tag", False):
 
@@ -466,10 +534,14 @@ def advanced_gigs_query():
 
             t_posts.extend(tag_one.posts)
 
-
     if request.form["location"] != "Location:":
         location = request.form["location"]
-        list_of_tuples = db.session.query(Zipcode,Post).join(Post).filter(Zipcode.region == location).all()
+        list_of_tuples = (
+            db.session.query(Zipcode, Post)
+            .join(Post)
+            .filter(Zipcode.region == location)
+            .all()
+        )
         l_posts = []
         for i in list_of_tuples:
             l_posts.append(i[1])
@@ -478,24 +550,28 @@ def advanced_gigs_query():
     posts = [c for c in venn_s_t for d in l_posts if c == d]
 
     if posts == []:
-            flash("No posting matched your search criteria.")
+        flash("No posting matched your search criteria.")
 
-    post_count=len(posts)
+    post_count = len(posts)
 
     return render_template("gigs.html", posts=posts, post_count=post_count)
 
 
-@app.route('/gig/<int:post_id>')
+@app.route("/gig/<int:post_id>")
 def display_active_gig(post_id):
     """Displays a gig's page"""
 
-    gig = Post.query.filter_by(post_id = post_id).one_or_none()
+    gig = Post.query.filter_by(post_id=post_id).one_or_none()
 
     if gig == None:
         if current_user.show_unpaid == True:
-            posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc())
+            posts = Post.query.filter(Post.active == True).order_by(
+                Post.creation_date.desc()
+            )
         else:
-            posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc())
+            posts = Post.query.filter(
+                Post.active == True, Post.unpaid == False
+            ).order_by(Post.creation_date.desc())
         flash("This gig does not exist.")
         return render_template("gigs.html", posts=posts)
 
@@ -503,23 +579,30 @@ def display_active_gig(post_id):
         gig_date_start = None
         gig_date_end = None
     elif gig.gig_date_end == None:
-        gig_date_start = datetime.strftime(gig.gig_date_start, '%b %d, %Y') 
+        gig_date_start = datetime.strftime(gig.gig_date_start, "%b %d, %Y")
         gig_date_end == None
     else:
-        gig_date_start = datetime.strftime(gig.gig_date_start, '%b %d, %Y')
-        gig_date_end = datetime.strftime(gig.gig_date_end, '%b %d, %Y') 
+        gig_date_start = datetime.strftime(gig.gig_date_start, "%b %d, %Y")
+        gig_date_end = datetime.strftime(gig.gig_date_end, "%b %d, %Y")
 
     zipdata = None
     mapzoom = 8
     mapcenter = [-122.241026, 37.767857]
 
     if gig.zipcodes.location_name == "Remote":
-        return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom, gig=gig, gig_date_start=gig_date_start, gig_date_end=gig_date_end)
+        return render_template(
+            "gig.html",
+            zipdata=zipdata,
+            mapcenter=mapcenter,
+            mapzoom=mapzoom,
+            gig=gig,
+            gig_date_start=gig_date_start,
+            gig_date_end=gig_date_end,
+        )
 
-
-    with open('static/baysuburbs.geojson') as json_file:
+    with open("static/baysuburbs.geojson") as json_file:
         data_one = json.load(json_file)
-    with open('static/sanjosesuburbs.geojson') as json_file:
+    with open("static/sanjosesuburbs.geojson") as json_file:
         data_two = json.load(json_file)
 
     for locations in data_one["features"]:
@@ -533,7 +616,7 @@ def display_active_gig(post_id):
     if zipdata != None:
 
         areabox = zipdata["geometry"]
-        if (area(areabox) > 50000000):
+        if area(areabox) > 50000000:
             # Area is Large. Greater than fifty million (X2, 345, 678)
             mapzoom = 8
         elif (area(areabox) <= 50000000) & (area(areabox) > 10000000):
@@ -545,7 +628,10 @@ def display_active_gig(post_id):
         else:
             # Area is Tiny. Less than one million, 500 thousand (X, 234, 567)
             mapzoom = 11
-        if type(((areabox["coordinates"])[0])[0]) is list and type((((areabox["coordinates"])[0])[0])[0]) is float:
+        if (
+            type(((areabox["coordinates"])[0])[0]) is list
+            and type((((areabox["coordinates"])[0])[0])[0]) is float
+        ):
             mapcenter = ((areabox["coordinates"])[0])[0]
         else:
             mapcenter = (((areabox["coordinates"])[0])[0])[0]
@@ -556,81 +642,236 @@ def display_active_gig(post_id):
 
     if zipdata == None:
         mapcenter = None
-        zipdata = {"type": "FeatureCollection",
-                    "features": []}
+        zipdata = {"type": "FeatureCollection", "features": []}
 
-        for my_zip in Zipcode.query.filter_by(location_name = gig.zipcodes.location_name).all():
-
-            for location in data_one["features"]:
-                if (location["properties"])["zip"] == str(my_zip.valid_zipcode):
-                    zipdata["features"].append(location)
-                    if mapcenter == None:
-                        if type((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0]) is list and type(((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]) is float:
-                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])
-                        else:
-                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
-
-
-                        
-
-            for location in data_two["features"]:
-                if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
-                    zipdata["features"].append(location)
-                    if mapcenter == None:
-                        if type((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0]) is list and type(((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]) is float:
-                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])
-                        else:
-                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
-
-        mapzoom = 8
-
-    if zipdata == {"type": "FeatureCollection",
-                    "features": []}:
-
-        for my_zip in Zipcode.query.filter_by(region = gig.zipcodes.region).all():
+        for my_zip in Zipcode.query.filter_by(
+            location_name=gig.zipcodes.location_name
+        ).all():
 
             for location in data_one["features"]:
                 if (location["properties"])["zip"] == str(my_zip.valid_zipcode):
                     zipdata["features"].append(location)
                     if mapcenter == None:
-                        if type((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0]) is list and type(((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]) is float:
-                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])
+                        if (
+                            type(
+                                (
+                                    (
+                                        (((zipdata["features"])[0])["geometry"])[
+                                            "coordinates"
+                                        ]
+                                    )[0]
+                                )[0]
+                            )
+                            is list
+                            and type(
+                                (
+                                    (
+                                        (
+                                            (((zipdata["features"])[0])["geometry"])[
+                                                "coordinates"
+                                            ]
+                                        )[0]
+                                    )[0]
+                                )[0]
+                            )
+                            is float
+                        ):
+                            mapcenter = (
+                                (
+                                    (((zipdata["features"])[0])["geometry"])[
+                                        "coordinates"
+                                    ]
+                                )[0]
+                            )[0]
                         else:
-                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+                            mapcenter = (
+                                (
+                                    (
+                                        (((zipdata["features"])[0])["geometry"])[
+                                            "coordinates"
+                                        ]
+                                    )[0]
+                                )[0]
+                            )[0]
 
             for location in data_two["features"]:
                 if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
                     zipdata["features"].append(location)
                     if mapcenter == None:
-                        if type((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0]) is list and type(((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]) is float:
-                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])
+                        if (
+                            type(
+                                (
+                                    (
+                                        (((zipdata["features"])[0])["geometry"])[
+                                            "coordinates"
+                                        ]
+                                    )[0]
+                                )[0]
+                            )
+                            is list
+                            and type(
+                                (
+                                    (
+                                        (
+                                            (((zipdata["features"])[0])["geometry"])[
+                                                "coordinates"
+                                            ]
+                                        )[0]
+                                    )[0]
+                                )[0]
+                            )
+                            is float
+                        ):
+                            mapcenter = (
+                                (
+                                    (((zipdata["features"])[0])["geometry"])[
+                                        "coordinates"
+                                    ]
+                                )[0]
+                            )[0]
                         else:
-                            mapcenter = ((((((zipdata["features"])[0])["geometry"])["coordinates"])[0])[0])[0]
+                            mapcenter = (
+                                (
+                                    (
+                                        (((zipdata["features"])[0])["geometry"])[
+                                            "coordinates"
+                                        ]
+                                    )[0]
+                                )[0]
+                            )[0]
 
         mapzoom = 8
 
-    return render_template("gig.html", zipdata=zipdata, mapcenter=mapcenter, mapzoom=mapzoom, gig=gig, gig_date_start=gig_date_start, gig_date_end=gig_date_end)
+    if zipdata == {"type": "FeatureCollection", "features": []}:
+
+        for my_zip in Zipcode.query.filter_by(region=gig.zipcodes.region).all():
+
+            for location in data_one["features"]:
+                if (location["properties"])["zip"] == str(my_zip.valid_zipcode):
+                    zipdata["features"].append(location)
+                    if mapcenter == None:
+                        if (
+                            type(
+                                (
+                                    (
+                                        (((zipdata["features"])[0])["geometry"])[
+                                            "coordinates"
+                                        ]
+                                    )[0]
+                                )[0]
+                            )
+                            is list
+                            and type(
+                                (
+                                    (
+                                        (
+                                            (((zipdata["features"])[0])["geometry"])[
+                                                "coordinates"
+                                            ]
+                                        )[0]
+                                    )[0]
+                                )[0]
+                            )
+                            is float
+                        ):
+                            mapcenter = (
+                                (
+                                    (((zipdata["features"])[0])["geometry"])[
+                                        "coordinates"
+                                    ]
+                                )[0]
+                            )[0]
+                        else:
+                            mapcenter = (
+                                (
+                                    (
+                                        (((zipdata["features"])[0])["geometry"])[
+                                            "coordinates"
+                                        ]
+                                    )[0]
+                                )[0]
+                            )[0]
+
+            for location in data_two["features"]:
+                if (location["properties"])["ZCTA"] == str(my_zip.valid_zipcode):
+                    zipdata["features"].append(location)
+                    if mapcenter == None:
+                        if (
+                            type(
+                                (
+                                    (
+                                        (((zipdata["features"])[0])["geometry"])[
+                                            "coordinates"
+                                        ]
+                                    )[0]
+                                )[0]
+                            )
+                            is list
+                            and type(
+                                (
+                                    (
+                                        (
+                                            (((zipdata["features"])[0])["geometry"])[
+                                                "coordinates"
+                                            ]
+                                        )[0]
+                                    )[0]
+                                )[0]
+                            )
+                            is float
+                        ):
+                            mapcenter = (
+                                (
+                                    (((zipdata["features"])[0])["geometry"])[
+                                        "coordinates"
+                                    ]
+                                )[0]
+                            )[0]
+                        else:
+                            mapcenter = (
+                                (
+                                    (
+                                        (((zipdata["features"])[0])["geometry"])[
+                                            "coordinates"
+                                        ]
+                                    )[0]
+                                )[0]
+                            )[0]
+
+        mapzoom = 8
+
+    return render_template(
+        "gig.html",
+        zipdata=zipdata,
+        mapcenter=mapcenter,
+        mapzoom=mapzoom,
+        gig=gig,
+        gig_date_start=gig_date_start,
+        gig_date_end=gig_date_end,
+    )
 
 
-@app.route('/login_form')
+@app.route("/login_form")
 def present_login_form():
     """Displays the login form. Eventually I would incorporate this on the 
     homepage"""
 
     return render_template("login_form.html")
 
-@app.route('/betauser')
+
+@app.route("/betauser")
 def login_beta_user():
     """Logs in a user to a pre-verified fake account"""
-    
+
     unum = randint(1, 40)
     user = User.query.get(unum)
     login_user(user)
 
     flash("You are now logged in.")
-    return redirect('/')
+    return redirect("/")
 
-@app.route('/login', methods=['GET', 'POST'])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
     """form to log in"""
 
@@ -654,29 +895,16 @@ def login():
         db.session.commit()
 
         flash("You are now logged in.")
-        return redirect('/')
+        return redirect("/")
 
     flash("Unexpected Error.")
     return redirect("/login_form")
 
 
-    # if not user:
-    #     flash("No such user")
-    #     return redirect("/login")
-        
-    # if user.password != password:
-    #     flash("Incorrect password")
-    #     return redirect("/login")
-
-    # login_user(user)
-    # flash("You are now logged in.")
-    # return redirect(f"/users/{user.id}")
-
-@app.route('/logout')
+@app.route("/logout")
 @login_required
 def logout():
     """Logs a user out and redirects to homepage."""
-
 
     logout_user()
     flashclass = 'class="alert alert-success success"'
@@ -685,7 +913,7 @@ def logout():
     return render_template("homepage.html", flashclass=flashclass)
 
 
-@app.route('/availability', methods=['GET'])
+@app.route("/availability", methods=["GET"])
 @login_required
 def display_availability_page():
     """Displays and artist's change availability page."""
@@ -695,31 +923,31 @@ def display_availability_page():
     return render_template("availability.html", daysweek=daysweek)
 
 
-@app.route('/changeavailability', methods=['GET', 'POST'])
+@app.route("/changeavailability", methods=["GET", "POST"])
 def change_availability():
     """Changes artist availability in database."""
-    
+
     new_avail = request.form.get("dates")
 
     current_user.daysweek = new_avail
 
     db.session.commit()
-    
+
     daysweek = list(new_avail)
 
     flash("You have successfully updated your availability.")
 
-    return redirect('/availability')
+    return redirect("/availability")
 
 
-@app.route('/sign_up', methods=['GET'])
+@app.route("/sign_up", methods=["GET"])
 def register_form():
     """Show form for user signup."""
 
     return render_template("register_form.html")
 
 
-@app.route('/register', methods=['POST'])
+@app.route("/register", methods=["POST"])
 def register_process():
     """Process registration."""
 
@@ -727,78 +955,72 @@ def register_process():
     user_name = request.form["user_name"]
 
     password = request.form["password"]
-    password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
+    password = generate_password_hash(password, method="pbkdf2:sha256", salt_length=8)
 
     email = (request.form["email"]).lower()
     display_email = request.form["email"]
 
-    # if request.form["is_artist"] == 't':
-    #     is_artist = True
-    # else:
-    #     is_artist = False  
-
-    # if request.form["show_unpaid"] == 't':
-    #     show_unpaid = True
-    # else:
-    #     show_unpaid = False  
-
     last_active = datetime.now()
 
-    # if request.form.get("link_to_website", False):
-    #     link_to_website = request.form["link_to_website"]
-    # else:
-    #     link_to_website = None
+    letters = [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "P",
+        "R",
+        "S",
+        "X",
+        "Y",
+        "Z",
+    ]
 
-    # if request.form.get("hourly_rate", False):
-    #     hourly_rate = request.form["hourly_rate"]
-    # else:
-    #     hourly_rate = None
-
-    # if request.form.get("phone", False):
-    #     phone = request.form["phone"]
-    # else:
-    #     phone = None
-
-    # if request.form.get("link_to_website", False):
-    #     link_to_website = request.form["link_to_website"]
-    # else:
-    #     link_to_website = None
-
-    # if request.form.get("bio", False):
-    #     bio = request.form["bio"]
-    # else:
-    #     bio = None
-
-    letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'X', 'Y', 'Z']
-
-    veri_code = letters[randint(0, len(letters)-1)] + str(randint(100000, 999999))
+    veri_code = letters[randint(0, len(letters) - 1)] + str(randint(100000, 999999))
 
     if User.query.filter_by(user_name=user_name).one_or_none():
         flash(f"Username already taken. Please try another.")
-        return redirect('/sign_up')
-    
+        return redirect("/sign_up")
+
     if User.query.filter_by(email=email).one_or_none():
-        flash(f"Welcome {user_name}. Please check {display_email} inbox for verification email.")
+        flash(
+            f"Welcome {user_name}. Please check {display_email} inbox for verification email."
+        )
         return redirect("/")
 
     from_email = "BayAreaArtConnect@gmail.com"
     # verify_email()
     send_email(from_email, display_email, user_name, veri_code)
 
-    new_user = User(user_name=user_name, password=password, email=email,
-        last_active=last_active, display_email=display_email,
-        veri_code=veri_code)
+    new_user = User(
+        user_name=user_name,
+        password=password,
+        email=email,
+        last_active=last_active,
+        display_email=display_email,
+        veri_code=veri_code,
+    )
     db.session.add(new_user)
     db.session.commit()
 
     if new_user.is_authenticated:
         login_user(new_user)
 
-    flash(f"Welcome {user_name}. Please check your {display_email} inbox for verification email.")
+    flash(
+        f"Welcome {user_name}. Please check your {display_email} inbox for verification email."
+    )
     return redirect("/")
 
 
-@app.route('/verify', methods=['POST'])
+@app.route("/verify", methods=["POST"])
 @login_required
 def verify_user():
     """Checks user input against random verification code."""
@@ -810,9 +1032,17 @@ def verify_user():
         db.session.commit()
 
         if current_user.show_unpaid == True:
-            posts = Post.query.filter(Post.active == True).order_by(Post.creation_date.desc()).all()
+            posts = (
+                Post.query.filter(Post.active == True)
+                .order_by(Post.creation_date.desc())
+                .all()
+            )
         else:
-            posts = Post.query.filter(Post.active == True, Post.unpaid == False).order_by(Post.creation_date.desc()).all()
+            posts = (
+                Post.query.filter(Post.active == True, Post.unpaid == False)
+                .order_by(Post.creation_date.desc())
+                .all()
+            )
         post_count = len(posts)
         flash("Thank you for verification.")
         return render_template("gigs.html", posts=posts, post_count=post_count)
@@ -821,7 +1051,7 @@ def verify_user():
     return render_template("homepage.html")
 
 
-@app.route('/changepic')
+@app.route("/changepic")
 @login_required
 def display_change_profile_picture():
     """Displays a form with a single option to upload a file"""
@@ -829,57 +1059,50 @@ def display_change_profile_picture():
     return render_template("changepic.html")
 
 
-@app.route('/uploadimg', methods=['GET', 'POST'])
+@app.route("/uploadimg", methods=["GET", "POST"])
 @login_required
 def upload_image():
     """Handles uploading an image"""
 
-    file = request.files['file']
+    file = request.files["file"]
     user = User.query.get(current_user.id)
 
-    if file.filename == '':
-        flash('No selected file')
-        return redirect('/changepic')
+    if file.filename == "":
+        flash("No selected file")
+        return redirect("/changepic")
 
     if allowed_file(file.filename):
 
         num = randint(10000000, 99999999)
-        file_name = f'{current_user.email[0:4]}_profilepic_{num}'
-        
+        file_name = f"{current_user.email[0:4]}_profilepic_{num}"
+
         user.img_route = file_name
 
         image = Image.open(file)
-        
+
         image.thumbnail([400, 400])
 
         in_mem_file = io.BytesIO()
 
-        image.save(in_mem_file, format='JPEG', quality=95)
+        image.save(in_mem_file, format="JPEG", quality=95)
 
         file = in_mem_file.getvalue()
-
-        # if user does not select file, browser also
-        # submit an empty part without filename
-
-        #implement Unique Here Storage Later
-
-
 
         db.session.commit()
 
     else:
         flash("Incorrent image format.")
-        return redirect('/changepic')
+        return redirect("/changepic")
     # s3.Bucket(os.environ.get('S3_BUCKET')).put_object(Key=file.filename, Body=file)
 
-    s3.Bucket('bayart').put_object(Key=file_name, Body=file)
+    s3.Bucket("bayart").put_object(Key=file_name, Body=file)
 
     flash("Image successfully uploaded.")
     flashstyle = "alert-success"
-    return redirect('/profile')
+    return redirect("/profile")
 
 
-@app.route('/profile')
+@app.route("/profile")
 @login_required
 def user_profile():
     """Individual user profile, pertainable to logged in user."""
@@ -887,64 +1110,58 @@ def user_profile():
     email = current_user.display_email
     elist = []
     count = 100
-    liame = email[::-1]   #It's email backwards.
+    liame = email[::-1]  # It's email backwards.
     two_chars = []
 
     for c in liame:
         count += 1
-        if c == '@':
+        if c == "@":
             count = 0
         if count == 1 or count == 2:
             two_chars.append(c)
 
-    elist.extend([ email[0], "*****", two_chars[1], two_chars[0] ])
-    
+    elist.extend([email[0], "*****", two_chars[1], two_chars[0]])
+
     count = 0
     for c in email:
-        if c == '@':
+        if c == "@":
             count = 1
         if count == 1:
             elist.append(c)
 
-        email = ''.join(elist)
+        email = "".join(elist)
 
     tags = Tag.query.all()
 
     def sort_tag_name(value):
         return value.tag_name
 
-    tags.sort(key = sort_tag_name)
-
-
+    tags.sort(key=sort_tag_name)
 
     image = current_user.img_route
 
-    url = s3_client.generate_presigned_url('get_object',
-                                    Params={
-                                   'Bucket': 'bayart',
-                                   'Key': image,
-                               },
-                               ExpiresIn=30000)
-
+    url = s3_client.generate_presigned_url(
+        "get_object", Params={"Bucket": "bayart", "Key": image}, ExpiresIn=30000
+    )
 
     return render_template("profile.html", email=email, tags=tags, url=url)
 
 
-@app.route('/update_info', methods=['POST'])
+@app.route("/update_info", methods=["POST"])
 def update_user_info():
     """Updates all user info, except e-mail and password. """
 
-    if request.form["is_artist"] == 't':
+    if request.form["is_artist"] == "t":
         is_artist = True
     else:
-        is_artist = False  
+        is_artist = False
 
     current_user.is_artist = is_artist
 
-    if request.form["show_unpaid"] == 't':
+    if request.form["show_unpaid"] == "t":
         show_unpaid = True
     else:
-        show_unpaid = False  
+        show_unpaid = False
 
     current_user.show_unpaid = show_unpaid
 
@@ -966,21 +1183,20 @@ def update_user_info():
         link_to_website = request.form["link_to_website"]
         if link_to_website[0:8].lower() == "https://":
             current_user.link_to_website = link_to_website
-        elif link_to_website[0:3].lower() == "www": 
+        elif link_to_website[0:3].lower() == "www":
             link_to_website = "https://" + link_to_website
             current_user.link_to_website = link_to_website
         else:
             link_to_website = "https://www." + link_to_website
             current_user.link_to_website = link_to_website
 
-
     if request.form.get("phone", False):
         current_user.phone = request.form["phone"]
 
     db.session.commit()
-    
+
     flash(f"Your information has been updated.")
-    return redirect('/profile')
+    return redirect("/profile")
 
 
 ###############################################################
