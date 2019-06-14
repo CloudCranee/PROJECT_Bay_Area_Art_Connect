@@ -83,8 +83,6 @@ class App extends React.Component {
   submissionRoute(evt) {
     let updateAvailDays = {dates: this.state.availDays.join('')};
 
-    console.log(updateAvailDays);
-
 
     $.post('/changeavailability', updateAvailDays, res => {
       this.setState({showFlash: true});
@@ -98,15 +96,10 @@ class App extends React.Component {
 
     this.setState((prevState) => {
       let availDays = prevState.availDays.slice();
-      console.log(daySelected);
 
       let indexNum = parseInt(daySelected[0]);
 
-      console.log(indexNum);
-
       availDays[indexNum] = daySelected[1];
-      
-      console.log(availDays);
 
       return { availDays };
   });
@@ -116,17 +109,12 @@ class App extends React.Component {
   componentDidMount() {
     var updateWeek = this.state.availDays;
 
-    console.log("from componentDidMount")
-    console.log(updateWeek);
-
   function setDays(updateWeek) {
     var selectableDOW_ = [];
     for(let i = 0; i <7; i++){
       if (updateWeek[i] == 't') {
         selectableDOW_.push(i);
-        console.log(selectableDOW_);
       }
-      console.log (selectableDOW_);
     }
     return selectableDOW_;
   }
@@ -149,17 +137,12 @@ class App extends React.Component {
     const updateWeek = this.state.availDays;
     const calendarEl = this.calendarRef.current;
 
-    console.log("from componentDidUpdate")
-    console.log(updateWeek);
-
 
     const selectableDOW_ = [];
     for (let i = 0; i <7; i++ ){
       if (updateWeek[i] == 't') {
         selectableDOW_.push(i);
-        console.log(selectableDOW_);
       }
-      console.log (selectableDOW_);
     }
 
     const datePicker = $(calendarEl).glDatePicker(true);

@@ -122,17 +122,13 @@ class App extends React.Component {
   componentDidMount() {
     var updateWeek = this.state.availDays;
 
-    console.log("from componentDidMount")
-    console.log(updateWeek);
 
   function setDays(updateWeek) {
     var selectableDOW_ = [];
     for(let i = 0; i <7; i++){
       if (updateWeek[i] == 't') {
         selectableDOW_.push(i);
-        console.log(selectableDOW_);
       }
-      console.log (selectableDOW_);
     }
     return selectableDOW_;
   }

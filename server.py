@@ -49,7 +49,7 @@ login_manager.init_app(app)
 s3 = boto3.resource("s3")
 s3_client = boto3.client("s3")
 
-app.secret_key = "thefriendswemadealongtheway"
+app.secret_key = os.environ['FLASK_SECRET_KEY']
 
 app.jinja_env.undefined = StrictUndefined
 
@@ -275,7 +275,9 @@ def add_new_gig_to_database():
     post_title = request.form["post_title"]
     description = request.form["description"]
     location = request.form["location"]
-    unpaid = request.form["location"]
+    unpaid = request.form["unpaid"]
+    unpaid = request.form["unpaid"]
+
     if unpaid == "f":
         unpaid = False
     else:
@@ -387,7 +389,8 @@ def submits_gig_edit(post_id):
         zipcode = Zipcode.query.filter_by(location_name=location).first()
         gig.zipcode = zipcode.valid_zipcode
 
-    unpaid = request.form["location"]
+    unpaid = request.form["unpaid"]
+
     if unpaid == "f":
         gig.unpaid = False
     else:
