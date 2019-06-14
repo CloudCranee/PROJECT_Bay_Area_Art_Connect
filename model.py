@@ -207,7 +207,7 @@ def seed_users():
 
         verified = True
 
-        img_route = "fakeuser" + str(randint(1, 35)) + ".jpg"
+        img_route = "fakeuser" + str(randint(1, 34)) + ".jpg"
 
         display_email = fname[:3] + fname[-2:] + str(i) + "@gmail.com"
         femail = display_email.lower()
