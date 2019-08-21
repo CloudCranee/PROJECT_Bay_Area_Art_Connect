@@ -161,148 +161,165 @@ def connect_to_db(app):
 def seed_users():
     """Creates a series of fake posts. Must seed BEFORE posts."""
 
-    tagsls = Tag.query.all()
+    # tagsls = Tag.query.all()
 
-    for i in range(1, 100):
+    # for i in range(1, 100):
 
-        fname = fake.name()
+    #     fname = fake.name()
 
-        fpassword = generate_password_hash(
-            "hello", method="pbkdf2:sha256", salt_length=8
-        )
+    #     fpassword = generate_password_hash(
+    #         "hello", method="pbkdf2:sha256", salt_length=8
+    #     )
 
-        fbio = fake.sentence() + " " + fake.text() + " " + fake.sentence()
-        fhourly_rate = randint(16, 125)
-        fartistnum = randint(0, 1)
+    #     fbio = fake.sentence() + " " + fake.text() + " " + fake.sentence()
+    #     fhourly_rate = randint(16, 125)
+    #     fartistnum = randint(0, 1)
 
-        fphone_list = str(randint(1111111111, 9999999999))
-        count = 0
-        fphone = "("
-        for num in fphone_list:
-            if count == 3:
-                fphone += ") "
-                fphone += num
-                count += 1
-            elif count == 6:
-                fphone += "-"
-                fphone += num
-                count += 1
-            else:
-                fphone += num
-                count += 1
+    #     fphone_list = str(randint(1111111111, 9999999999))
+    #     count = 0
+    #     fphone = "("
+    #     for num in fphone_list:
+    #         if count == 3:
+    #             fphone += ") "
+    #             fphone += num
+    #             count += 1
+    #         elif count == 6:
+    #             fphone += "-"
+    #             fphone += num
+    #             count += 1
+    #         else:
+    #             fphone += num
+    #             count += 1
 
-        if fartistnum == 0:
-            fartist = False
-        else:
-            fartist = True
+    #     if fartistnum == 0:
+    #         fartist = False
+    #     else:
+    #         fartist = True
 
-        if i % 2 == 0:
-            daysweek = "ttttttt"
-        elif i % 3 == 0:
-            daysweek = "tffffft"
-        else:
-            daysweek = "fttttff"
+    #     if i % 2 == 0:
+    #         daysweek = "ttttttt"
+    #     elif i % 3 == 0:
+    #         daysweek = "tffffft"
+    #     else:
+    #         daysweek = "fttttff"
 
-        link_to_website = fake.url()
+    #     link_to_website = fake.url()
 
-        verified = True
+    #     verified = True
 
-        img_route = "fakeuser" + str(randint(1, 34)) + ".jpg"
+    #     img_route = "fakeuser" + str(randint(1, 34)) + ".jpg"
 
-        display_email = fname[:3] + fname[-2:] + str(i) + "@gmail.com"
-        femail = display_email.lower()
-        flast_active = fake.date_between(start_date="-1y", end_date="today")
-        fuser = User(
-            user_name=fname,
-            is_artist=fartist,
-            password=fpassword,
-            bio=fbio,
-            hourly_rate=fhourly_rate,
-            phone=fphone,
-            email=femail,
-            last_active=flast_active,
-            display_email=display_email,
-            img_route=img_route,
-            verified=verified,
-            daysweek=daysweek,
-            link_to_website=link_to_website,
-        )
+    #     display_email = fname[:3] + fname[-2:] + str(i) + "@gmail.com"
+    #     femail = display_email.lower()
+    #     flast_active = fake.date_between(start_date="-1y", end_date="today")
+    #     fuser = User(
+    #         user_name=fname,
+    #         is_artist=fartist,
+    #         password=fpassword,
+    #         bio=fbio,
+    #         hourly_rate=fhourly_rate,
+    #         phone=fphone,
+    #         email=femail,
+    #         last_active=flast_active,
+    #         display_email=display_email,
+    #         img_route=img_route,
+    #         verified=verified,
+    #         daysweek=daysweek,
+    #         link_to_website=link_to_website,
+    #     )
 
-        db.session.add(fuser)
-        fuser.tags.append(tagsls[randint(0, (len(tagsls) - 1))])
+    #     db.session.add(fuser)
+    #     fuser.tags.append(tagsls[randint(0, (len(tagsls) - 1))])
+
+    fpassword = generate_password_hash(
+        "temppwforseedonly", method="pbkdf2:sha256", salt_length=8
+    )
+
+    buser = User(
+        user_name="Bode Riis",
+        password=fpassword,
+        bio="Bode Riis. I created this site. Awesome!",
+        email="riisbode@gmail.com",
+        display_email="RiisBode@gmail.com",
+        verified=True,
+        link_to_website="www.BodeRiis.com",
+    )
+
+    db.session.add(buser)
 
     print("Commiting all new users.")
     db.session.commit()
 
 
-def seed_posts():
-    """Creates a series of fake posts. Must seed AFTER zipcodes and users."""
-    tags = Tag.query.all()
+# def seed_posts():
+#     """Creates a series of fake posts. Must seed AFTER zipcodes and users."""
+#     tags = Tag.query.all()
 
-    for i in range(1, 80):
-        fuser_id = randint(1, 50)
-        fpost_date = fake.date_between(start_date="-3y", end_date="today")
-        is_pay = randint(0, 1)
+#     for i in range(1, 80):
+#         fuser_id = randint(1, 50)
+#         fpost_date = fake.date_between(start_date="-3y", end_date="today")
+#         is_pay = randint(0, 1)
 
-        if is_pay == 0:
-            fpay = 0
-        else:
-            fpay = randint(30, 2000)
-        fpone = fake.name()
+#         if is_pay == 0:
+#             fpay = 0
+#         else:
+#             fpay = randint(30, 2000)
+#         fpone = fake.name()
 
-        gig_date_start = fake.date_between(start_date="-1y", end_date="+1y")
+#         gig_date_start = fake.date_between(start_date="-1y", end_date="+1y")
 
-        if (randint(0, 1)) == 1:
-            gig_date_end = gig_date_start
-        else:
-            gig_date_end = fake.date_between(start_date="-1y", end_date="+1y")
+#         if (randint(0, 1)) == 1:
+#             gig_date_end = gig_date_start
+#         else:
+#             gig_date_end = fake.date_between(start_date="-1y", end_date="+1y")
 
-        if fpay == 0:
-            unpaid = True
-        else:
-            unpaid = False
+#         if fpay == 0:
+#             unpaid = True
+#         else:
+#             unpaid = False
 
-        if (randint(0, 1)) == 1:
-            ishourly = False
-        else:
-            ishourly = True
+#         if (randint(0, 1)) == 1:
+#             ishourly = False
+#         else:
+#             ishourly = True
 
-        fpost_title = fake.sentence()
-        fdescription = (
-            fake.sentence()
-            + " "
-            + fake.text()
-            + " "
-            + fake.text()
-            + " "
-            + fake.sentence()
-            + " "
-            + fake.text()
-        )
-        fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
-        fzipcode = fzipcodes[randint(1, 350)]
-        fpost = Post(
-            user_id=fuser_id,
-            description=fdescription,
-            zipcode=fzipcode,
-            post_title=fpost_title,
-            creation_date=fpost_date,
-            pay=fpay,
-            gig_date_end=gig_date_end,
-            gig_date_start=gig_date_start,
-            unpaid=unpaid,
-            ishourly=ishourly,
-        )
-        db.session.add(fpost)
+#         fpost_title = fake.sentence()
+#         fdescription = (
+#             fake.sentence()
+#             + " "
+#             + fake.text()
+#             + " "
+#             + fake.text()
+#             + " "
+#             + fake.sentence()
+#             + " "
+#             + fake.text()
+#         )
+#         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
+#         fzipcode = fzipcodes[randint(1, 350)]
+#         fpost = Post(
+#             user_id=fuser_id,
+#             description=fdescription,
+#             zipcode=fzipcode,
+#             post_title=fpost_title,
+#             creation_date=fpost_date,
+#             pay=fpay,
+#             gig_date_end=gig_date_end,
+#             gig_date_start=gig_date_start,
+#             unpaid=unpaid,
+#             ishourly=ishourly,
+#         )
+#         db.session.add(fpost)
 
-        fpost.tags.append(tags[randint(0, (len(tags) - 1))])
+#         fpost.tags.append(tags[randint(0, (len(tags) - 1))])
 
-    print("Commiting all new posts.")
-    db.session.commit()
+#     print("Commiting all new posts.")
+#     db.session.commit()
 
 
 def seed_tags():
     """Seeds tags as listed below:"""
+    
     tag_list = [
         "Photography",
         "Cinematography",
@@ -385,7 +402,7 @@ def seed_all():
     seed_zipcodes()
     seed_tags()
     seed_users()
-    seed_posts()
+    # seed_posts()
 
     zips = Zipcode.query.all()
 

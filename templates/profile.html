@@ -2,12 +2,6 @@
 {% block content %}
 
 
-
-
-
-
-
-
 <div class="container justify-content-center">
     <div class="justify-content-md-center col-7 col-md-auto">
           <section class="card justify-content-center justify-content-md-center row">
@@ -28,9 +22,6 @@
 {% else %}
 
 
-
-
-
 <form action="/update_info" method="POST" class="form">
 <p class="text-align-center form-group card-text">
 {{ current_user.display_email }}
@@ -38,15 +29,12 @@
 
 <img class="profile-image" src="{{ url }}" alt="{{current_user.user_name}} Profile Picture"></img>
 <p class="form-group card-text">
-<a href="/changepic">Change your profile picture.</a>
+<a href="/changepic"><h5>Change your profile picture.</h5></a>
 </p>
 
-{% if current_user.is_artist %}
 <p class="form-group card-text">
-    <a href="/availability"> Update your availability.</a>
+<a href="/seeownposts"><h5>Click here to view all your own posts.</h5></a>
 </p>
-{% endif %}
-
 
 <p class="form-group card-text">
 User Bio: <br></br>
@@ -54,14 +42,34 @@ User Bio: <br></br>
 <textarea name="bio" rows="10" cols="30">{% if current_user.bio != None %} {{ current_user.bio }} {% endif %}</textarea>
 </p>
 
+<br>
+<div>
+<p class="form-group card-text">
+To change your password type your old password here: <br>
+
+<input type="password" name="oldpw"></input>
+</p>
+<p class="form-group card-text">
+And your new password here:<br>
+
+<input type="password" name="newpw1"></input>
+</p>
+<p class="form-group card-text">
+Verify new password:<br>
+
+<input type="password" name="newpw2"></input>
+</p>
+</div>
+
+
 <div>
 <p class="form-group card-text">
 Website: <br></br>
 
-
 <input type="text" name="link_to_website" {% if current_user.link_to_website != None %} value="{{ current_user.link_to_website }}" {% endif %} ></input>
 </p>
 </div>
+
 <br>
 <div>
 <p class="form-group card-text">
@@ -95,6 +103,7 @@ Phone: <br>
 
 {% if current_user.verified %}
                 
+
   <p class="form-group card-text">
   <h3>Do you wish to be listed as an active artist?</h3>
   </p>
@@ -117,8 +126,37 @@ Phone: <br>
 {% endif %}
 
 
+<!-- Trigger the modal with a button -->
+<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Update your availability.</button>
 
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
 
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Warning:</h4>
+      </div>
+      <div class="modal-body">
+        <p>This will take you away from the current page. Any unsaved data will be lost. Do you want to continue?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Stay on Current Page</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" href="/availability">Continue to Availability</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 
+{% if current_user.is_artist %}
+<p class="form-group card-text">
+    <a href="/availability"> Update your availability.</a>
+</p>
+{% endif %} -->
 
 
 <p class="form-group card-text">

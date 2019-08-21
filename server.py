@@ -99,6 +99,72 @@ def index():
         return render_template("homepage.html")
 
 
+
+@app.route("/login_form")
+def present_login_form():
+    """Displays the login form. Eventually I would incorporate this on the 
+    homepage"""
+
+    return render_template("login_form.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """form to log in"""
+
+    email = (request.form["email"]).lower()
+    password = request.form["password"]
+    user = User.query.filter_by(email=email).one_or_none()
+
+    if not user:
+        flash("Incorrect email or password.")
+        return redirect("/login_form")
+
+    if not check_password_hash(user.password, password):
+        flash("Incorrect email or password.")
+        return redirect("/login_form")
+
+    if user.is_authenticated:
+        login_user(user)
+
+        last_active = datetime.now()
+        current_user.last_active = last_active
+        db.session.commit()
+
+        flash("You are now logged in.")
+        return redirect("/")
+
+    flash("Unexpected Error.")
+    return redirect("/login_form")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    """Logs a user out and redirects to homepage."""
+
+    logout_user()
+    flashclass = 'class="alert alert-success success"'
+    flash("You have successfully logged out.")
+
+    return render_template("homepage.html", flashclass=flashclass)
+
+
+@app.route("/about")
+def about_page():
+    """Displays the about page"""
+
+    image = bode.img_route
+
+    url = s3_client.generate_presigned_url(
+        "get_object", Params={"Bucket": "bayart", "Key": image}, ExpiresIn=30000
+    )
+
+    bode = User.query.filter(User.id == 1).one()
+
+    return render_template("about.html", bode=bode, url=url)
+
+
 @app.route("/artists")
 def display_artists():
     """Renders a page with all artists info."""
@@ -223,11 +289,7 @@ def display_public_user(id):
         "get_object", Params={"Bucket": "bayart", "Key": image}, ExpiresIn=30000
     )
 
-    if page_user.is_artist or (current_user.is_authenticated and current_user.id == id):
-        return render_template("user.html", user=page_user, daysweek=daysweek, url=url)
-    else:
-        flash("Error, page not found.")
-        return render_template("homepage.html")
+    return render_template("user.html", user=page_user, daysweek=daysweek, url=url)
 
 
 @app.route("/newpost")
@@ -435,6 +497,12 @@ def display_gigs():
             datetime.now() - timedelta(days=2)
         ):
             post.active = False
+        elif post.gig_date_end == None and post.gig_date_start and post.gig_date_start < (
+            datetime.now() - timedelta(days=2)
+        ):
+            post.active = False
+        else:
+            continue
 
     db.session.commit()
 
@@ -554,6 +622,58 @@ def advanced_gigs_query():
 
     if posts == []:
         flash("No posting matched your search criteria.")
+
+    post_count = len(posts)
+
+    return render_template("gigs.html", posts=posts, post_count=post_count)
+
+@app.route("/admin")
+@login_required
+def admin_page():
+    """Allows options for adding and removing tags"""
+
+    if current_user.id == 1:
+
+        tags = Tag.query.all()
+
+        return render_template("admin.html", tags=tags)
+    else:
+        return render_template("homepage.html")
+
+
+@app.route("/add_rm_tags")
+@login_required
+def add_or_rm_tags():
+
+    if current_user.id == 1:
+
+        if request.form.get("newtag", False):
+
+            newtag = request.form("newtag")
+
+            tag_to_add = Tag(tag_name=newtag)
+            db.session.add(tag_to_add)
+
+        if request.form.get("rmtag", False):
+
+            rmtag = request.form("rmtag")
+
+            try:
+                Tag.query.filter_by(tag_name=rmtag).delete()
+            except:
+                continue
+
+        db.session.commit()
+
+    return render_template("homepage.html")
+
+
+@app.route("/seeownposts")
+@login_required
+def display_own_posts():
+    """Displays a user's own posts"""
+
+    posts = Post.query.filter(Post.active == True, Post.user_id == current_user.id)
 
     post_count = len(posts)
 
@@ -854,67 +974,6 @@ def display_active_gig(post_id):
     )
 
 
-@app.route("/login_form")
-def present_login_form():
-    """Displays the login form. Eventually I would incorporate this on the 
-    homepage"""
-
-    return render_template("login_form.html")
-
-
-@app.route("/betauser")
-def login_beta_user():
-    """Logs in a user to a pre-verified fake account"""
-
-    unum = randint(1, 40)
-    user = User.query.get(unum)
-    login_user(user)
-
-    flash("You are now logged in.")
-    return redirect("/")
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    """form to log in"""
-
-    email = (request.form["email"]).lower()
-    password = request.form["password"]
-    user = User.query.filter_by(email=email).one_or_none()
-
-    if not user:
-        flash("Incorrect email or password.")
-        return redirect("/login_form")
-
-    if not check_password_hash(user.password, password):
-        flash("Incorrect email or password.")
-        return redirect("/login_form")
-
-    if user.is_authenticated:
-        login_user(user)
-
-        last_active = datetime.now()
-        current_user.last_active = last_active
-        db.session.commit()
-
-        flash("You are now logged in.")
-        return redirect("/")
-
-    flash("Unexpected Error.")
-    return redirect("/login_form")
-
-
-@app.route("/logout")
-@login_required
-def logout():
-    """Logs a user out and redirects to homepage."""
-
-    logout_user()
-    flashclass = 'class="alert alert-success success"'
-    flash("You have successfully logged out.")
-
-    return render_template("homepage.html", flashclass=flashclass)
-
 
 @app.route("/availability", methods=["GET"])
 @login_required
@@ -1165,6 +1224,15 @@ def update_user_info():
         show_unpaid = True
     else:
         show_unpaid = False
+
+    if request.form.get("newpw1", False) and request.form.get("newpw2", False) and request.form.get("oldpw", False):
+        newpw1 = request.form.get("newpw1")
+        newpw2 = request.form.get("newpw2")
+        oldpw = request.form.get("oldpw")
+
+        if check_password_hash(current_user.password, oldpw) and newpw1 == newpw2:
+            newpassword = generate_password_hash(newpw1, method="pbkdf2:sha256", salt_length=8)
+            current_user.password = newpassword
 
     current_user.show_unpaid = show_unpaid
 

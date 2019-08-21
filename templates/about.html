@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+
+
+
+{% block head_content %}
+
+<!-- This is all css and link imports needed for this page. -->
+<link href="/static/styles/general.css" rel="stylesheet" type="text/css">
+<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+<link href="/static/styles/glDatePicker.default.css" rel="stylesheet" type="text/css">
+<script src="/static/js/glDatePicker.js"></script>
+
+<!-- End imports needed for this page. -->
+{% endblock %}
+
+{% block content %}
+
+<div class="main-content">
+
+  <div class="container forever-container">
+
+    <div class="row forever-row">
+
+      <div class="col-8">
+
+        <section class="card">
+
+          <div class="card-header justify-content-center">
+
+            
+            <h3 class="text-align-center">
+              {{bode.user_name}}
+            </h3>
+          </div>
+
+<div class="text-align-center card-body justify-content-center">
+
+
+<img class="profile-image" src="{{ url }}" alt="{{bode.user_name}} Profile Picture"></img>
+
+<div class="card-text justify-content-center row">
+            <p class="row card-text user-bio">
+              <br>
+                Bay Art Connect is a website designed to connect artists and other
+                freelancers in the Bay Area. This site was Bode's capstone project
+                for their Hackbright Academy Software Engineering Fellowship, which they completed in July of 2019.
+              </br>
+              <br>
+                Bay Art Connect is built with a PostgreSQL database,
+                a Flask-implemented Python backend,
+                and an HTML, CSS, JavaScript, and React frontend.
+                Bode also deployed the site themself,
+                on AWS Lightsail, served via HTTPS. 
+              </br>
+              <br>
+                Connect with Bode Riis on <a href="https://github.com/BodeRiis">GitHub</a> or <a href="https://www.linkedin.com/in/boderiis/">LinkedIn</a>.
+              </br>
+            </p>
+              </div>
+
+</div>
+        </section>
+        </div>
+
+      </div>
+    </div>
+
+
+
+
+{% endblock %}
