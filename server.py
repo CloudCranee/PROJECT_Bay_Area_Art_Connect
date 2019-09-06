@@ -493,16 +493,12 @@ def display_gigs():
     posts = Post.query.filter(Post.active == True).all()
 
     for post in posts:
-        if post.gig_date_end and post.gig_date_end < (
-            datetime.now() - timedelta(days=2)
-        ):
-            post.active = False
-        elif post.gig_date_end == None and post.gig_date_start and post.gig_date_start < (
-            datetime.now() - timedelta(days=2)
-        ):
+        if post.gig_date_end and post.gig_date_end < ( datetime.now() - timedelta(days=2) ):
             post.active = False
         else:
-            continue
+            if post.gig_date_end == None and post.gig_date_start and post.gig_date_start < (datetime.now() - timedelta(days=2)):
+                post.active = False
+    
 
     db.session.commit()
 
