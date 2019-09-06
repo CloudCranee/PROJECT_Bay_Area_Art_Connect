@@ -664,3 +664,4 @@ if __name__ == "__main__":
 
     connect_to_db(app)
     print("Connected to the database!")
+    seed_all()
