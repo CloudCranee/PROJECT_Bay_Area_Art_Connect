@@ -251,37 +251,37 @@ def seed_users():
     db.session.commit()
 
 
-# def seed_posts():
+def seed_posts():
 #     """Creates a series of fake posts. Must seed AFTER zipcodes and users."""
 #     tags = Tag.query.all()
 
 #     for i in range(1, 80):
 #         fuser_id = randint(1, 50)
-#         fpost_date = fake.date_between(start_date="-3y", end_date="today")
-#         is_pay = randint(0, 1)
+    fpost_date = fake.date_between(start_date="-3y", end_date="today")
+    is_pay = randint(0, 1)
 
-#         if is_pay == 0:
-#             fpay = 0
-#         else:
-#             fpay = randint(30, 2000)
+    if is_pay == 0:
+        fpay = 0
+    else:
+        fpay = randint(30, 2000)
 #         fpone = fake.name()
 
-#         gig_date_start = fake.date_between(start_date="-1y", end_date="+1y")
+    gig_date_start = fake.date_between(start_date="-1y", end_date="+1y")
 
-#         if (randint(0, 1)) == 1:
-#             gig_date_end = gig_date_start
-#         else:
-#             gig_date_end = fake.date_between(start_date="-1y", end_date="+1y")
+    if (randint(0, 1)) == 1:
+        gig_date_end = gig_date_start
+    else:
+        gig_date_end = fake.date_between(start_date="-1y", end_date="+1y")
 
-#         if fpay == 0:
-#             unpaid = True
-#         else:
-#             unpaid = False
+    if fpay == 0:
+        unpaid = True
+    else:
+        unpaid = False
 
-#         if (randint(0, 1)) == 1:
-#             ishourly = False
-#         else:
-#             ishourly = True
+    if (randint(0, 1)) == 1:
+        ishourly = False
+    else:
+        ishourly = True
 
 #         fpost_title = fake.sentence()
 #         fdescription = (
@@ -297,24 +297,25 @@ def seed_users():
 #         )
 #         fzipcodes = db.session.query(Zipcode.valid_zipcode).all()
 #         fzipcode = fzipcodes[randint(1, 350)]
-#         fpost = Post(
-#             user_id=fuser_id,
-#             description=fdescription,
-#             zipcode=fzipcode,
-#             post_title=fpost_title,
-#             creation_date=fpost_date,
-#             pay=fpay,
-#             gig_date_end=gig_date_end,
-#             gig_date_start=gig_date_start,
-#             unpaid=unpaid,
-#             ishourly=ishourly,
-#         )
-#         db.session.add(fpost)
+    fpost = Post(
+        user_id=1,
+        description="First Temp Post",
+        zipcode=94608,
+        post_title="First Temp Post",
+        creation_date=fpost_date,
+        pay=fpay,
+        gig_date_end=gig_date_end,
+        gig_date_start=gig_date_start,
+        unpaid=unpaid,
+        ishourly=ishourly,
+    )
+
+    db.session.add(fpost)
 
 #         fpost.tags.append(tags[randint(0, (len(tags) - 1))])
 
-#     print("Commiting all new posts.")
-#     db.session.commit()
+    print("Commiting all new posts.")
+    db.session.commit()
 
 
 def seed_tags():
