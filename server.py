@@ -657,7 +657,7 @@ def add_or_rm_tags():
             try:
                 Tag.query.filter_by(tag_name=rmtag).delete()
             except:
-                continue
+                print("Tag deletion Invalid")
 
         db.session.commit()
 
