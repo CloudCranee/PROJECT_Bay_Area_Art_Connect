@@ -235,7 +235,7 @@ def advanced_artist_query():
         .all()
     )
 
-    a_users = (
+    b_users = (
     User.query.filter(User.is_artist == True, User.verified == True)
     .order_by(User.last_active.desc())
     .all()
@@ -267,7 +267,12 @@ def advanced_artist_query():
 
     if request.form.get("availability", "alldays") != "alldays":
         a_day = request.form["availability"]
-        a_users = User.query.filter(User.daysweek[(int(a_day))] == "t")
+        a_users = []
+        for useb in b_users:
+            days_string = useb.daysweek
+
+            if days_string[(int(a_day))] == "t":
+                a_users.append(useb)
 
     venn_s_t = [a for a in s_users for b in t_users if a == b]
     artists = [c for c in venn_s_t for d in a_users if c == d]
