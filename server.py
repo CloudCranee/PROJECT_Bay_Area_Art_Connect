@@ -222,7 +222,7 @@ def advanced_artist_search_page():
 @app.route("/searchartistsadvance", methods=["GET", "POST"])
 @login_required
 def advanced_artist_query():
-    """This route processed an advanced artist search."""
+    """This route processes an advanced artist search."""
 
     s_users = (
         User.query.filter(User.is_artist == True, User.verified == True)
@@ -233,6 +233,12 @@ def advanced_artist_query():
         User.query.filter(User.is_artist == True, User.verified == True)
         .order_by(User.last_active.desc())
         .all()
+    )
+
+    a_users = (
+    User.query.filter(User.is_artist == True, User.verified == True)
+    .order_by(User.last_active.desc())
+    .all()
     )
 
     if request.form.get("search", False):
@@ -259,7 +265,12 @@ def advanced_artist_query():
 
             t_users.extend(tag_one.users)
 
-    artists = [a for a in s_users for b in t_users if a == b]
+    if request.form.get("availability", "alldays") != "alldays":
+        a_day = request.form["availability"]
+        a_users = User.query.filter(User.daysweek[(int(a_day))] == "t")
+
+    venn_s_t = [a for a in s_users for b in t_users if a == b]
+    artists = [c for c in venn_s_t for d in a_users if c == d]
 
     if artists == []:
         flash("No posting matched your search criteria.")
