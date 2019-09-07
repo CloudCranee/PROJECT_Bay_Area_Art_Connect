@@ -242,7 +242,7 @@ def seed_users():
         email="riisbode@gmail.com",
         display_email="RiisBode@gmail.com",
         verified=True,
-        link_to_website="www.BodeRiis.com",
+        link_to_website="https://www.BodeRiis.com",
     )
 
     db.session.add(buser)

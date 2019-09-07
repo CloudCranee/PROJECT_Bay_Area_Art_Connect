@@ -1,30 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="well spaced" style="width:40%;">
-<div>
-  <br>
-  <p>
-    <h1>Login</h1>
-    <form action="/login" method="POST">
 
-      <div class="form-group">
-        <label>Email:
-            <input type="email" name="email" required class="form-control">
-        </label>
-      </div>
 
-      <div class="form-group">
-        <label>Password:
-            <input type="password" name="password" required class="form-control">
-        </label>
-      </div>
+<div class="container justify-content-center mb-5">
+    <div class="justify-content-center col">
 
-      <div class="form-group">
-        <input type="submit" value="Log In" class="log-in-btn">
-      </div>
+<br></br>
+          <section class="card justify-content-center row">
+              <div class="card-header">
 
-  </form>
-</p>
+
+                    <h1>Login</h1>
+
+                </div>
+                <div class="card-body justify-content-center">
+                    <form action="/login" method="POST">
+
+                  <div class="form-group">
+                    <label>Email:
+                        <input type="email" name="email" required class="form-control">
+                    </label>
+                  </div>
+
+                            <br>
+                  <div class="form-group">
+                    <label>Password:
+                        <input type="password" name="password" required class="form-control">
+                    </label>
+                  </div>
+                  <br>
+
+                  <div class="form-group card-text">
+
+                     <input type="submit" value="Log In" class="log-in-btn">
+
+                  </div>
+
+              </form>
+          </div>
+      </section>
+    </div>
 </div>
-</div>
+
 {% endblock %}

@@ -99,11 +99,9 @@ def index():
         return render_template("homepage.html")
 
 
-
 @app.route("/login_form")
 def present_login_form():
-    """Displays the login form. Eventually I would incorporate this on the 
-    homepage"""
+    """Displays the login form."""
 
     return render_template("login_form.html")
 
@@ -154,13 +152,13 @@ def logout():
 def about_page():
     """Displays the about page"""
 
+    bode = User.query.filter(User.id == 1).one()
+
     image = bode.img_route
 
     url = s3_client.generate_presigned_url(
         "get_object", Params={"Bucket": "bayart", "Key": image}, ExpiresIn=30000
     )
-
-    bode = User.query.filter(User.id == 1).one()
 
     return render_template("about.html", bode=bode, url=url)
 
@@ -637,7 +635,7 @@ def admin_page():
         return render_template("homepage.html")
 
 
-@app.route("/add_rm_tags")
+@app.route("/add_rm_tags", methods=["GET", "POST"])
 @login_required
 def add_or_rm_tags():
 
@@ -1054,7 +1052,7 @@ def register_process():
         )
         return redirect("/")
 
-    from_email = "BayAreaArtConnect@gmail.com"
+    from_email = "noreply@bayartconnect.com"
     # verify_email()
     send_email(from_email, display_email, user_name, veri_code)
 
