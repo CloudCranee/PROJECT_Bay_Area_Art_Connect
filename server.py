@@ -654,19 +654,21 @@ def admin_page():
 @app.route("/add_rm_tags", methods=["GET", "POST"])
 @login_required
 def add_or_rm_tags():
+    """Lets an admin add or remove a tag to the tag table.
+    Currently this route is throwing an ERROR. Please investigate."""
 
     if current_user.id == 1:
 
         if request.form.get("newtag", False):
 
-            newtag = request.form("newtag")
+            newtag = request.form["newtag"]
 
             tag_to_add = Tag(tag_name=newtag)
             db.session.add(tag_to_add)
 
         if request.form.get("rmtag", False):
 
-            rmtag = request.form("rmtag")
+            rmtag = request.form["rmtag"]
 
             try:
                 Tag.query.filter_by(tag_name=rmtag).delete()
