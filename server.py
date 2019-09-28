@@ -54,6 +54,11 @@ from datadog import (
 dogApiKey = os.environ['DOG_API_KEY']
 dogAppKey = os.environ['DOG_APP_KEY']
 
+options = {
+    'api_key':dogApiKey,
+    'app_key':dogAppKey
+}
+
 initialize(**options)
 
 stats = ThreadStats()
