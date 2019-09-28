@@ -106,6 +106,17 @@ def unauthorized_callback():
 def page_not_found(e):
     """This is a custom 404 page."""
 
+    title = "A user encountered an error 404"
+
+    if current_user.is_authenticated:    
+        text = 'The user was logged in'
+    else:
+        text = 'No user was logged in'
+
+    tags = ['Added:2019', 'application:webapp']
+
+    api.Event.create(title=title, text=text, tags=tags)
+
     flash("Error 404, page not found.")
 
     return render_template("homepage.html")
