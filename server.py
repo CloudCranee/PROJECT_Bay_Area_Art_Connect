@@ -24,6 +24,7 @@ from flask_login import (
     logout_user,
     current_user,
 )
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
@@ -42,6 +43,21 @@ from area import area
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from sendgridpy import send_email, verify_email
+
+from datadog import (
+    initialize,
+    statsd,
+    api,
+    ThreadStats,
+)
+
+dogApiKey = os.environ['DOG_API_KEY']
+dogAppKey = os.environ['DOG_APP_KEY']
+
+initialize(**options)
+
+stats = ThreadStats()
+stats.start()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -93,6 +109,11 @@ def page_not_found(e):
 @app.route("/")
 def index():
     """Homepage."""
+
+    statsd.increment('page.views')
+
+    stats.increment('page.views')
+
     if current_user.is_authenticated:
         return redirect("gigs")
     else:
