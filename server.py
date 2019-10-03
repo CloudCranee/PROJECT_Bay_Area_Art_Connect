@@ -138,7 +138,7 @@ def page_not_found(e):
 
     print(r.status_code, r.reason)
 
-    flash("Error 404, page not found. Check: " + chk.status_code + ". Request: " + r.status_code)
+    flash("Error 404, page not found.")
 
     return render_template("homepage.html")
 
