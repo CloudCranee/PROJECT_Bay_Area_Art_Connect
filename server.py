@@ -53,6 +53,8 @@ from datadog import (
     ThreadStats,
 )
 
+from datadog.api.constants import CheckStatus
+
 dogApiKey = os.environ['DOG_API_KEY']
 dogAppKey = os.environ['DOG_APP_KEY']
 
@@ -110,6 +112,14 @@ def page_not_found(e):
     This 404 page also sends a POST request to DataDog
     to log an event every time a user encounters a 404 error"""
 
+    check = 'app.ok'
+    host = 'app1'
+    status = CheckStatus.OK  # equals 0
+    tags = ['env:test']
+
+    chk = api.ServiceCheck.check(check=check, host_name=host, status=status, message='Response: 200 OK', tags=tags)
+
+
     title = "A user encountered an error 404"
 
     if current_user.is_authenticated:    
@@ -127,8 +137,8 @@ def page_not_found(e):
     r = requests.post(url = url, data = {'title' : title, 'text' : text, 'tags' : tags }) 
 
     print(r.status_code, r.reason)
-    
-    flash("Error 404, page not found.")
+
+    flash("Error 404, page not found. Check: " + chk + ". Request: " + r)
 
     return render_template("homepage.html")
 
