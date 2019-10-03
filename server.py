@@ -2,6 +2,7 @@ from flask import (
     Flask,
     render_template,
     request,
+    request,
     jsonify,
     flash,
     redirect,
@@ -29,6 +30,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 import json
+import urllib.request
 import os
 import io
 import requests
@@ -104,19 +106,28 @@ def unauthorized_callback():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    """This is a custom 404 page."""
+    """This is a custom 404 page.
+    This 404 page also sends a POST request to DataDog
+    to log an event every time a user encounters a 404 error"""
 
     title = "A user encountered an error 404"
 
     if current_user.is_authenticated:    
         text = 'The user was logged in'
     else:
-        text = 'No user was logged in'
+        text = 'The user was NOT logged in'
 
     tags = ['Added:2019', 'application:webapp']
 
     api.Event.create(title=title, text=text, tags=tags)
 
+    url = "https://api.datadoghq.com/api/v1/events?api_key=" + dogApiKey + "&application_key=" + dogAppKey + "&datadog_site=com"
+      
+    # sending post request and saving response as response object 
+    r = requests.post(url = url, data = {'title' : title, 'text' : text, 'tags' : tags }) 
+
+    print(r.status_code, r.reason)
+    
     flash("Error 404, page not found.")
 
     return render_template("homepage.html")
